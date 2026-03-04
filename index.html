@@ -124,7 +124,7 @@
         <div id="result"></div>
     </div>
 <script>
-        const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbx1lVFyqLpkfWONFIt3_pVdlJFJjA6mA9s083gA1NUn9FXcg4_oNfkk4DqQ6Kajvz470A/exec";
+        const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbw4aBRw5cn3iUzLC_x_i9bE76nXkulIK14gmots-0ZP4cboqmsmRjoivi_bHMHdX8LErA/exec";
         async function calculateFinal() {
             const name = document.getElementById('student_name').value.trim();
             if (!name) { alert("Представьтесь, Локи следит за Вами!"); return; }
@@ -141,12 +141,16 @@
             if (!document.getElementById('q7_1').checked && document.getElementById('q7_2').checked && !document.getElementById('q7_3').checked && document.getElementById('q7_4').checked && !document.getElementById('q7_5').checked) score++;
             if (document.getElementById('q8').value == "1") score++;
             
-            try {
-                await fetch(GOOGLE_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ name: name, score: score, rank: "Кейс №1" }) });
+            ttry {
+                await fetch(GOOGLE_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify({ name: name, score: score, rank: "Кейс №1" })
+                });
                 document.getElementById('result').innerHTML = `ТОЧНОСТЬ: ${score} из 8<br>ДАННЫЕ ОТПРАВЛЕНЫ УЧИТЕЛЮ ХИМИИ.`;
-            } catch (e) { document.getElementById('result').innerHTML = `Ошибка резонанса. Балл: ${score}`; }
-            document.getElementById('btn').innerText = "ГОТОВО";
-        }
+            } catch (e) {
+                document.getElementById('result').innerHTML = `Ошибка! Балл: ${score}`;
+            }
     </script>
 </body>
 </html>
