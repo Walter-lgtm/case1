@@ -124,33 +124,61 @@
         <div id="result"></div>
     </div>
 <script>
+        // ТВОЙ АКТУАЛЬНЫЙ URL (Проверь его еще раз!)
         const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbw4aBRw5cn3iUzLC_x_i9bE76nXkulIK14gmots-0ZP4cboqmsmRjoivi_bHMHdX8LErA/exec";
+
         async function calculateFinal() {
-            const name = document.getElementById('student_name').value.trim();
-            if (!name) { alert("Представьтесь, Локи следит за Вами!"); return; }
-            document.getElementById('btn').disabled = true;
-            document.getElementById('btn').innerText = "СИНХРОНИЗАЦИЯ...";
-            let score = 0;
-            if (['q1_1','q1_2','q1_3','q1_4'].every(id => document.getElementById(id).value == "1")) score++;
-            if (document.getElementById('q2').value == "1") score++;
-            let q3v = document.getElementById('q3').value.toLowerCase();
-            if (q3v.includes("хлор")) score++;
-            if (['q4_1','q4_2','q4_3'].every(id => document.getElementById(id).value == "1")) score++;
-            if (['q5_1','q5_2'].every(id => document.getElementById(id).value == "1")) score++;
-            if (!document.getElementById('q6_1').checked && document.getElementById('q6_2').checked && document.getElementById('q6_3').checked && !document.getElementById('q6_4').checked && !document.getElementById('q6_5').checked && document.getElementById('q6_6').checked) score++;
-            if (!document.getElementById('q7_1').checked && document.getElementById('q7_2').checked && !document.getElementById('q7_3').checked && document.getElementById('q7_4').checked && !document.getElementById('q7_5').checked) score++;
-            if (document.getElementById('q8').value == "1") score++;
+            const nameInput = document.getElementById('student_name');
+            const btn = document.getElementById('btn');
+            const resultDiv = document.getElementById('result');
             
-            ttry {
+            const name = nameInput.value.trim();
+            if (!name) { 
+                alert("Локи требует Ваше имя, смертный!"); 
+                return; 
+            }
+
+            // Блокируем кнопку, чтобы не было дублей
+            btn.disabled = true;
+            btn.innerText = "СИНХРОНИЗАЦИЯ...";
+
+            let score = 0;
+            try {
+                // 1. Цепочка превращений
+                if (['q1_1','q1_2','q1_3','q1_4'].every(id => document.getElementById(id).value == "1")) score++;
+                // 2. Реакция с водой
+                if (document.getElementById('q2').value == "1") score++;
+                // 3. Неизвестное вещество X
+                let q3v = document.getElementById('q3').value.toLowerCase();
+                if (q3v.includes("хлор")) score++;
+                // 4. Продукты реакций
+                if (['q4_1','q4_2','q4_3'].every(id => document.getElementById(id).value == "1")) score++;
+                // 5. Схема синтеза
+                if (['q5_1','q5_2'].every(id => document.getElementById(id).value == "1")) score++;
+                // 6. Вытеснение водорода
+                if (!document.getElementById('q6_1').checked && document.getElementById('q6_2').checked && document.getElementById('q6_3').checked && !document.getElementById('q6_4').checked && !document.getElementById('q6_5').checked && document.getElementById('q6_6').checked) score++;
+                // 7. Запретные стадии
+                if (!document.getElementById('q7_1').checked && document.getElementById('q7_2').checked && !document.getElementById('q7_3').checked && document.getElementById('q7_4').checked && !document.getElementById('q7_5').checked) score++;
+                // 8. Образование щёлочи
+                if (document.getElementById('q8').value == "1") score++;
+
+                // ПАХТ-Отправка
                 await fetch(GOOGLE_URL, {
                     method: "POST",
                     mode: "no-cors",
+                    cache: "no-cache",
                     body: JSON.stringify({ name: name, score: score, rank: "Кейс №1" })
                 });
-                document.getElementById('result').innerHTML = `ТОЧНОСТЬ: ${score} из 8<br>ДАННЫЕ ОТПРАВЛЕНЫ УЧИТЕЛЮ ХИМИИ.`;
-            } catch (e) {
-                document.getElementById('result').innerHTML = `Ошибка! Балл: ${score}`;
+
+                resultDiv.innerHTML = `ТОЧНОСТЬ: ${score} из 8<br>ДАННЫЕ ОТПРАВЛЕНЫ УЧИТЕЛЮ ХИМИИ.`;
+                btn.innerText = "РЕАКЦИЯ ЗАВЕРШЕНА";
+            } catch (err) {
+                console.error(err);
+                resultDiv.innerHTML = `ОШИБКА РЕЗОНАНСА. Балл: ${score}`;
+                btn.disabled = false;
+                btn.innerText = "ПОПРОБОВАТЬ СНОВА";
             }
+        }
     </script>
 </body>
 </html>
