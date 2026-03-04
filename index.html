@@ -8,19 +8,25 @@
         :root { --main: #2ecc71; --bg: #0a0f0d; --card: #111; --border: #27ae60; }
         body { background: var(--bg); color: var(--main); font-family: 'Times New Roman', serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 10px; overflow-x: hidden; }
         .card { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 20px; box-shadow: 0 0 30px #2ecc7133; max-width: 600px; width: 100%; text-align: center; box-sizing: border-box; margin-bottom: 20px; }
+        
         h1 { font-size: 1.2rem; text-shadow: 0 0 10px var(--main); margin: 10px 0; line-height: 1.3; }
         .user-box { background: #0d1a12; padding: 12px; border-radius: 12px; border: 1px dashed var(--main); margin-bottom: 20px; }
         input[type="text"], select { background: #000; color: #fff; border: 1px solid var(--main); padding: 12px; width: 100%; border-radius: 8px; font-size: 1rem; box-sizing: border-box; margin: 5px 0; font-family: inherit; outline: none; }
+        
         .video-container { width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid #333; margin: 15px 0; background: #000; position: relative; padding-bottom: 56.25%; height: 0; }
         .video-container video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
         .task-block { background: #080808; border: 1px solid #222; padding: 15px; border-radius: 12px; margin-bottom: 15px; text-align: left; box-sizing: border-box; }
         .task-num { color: var(--main); font-weight: bold; font-size: 1.1rem; margin-bottom: 8px; display: block; border-bottom: 1px solid #333; padding-bottom: 5px; }
         .task-text { color: #fff; margin-bottom: 12px; display: block; font-size: 0.95rem; line-height: 1.4; }
+
         .check-grid { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
         .check-item { display: flex; align-items: center; background: #000; padding: 10px; border: 1px solid #1a1a1a; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
         input[type="checkbox"] { accent-color: var(--main); margin-right: 12px; transform: scale(1.3); }
+
         button { background: var(--border); color: #000; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 1.2rem; width: 100%; max-width: 350px; margin-top: 10px; transition: 0.4s; }
         button:hover:not(:disabled) { background: var(--main); box-shadow: 0 0 25px var(--main); }
+        button:disabled { background: #333; color: #666; }
         #result { margin-top: 20px; font-weight: bold; font-size: 1.2rem; color: #fff; text-shadow: 0 0 10px var(--main); text-align: center; }
         sub { font-size: 0.7em; vertical-align: sub; line-height: 0; }
     </style>
@@ -28,91 +34,121 @@
 <body>
     <div class="card">
         <h1>Генетическая связь между основными классами неорганических соединений</h1>
-        <div class="user-box"><input type="text" id="student_name" placeholder="Фамилия, Имя, Класс"></div>
+        <div class="user-box">
+            <input type="text" id="student_name" placeholder="Фамилия, Имя, Класс">
+        </div>
+
         <div class="video-container">
-            <video controls playsinline preload="metadata"><source src="video.mp4" type="video/mp4"></video>
+            <video controls><source src="video.mp4" type="video/mp4"></video>
         </div>
 
-        <!-- Задания 1-8 воссозданы в полной мере -->
+        <!-- №1 -->
         <div class="task-block">
-            <span class="task-num">№1</span><span class="task-text">Медь → Оксид → Соль → Основание</span>
-            <select id="q1_1"><option value="0">Металл...</option><option value="w">алюминий</option><option value="1">медь</option><option value="w">сера</option></select>
-            <select id="q1_2"><option value="0">Оксид...</option><option value="1">оксид меди (II)</option></select>
-            <select id="q1_3"><option value="0">Соль...</option><option value="1">сульфат меди (II)</option></select>
-            <select id="q1_4"><option value="0">Основание...</option><option value="1">гидроксид меди (II)</option></select>
+            <span class="task-num">№1. Цепочка превращений</span>
+            <span class="task-text">Металл → Оксид → Соль → Основание</span>
+            <select id="q1_1"><option value="0">выбор Металла...</option><option value="w">алюминий</option><option value="1">медь</option><option value="w">сера</option></select>
+            <select id="q1_2"><option value="0">выбор Оксида...</option><option value="w">оксид серы (IV)</option><option value="w">оксид алюминия</option><option value="1">оксид меди (II)</option></select>
+            <select id="q1_3"><option value="0">выбор Соли...</option><option value="w">гидроксид меди (II)</option><option value="w">серная кислота</option><option value="1">сульфат меди (II)</option><option value="w">гидроксид алюминия</option></select>
+            <select id="q1_4"><option value="0">выбор Основания...</option><option value="1">гидроксид меди (II)</option><option value="w">сульфат меди (II)</option><option value="w">гидроксид алюминия</option></select>
         </div>
 
-        <div class="task-block"><span class="task-num">№2</span><span class="task-text">Кислота из оксида + вода:</span>
-            <select id="q2"><option value="0">выбор...</option><option value="1">оксида серы (VI)</option><option value="w">оксида натрия</option></select>
+        <!-- №2 -->
+        <div class="task-block">
+            <span class="task-num">№2. Реакция с водой</span>
+            <span class="task-text">Кислота образуется при взаимодействии с водой:</span>
+            <select id="q2"><option value="0">выбор...</option><option value="1">оксида серы (VI)</option><option value="w">оксида углерода (II)</option><option value="w">оксида натрия</option><option value="w">оксида кремния (IV)</option></select>
         </div>
 
-        <div class="task-block"><span class="task-num">№3</span><span class="task-text">Cl<sub>2</sub> + H<sub>2</sub> → <b>X</b>:</span>
-            <input type="text" id="q3" placeholder="Название X...">
+        <!-- №3 -->
+        <div class="task-block">
+            <span class="task-num">№3. Неизвестное вещество</span>
+            <span class="task-text">Cl<sub>2</sub> + H<sub>2</sub> → <b>X</b> → CuCl<sub>2</sub>. Назовите <b>X</b>:</span>
+            <input type="text" id="q3" placeholder="Введите название...">
         </div>
 
-        <div class="task-block"><span class="task-num">№4</span><span class="task-text">HCl + AgNO<sub>3</sub>:</span>
-            <select id="q4_1"><option value="0">выбор...</option><option value="1">AgCl</option></select>
-            <span class="task-text" style="margin-top:10px;">HCl + Na<sub>2</sub>CO<sub>3</sub>:</span>
-            <select id="q4_2"><option value="1">CO<sub>2</sub> и H<sub>2</sub>O</option></select>
-            <span class="task-text" style="margin-top:10px;">Na<sub>2</sub>CO<sub>3</sub> + AgNO<sub>3</sub>:</span>
-            <select id="q4_3"><option value="1">Ag<sub>2</sub>CO<sub>3</sub></option></select>
+        <!-- №4 -->
+        <div class="task-block">
+            <span class="task-num">№4. Продукты реакций</span>
+            <span class="task-text">соляная кислота — нитрат серебра:</span>
+            <select id="q4_1"><option value="0">выбор...</option><option value="1">AgCl</option><option value="w">CO<sub>2</sub> и H<sub>2</sub>O</option><option value="w">Ag<sub>2</sub>CO<sub>3</sub></option></select>
+            <span class="task-text" style="margin-top:10px;">соляная кислота — карбонат натрия:</span>
+            <select id="q4_2"><option value="0">выбор...</option><option value="w">AgCl</option><option value="1">CO<sub>2</sub> и H<sub>2</sub>O</option><option value="w">Ag<sub>2</sub>CO<sub>3</sub></option></select>
+            <span class="task-text" style="margin-top:10px;">карбонат натрия — нитрат серебра:</span>
+            <select id="q4_3"><option value="0">выбор...</option><option value="w">AgCl</option><option value="w">CO<sub>2</sub> и H<sub>2</sub>O</option><option value="1">Ag<sub>2</sub>CO<sub>3</sub></option></select>
         </div>
 
-        <div class="task-block"><span class="task-num">№5</span><span class="task-text">KOH + <b>X</b> → К<sub>2</sub>СО<sub>3</sub>:</span>
-            <select id="q5_1"><option value="1">оксид углерода (IV)</option><option value="w">карбонат бария</option></select>
-            <span class="task-text" style="margin-top:10px;">Для получения KCl:</span>
-            <select id="q5_2"><option value="1">соляная кислота</option><option value="w">хлор</option></select>
+        <!-- №5 -->
+        <div class="task-block">
+            <span class="task-num">№5. Схема синтеза</span>
+            <span class="task-text">KOH + <b>X</b> → К<sub>2</sub>СО<sub>3</sub> + <b>Y</b> → КСl</span>
+            <span class="task-text">Вещество X:</span>
+            <select id="q5_1"><option value="0">выбор...</option><option value="1">оксид углерода (IV)</option><option value="w">оксид углерода (II)</option><option value="w">карбонат кальция</option><option value="w">карбонат бария</option></select>
+            <span class="task-text" style="margin-top:10px;">Вещество Y:</span>
+            <select id="q5_2"><option value="0">выбор...</option><option value="w">хлорид серебра</option><option value="w">хлор</option><option value="w">оксид хлора (I)</option><option value="1">соляная кислота</option></select>
         </div>
 
-        <div class="task-block"><span class="task-num">№6</span><span class="task-text">Вытесняют H<sub>2</sub> из H<sub>2</sub>SO<sub>4</sub>:</span>
+        <!-- №6 -->
+        <div class="task-block">
+            <span class="task-num">№6. Вытеснение водорода</span>
+            <span class="task-text">H<sub>2</sub>SO<sub>4</sub> → Н<sub>2</sub> можно осуществить с помощью:</span>
             <div class="check-grid">
-                <label class="check-item"><input type="checkbox" id="q6_2"> цинк</label>
-                <label class="check-item"><input type="checkbox" id="q6_3"> магний</label>
-                <label class="check-item"><input type="checkbox" id="q6_6"> железо</label>
+                <label class="check-item"><input type="checkbox" id="q6_1"> ртути</label>
+                <label class="check-item"><input type="checkbox" id="q6_2"> цинка</label>
+                <label class="check-item"><input type="checkbox" id="q6_3"> магния</label>
+                <label class="check-item"><input type="checkbox" id="q6_4"> кремния</label>
+                <label class="check-item"><input type="checkbox" id="q6_5"> свинца</label>
+                <label class="check-item"><input type="checkbox" id="q6_6"> железа</label>
             </div>
         </div>
 
-        <div class="task-block"><span class="task-num">№7</span><span class="task-text">НЕЛЬЗЯ в 1 стадию:</span>
+        <!-- №7 -->
+        <div class="task-block">
+            <span class="task-num">№7. Запретные стадии</span>
+            <span class="task-text">НЕЛЬЗЯ осуществить в одну стадию:</span>
             <div class="check-grid">
+                <label class="check-item"><input type="checkbox" id="q7_1"> MgO → Mg(NO<sub>3</sub>)<sub>2</sub></label>
                 <label class="check-item"><input type="checkbox" id="q7_2"> SiO<sub>2</sub> → H<sub>2</sub>SiO<sub>3</sub></label>
+                <label class="check-item"><input type="checkbox" id="q7_3"> SO<sub>3</sub> → H<sub>2</sub>SO<sub>4</sub></label>
                 <label class="check-item"><input type="checkbox" id="q7_4"> CuO → Cu(OH)<sub>2</sub></label>
+                <label class="check-item"><input type="checkbox" id="q7_5"> K<sub>2</sub>O → KOH</label>
             </div>
         </div>
 
-        <div class="task-block"><span class="task-num">№8</span><span class="task-text">Щёлочь из оксида + вода:</span>
-            <select id="q8"><option value="1">оксид кальция</option><option value="w">оксид железа (II)</option></select>
+        <!-- №8 -->
+        <div class="task-block">
+            <span class="task-num">№8. Образование щёлочи</span>
+            <span class="task-text">Щёлочь образуется при взаимодействии с водой:</span>
+            <select id="q8"><option value="0">выбор...</option><option value="w">оксид азота (II)</option><option value="w">оксид азота (IV)</option><option value="1">оксид кальция</option><option value="w">оксид железа (II)</option></select>
         </div>
 
-        <button id="btn" onclick="calculateFinal()">ЗАПУСТИТЬ РЕАКЦИЮ</button>
+        <button id="btn" onclick="calculateFinal()"
+
+>ЗАПУСТИТЬ РЕАКЦИЮ</button>
         <div id="result"></div>
     </div>
 
     <script>
-        // ТВОЙ ПОСЛЕДНИЙ URL ДЛЯ КЕЙСА №1
         const GOOGLE_URL = "https://script.google.com";
-
         async function calculateFinal() {
             const name = document.getElementById('student_name').value.trim();
-            if (!name) { alert("Представьтесь!"); return; }
+            if (!name) { alert("Представьтесь, Локи следит за Вами!"); return; }
             document.getElementById('btn').disabled = true;
-
+            document.getElementById('btn').innerText = "СИНХРОНИЗАЦИЯ...";
             let score = 0;
-            // Проверка (упрощенная для стабильности)
             if (['q1_1','q1_2','q1_3','q1_4'].every(id => document.getElementById(id).value == "1")) score++;
             if (document.getElementById('q2').value == "1") score++;
-            if (document.getElementById('q3').value.toLowerCase().includes("хлор")) score++;
+            let q3v = document.getElementById('q3').value.toLowerCase();
+            if (q3v.includes("хлор")) score++;
             if (['q4_1','q4_2','q4_3'].every(id => document.getElementById(id).value == "1")) score++;
             if (['q5_1','q5_2'].every(id => document.getElementById(id).value == "1")) score++;
-            if (document.getElementById('q6_2').checked && document.getElementById('q6_3').checked && document.getElementById('q6_6').checked) score++;
-            if (document.getElementById('q7_2').checked && document.getElementById('q7_4').checked) score++;
+            if (!document.getElementById('q6_1').checked && document.getElementById('q6_2').checked && document.getElementById('q6_3').checked && !document.getElementById('q6_4').checked && !document.getElementById('q6_5').checked && document.getElementById('q6_6').checked) score++;
+            if (!document.getElementById('q7_1').checked && document.getElementById('q7_2').checked && !document.getElementById('q7_3').checked && document.getElementById('q7_4').checked && !document.getElementById('q7_5').checked) score++;
             if (document.getElementById('q8').value == "1") score++;
-
+            
             try {
                 await fetch(GOOGLE_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ name: name, score: score, rank: "Кейс №1" }) });
                 document.getElementById('result').innerHTML = `ТОЧНОСТЬ: ${score} из 8<br>ДАННЫЕ ОТПРАВЛЕНЫ УЧИТЕЛЮ ХИМИИ.`;
-            } catch (e) {
-                document.getElementById('result').innerHTML = `Балл: ${score}. Ошибка сети.`;
-            }
+            } catch (e) { document.getElementById('result').innerHTML = `Ошибка резонанса. Балл: ${score}`; }
             document.getElementById('btn').innerText = "ГОТОВО";
         }
     </script>
