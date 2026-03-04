@@ -3,96 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>L & ⅂ | Генетическая связь (Кейс №1)</title>
+    <title>L & ⅂ | Генетическая связь</title>
     <style>
-        :root { --main: #
-
-2ecc71; --bg: #0a0f0d; --card: #111; }
+        :root { --main: #2ecc71; --bg: #0a0f0d; --card: #111; --border: #27ae60; }
         body { background: var(--bg); color: var(--main); font-family: 'Times New Roman', serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 10px; }
-        .card { background: var(--card); border: 1px solid #27ae60; padding: 20px; border-radius: 20px; box-shadow: 0 0 30px #2ecc7133; max-width: 800px; width: 95%; text-align: center; box-sizing: border-box; }
-        h1 { font-size: 1.5rem; text-shadow: 0 0 10px var(--main); margin: 10px 0; }
-        .user-box { background: #0d1a12; padding: 15px; border-radius: 10px; border: 1px dashed var(--main); margin-bottom: 20px; }
-        input[type="text"] { background: #000; color: #fff; border: 1px solid var(--main); padding: 10px; width: 90%; border-radius: 5px; text-align: center; }
+        .card { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 20px; box-shadow: 0 0 30px #2ecc7133; max-width: 800px; width: 100%; text-align: center; box-sizing: border-box; margin-bottom: 20px; }
         
-        .video-container { width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid #333; margin: 15px 0; background: #000; position: relative; padding-bottom: 56.25%; height: 0; }
-        .video-container video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .user-box { background: #0d1a12; padding: 15px; border-radius: 12px; border: 1px dashed var(--main); margin-bottom: 20px; }
+        input[type="text"], select { background: #000; color: #fff; border: 1px solid var(--main); padding: 12px; width: 100%; border-radius: 8px; font-size: 1rem; box-sizing: border-box; margin: 5px 0; font-family: inherit; }
         
-        h2 { color: #fff; border-bottom: 1px solid #27ae60; font-size: 1.1rem; text-align: left; margin: 20px 0 10px; }
-        .table-wrapper { width: 100%; overflow-x: auto; margin: 10px 0; display: block !important; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; background: #000; display: table !important; }
-        th, td { border: 1px solid #27ae60; padding: 8px; font-size: 0.85rem; text-align: left; color: #fff; }
-        th { color: var(--main); background: #0d1a12; text-align: center; }
-        
-        select, .text-ans { background: #000; color: var(--main); border: 1px solid var(--main); padding: 5px; width: 100%; border-radius: 4px; }
-        .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; text-align: left; padding: 5px; }
-        
-        button { background: #27ae60; color: #000; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1.1rem; width: 100%; max-width: 300px; margin-top: 20px; }
-        #result { margin-top: 15px; font-weight: bold; font-size: 1.2rem; color: #fff; text-shadow: 0 0 10px var(--main); }
+        .video-container { width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid #333; margin: 20px 0; background: #000; }
+        video { width: 100%; display: block; }
+
+        .task-block { background: #080808; border: 1px solid #222; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: left; transition: 0.3s; }
+        .task-block:hover { border-color: var(--main); }
+        .task-num { color: var(--main); font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; display: block; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .task-text { color: #fff; margin-bottom: 15px; display: block; font-size: 1rem; }
+
+        .check-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
+        .check-item { display: flex; align-items: center; background: #000; padding: 10px; border: 1px solid #1a1a1a; border-radius: 6px; cursor: pointer; }
+        input[type="checkbox"] { accent-color: var(--main); margin-right: 12px; transform: scale(1.3); }
+
+        button { background: var(--border); color: #000; border: none; padding: 20px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 1.2rem; width: 100%; max-width: 400px; margin-top: 20px; transition: 0.4s; }
+        button:hover:not(:disabled) { background: var(--main); box-shadow: 0 0 30px var(--main); transform: translateY(-2px); }
+        button:disabled { background: #333; color: #666; }
+        #result { margin-top: 20px; font-weight: bold; font-size: 1.4rem; color: #fff; text-shadow: 0 0 10px var(--main); }
     </style>
 </head>
 <body>
     <div class="card">
         <h1>L & ⅂ | Кейс №1: Генетическая связь</h1>
-        <div class="user-box"><input type="text" id="student_name" placeholder="Фамилия, Имя, Класс"></div>
+        <div class="user-box">
+            <input type="text" id="student_name" placeholder="Введите Фамилию, Имя, Класс">
+        </div>
 
-        <h2>1. Видеоурок (Liamelon School)</h2>
         <div class="video-container">
-            <!-- Проверь, что файл называется именно video.mp4 в той же папке -->
-            <video controls preload="metadata"><source src="video.mp4" type="video/mp4">Браузер не видит видео.</video>
+            <video controls><source src="video.mp4" type="video/mp4"></video>
         </div>
 
-        <h2>2. Испытание (8 заданий)</h2>
-        <div class="table-wrapper">
-            <table>
-                <tr><th style="width:30px;">№</th><th>Задание</th><th>Ответ</th></tr>
-                <tr><td>1</td><td>Цепочка: Медь → ? → ? → ?</td><td>
-                    <select id="q1_1"><option value="0">Оксид...</option><option value="1">Оксид меди (II)</option></select><br>
-                    <select id="q1_2" style="margin-top:5px;"><option value="0">Соль...</option><option value="1">Сульфат меди (II)</option></select><br>
-                    <select id="q1_3" style="margin-top:5px;"><option value="0">Основание...</option><option value="1">Гидроксид меди (II)</option></select>
-                </td></tr>
-                <tr><td>2</td><td>Кислота + вода:</td><td><select id="q2"><option value="0">выбор...</option><option value="1">оксид серы (VI)</option><option value="w">оксид натрия</option></select></td></tr>
-                <tr><td>3</td><td>X в Cl2 + H2 → X:</td><td><input type="text" id="q3" class="text-ans" placeholder="название..."></td></tr>
-                <tr><td>4</td><td>Продукты HCl+AgNO3:</td><td><select id="q4_1"><option value="0">выбор...</option><option value="1">AgCl</option><option value="w">CO2</option></select></td></tr>
-                <tr><td>5</td><td>KOH + X → К2СО3:</td><td>X: <select id="q5_1"><option value="1">оксид углерода (IV)</option><option value="w">хлор</option></select></td></tr>
-                <tr><td>6</td><td>Металлы к H2SO4:</td><td>
-                    <div class="check-grid">
-                        <label><input type="checkbox" id="q6_1"> Цинк</label>
-                        <label><input type="checkbox" id="q6_2"> Магний</label>
-                    </div>
-                </td></tr>
-                <tr><td>7</td><td>НЕЛЬЗЯ в 1 стадию:</td><td>
-                    <div class="check-grid">
-                        <label><input type="checkbox" id="q7_1"> SiO2 → H2SiO3</label>
-                        <label><input type="checkbox" id="q7_2"> CuO → Cu(OH)2</label>
-                    </div>
-                </td></tr>
-                <tr><td>8</td><td>Щёлочь + вода:</td><td><select id="q8"><option value="1">оксид кальция</option><option value="w">оксид железа</option></select></td></tr>
-            </table>
+        <!-- Задание 1 -->
+        <div class="task-block">
+            <span class="task-num">№1. Цепочка превращений</span>
+            <span class="task-text">Металл: <b>Медь</b> → Оксид → Соль → Основание</span>
+            <select id="q1_1"><option value="0">Выберите оксид...</option><option value="1">Оксид меди (II)</option><option value="w">Оксид алюминия</option></select>
+            <select id="q1_2"><option value="0">Выберите соль...</option><option value="1">Сульфат меди (II)</option><option value="w">Нитрат натрия</option></select>
+            <select id="q1_3"><option value="0">Выберите основание...</option><option value="1">Гидроксид меди (II)</option><option value="w">Гидроксид калия</option></select>
         </div>
+
+        <!-- Задание 2 -->
+        <div class="task-block">
+            <span class="task-num">№2. Реакция с водой</span>
+            <span class="task-text">Кислота образуется при взаимодействии с водой:</span>
+            <select id="q2"><option value="0">Выберите ответ...</option><option value="1">оксида серы (VI)</option><option value="w">оксида углерода (II)</option><option value="w">оксида натрия</option></select>
+        </div>
+
+        <!-- Задание 3 -->
+        <div class="task-block">
+            <span class="task-num">№3. Неизвестное вещество</span>
+            <span class="task-text">Цепочка: Cl<sub>2</sub> + H<sub>2</sub> → <b>X</b> → CuCl<sub>2</sub>. Назовите <b>X</b>:</span>
+            <input type="text" id="q3" placeholder="Введите название вещества">
+        </div>
+
+        <!-- Задание 4 -->
+        <div class="task-block">
+            <span class="task-num">№4. Продукты реакций</span>
+            <span class="task-text">HCl + AgNO<sub>3</sub> образует:</span>
+            <select id="q4_1"><option value="0">выбор...</option><option value="1">AgCl (осадок)</option><option value="w">Ag2O</option></select>
+            <span class="task-text" style="margin-top:10px;">HCl + Na<sub>2</sub>CO<sub>3</sub> образует:</span>
+            <select id="q4_2"><option value="0">выбор...</option><option value="1">CO2 и H2O</option><option value="w">H2</option></select>
+        </div>
+
+        <!-- Задание 5 -->
+        <div class="task-block">
+            <span class="task-num">№5. Схема синтеза</span>
+            <span class="task-text">KOH + <b>X</b> → К<sub>2</sub>СО<sub>3</sub></span>
+            <select id="q5_1"><option value="0">Что такое X?</option><option value="1">оксид углерода (IV)</option><option value="w">карбонат бария</option></select>
+        </div>
+
+        <!-- Задание 6 -->
+        <div class="task-block">
+            <span class="task-num">№6. Вытеснение водорода</span>
+            <span class="task-text">H<sub>2</sub>SO<sub>4</sub> → Н<sub>2</sub>. Выберите подходящие металлы:</span>
+            <div class="check-grid">
+                <label class="check-item"><input type="checkbox" id="q6_1"> Ртуть</label>
+                <label class="check-item"><input type="checkbox" id="q6_2"> Цинк</label>
+                <label class="check-item"><input type="checkbox" id="q6_3"> Магний</label>
+                <label class="check-item"><input type="checkbox" id="q6_4"> Железо</label>
+            </div>
+        </div>
+
+        <!-- Задание 7 -->
+        <div class="task-block">
+            <span class="task-num">№7. Сложные превращения</span>
+            <span class="task-text">Выберите превращения, которые НЕЛЬЗЯ сделать в 1 стадию:</span>
+            <div class="check-grid">
+                <label class="check-item"><input type="checkbox" id="q7_1"> SiO2 → H2SiO3</label>
+                <label class="check-item"><input type="checkbox" id="q7_2"> CuO → Cu(OH)2</label>
+                <label class="check-item"><input type="checkbox" id="q7_3"> K2O → KOH</label>
+            </div>
+        </div>
+
+        <!-- Задание 8 -->
+        <div class="task-block">
+            <span class="task-num">№8. Образование щёлочи</span>
+            <span class="task-text">Щёлочь образуется при реакции с водой:</span>
+            <select id="q8"><option value="0">выбор...</option><option value="1">оксид кальция</option><option value="w">оксид железа (II)</option></select>
+        </div>
+
         <button id="btn" onclick="calculateFinal()">ЗАПУСТИТЬ РЕАКЦИЮ</button>
         <div id="result"></div>
+        <p style="font-size: 0.8rem; color: #444; margin-top: 20px;">L & ⅂ Digital Education | Universal Science</p>
     </div>
 
     <script>
         const GOOGLE_URL = "https://script.google.com";
         async function calculateFinal() {
             const name = document.getElementById('student_name').value.trim();
-            if (!name) { alert("Представьтесь!"); return; }
+            if (!name) { alert("Представьтесь, смертный!"); return; }
             document.getElementById('btn').disabled = true;
             let score = 0;
             if (['q1_1','q1_2','q1_3'].every(id => document.getElementById(id).value == "1")) score++;
             if (document.getElementById('q2').value == "1") score++;
-            if (document.getElementById('q3').value.toLowerCase().includes("хлор")) score++;
-            if (document.getElementById('q4_1').value == "1") score++;
+            let q3v = document.getElementById('q3').value.toLowerCase();
+            if (q3v.includes("хлор")) score++;
+            if (['q4_1','q4_2'].every(id => document.getElementById(id).value == "1")) score++;
             if (document.getElementById('q5_1').value == "1") score++;
-            if (document.getElementById('q6_1').checked && document.getElementById('q6_2').checked) score++;
-            if (document.getElementById('q7_1').checked && document.getElementById('q7_2').checked) score++;
+            if (!document.getElementById('q6_1').checked && document.getElementById('q6_2').checked && document.getElementById('q6_3').checked && document.getElementById('q6_4').checked) score++;
+            if (document.getElementById('q7_1').checked && document.getElementById('q7_2').checked && !document.getElementById('q7_3').checked) score++;
             if (document.getElementById('q8').value == "1") score++;
 
             try {
                 await fetch(GOOGLE_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ name: name, score: score, rank: "Кейс №1" }) });
                 document.getElementById('result').innerHTML = `ТОЧНОСТЬ: ${score} из 8<br>ДАННЫЕ ОТПРАВЛЕНЫ УЧИТЕЛЮ ХИМИИ.`;
-            } catch (e) { document.getElementById('result').innerHTML = `Ошибка! Балл: ${score}`; }
+            } catch (e) { document.getElementById('result').innerHTML = `Балл: ${score}`; }
             document.getElementById('btn').innerText = "ГОТОВО";
         }
     </script>
