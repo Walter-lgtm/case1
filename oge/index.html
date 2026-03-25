@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OGE-SCANNER | PRO</title>
+    <style>
+        :root { --accent: #58a6ff; --bg: #0d1117; --panel: #161b22; --border: #30363d; }
+        body { background: var(--bg); color: #c9d1d9; font-family: -apple-system, sans-serif; display: flex; justify-content: center; padding: 20px; margin: 0; }
+        .container { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 25px; width: 100%; max-width: 450px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+        h2 { color: var(--accent); text-align: center; letter-spacing: 1px; margin-bottom: 20px; }
+        .field-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: #8b949e; }
+        input, select { width: 100%; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: #fff; border-radius: 6px; box-sizing: border-box; }
+        .grid-inputs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 20px; }
+        .grid-inputs input { text-align: center; }
+        button { width: 100%; padding: 15px; background: #238636; border: none; color: #fff; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 20px; transition: 0.2s; }
+        button:hover { background: #2ea043; }
+        #log { margin-top: 20px; padding: 15px; border-radius: 6px; display: none; text-align: center; border: 1px solid var(--accent); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>SYSTEM SCANNER</h2>
+    <div class="field-group">
+        <label>ФИО Участника</label>
+        <input type="text" id="fio" placeholder="Введите фамилию и имя">
+    </div>
+    <div class="field-group">
+        <label>Вариант КИМ</label>
+        <select id="variant">
+            <option value="1">Вариант №1</option>
+            <option value="2">Вариант №2</option>
+        </select>
+    </div>
+    <div class="grid-inputs" id="answersGrid"></div>
+    <button onclick="processData()">ПОЛУЧИТЬ РЕЗУЛЬТАТ</button>
+    <div id="log"></div>
+</div>
+
+<script>
+    const keys = {
+        "1": ["25","166","312","211","25","24","23","12","214","423","25","412","45","35","211","123","334","13.9","21.6"],
+        "2": ["23","41","132","431","34","13","15","13","231","341","24","141","35","14","221","34","223","34.8","0.17"]
+    };
+
+    const grid = document.getElementById('answersGrid');
+    for(let i=1; i<=19; i++) {
+        grid.innerHTML += `<input type="text" id="q${i}" placeholder="${i}">`;
+    }
+
+    async function processData() {
+        const fio = document.getElementById('fio').value;
+        const variant = document.getElementById('variant').value;
+        let score = 0;
+        
+        keys[variant].forEach((key, i) => {
+            if(document.getElementById(`q${i+1}`).value.trim() === key) score++;
+        });
+
+        let grade = score < 9 ? 2 : score < 14 ? 3 : score < 18 ? 4 : 5;
+        
+        const log = document.getElementById('log');
+        log.style.display = 'block';
+        log.innerHTML = `Баллы: ${score} | Оценка: ${grade}`;
+
+        // Отправка в Google Таблицу
+        const webAppUrl = 'https://script.google.com/macros/s/AKfycbyryV4AZdx1hgwf8QCjjNCadjpPKcoQ8xPew3u86s17dAIttjQF7_WJbhuKsEk_hdkP/exec'; 
+        const data = { fio, variant, score, grade, date: new Date().toLocaleString() };
+        
+        fetch(webAppUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify(data)
+        });
+    }
+</script>
+</body>
+</html>
