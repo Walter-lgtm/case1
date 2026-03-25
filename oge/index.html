@@ -2,22 +2,73 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>OGE-SCANNER | Professional Edition</title>
+    <!-- Тот самый тег для масштабируемости на смартфонах -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OGE-SCANNER | PRO Mobile</title>
     <style>
         :root { --accent: #58a6ff; --bg: #0d1117; --panel: #161b22; --border: #30363d; --success: #238636; }
-        body { background: var(--bg); color: #c9d1d9; font-family: -apple-system, sans-serif; display: flex; justify-content: center; padding: 20px; }
-        .container { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 25px; width: 100%; max-width: 500px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
-        h2 { color: var(--accent); text-align: center; margin-bottom: 20px; text-transform: uppercase; font-size: 1.2rem; }
-        .field-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-size: 0.85rem; color: #8b949e; }
-        input, select { width: 100%; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: #fff; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
-        .grid-inputs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; border-top: 1px solid var(--border); padding-top: 20px; }
-        .grid-inputs input { text-align: center; padding: 8px; }
-        .part2-box { background: rgba(88, 166, 255, 0.05); border: 1px dashed var(--accent); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        button { width: 100%; padding: 15px; background: var(--success); border: none; color: #fff; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s; font-size: 1rem; }
-        button:hover { background: #2ea043; transform: translateY(-1px); }
-        #log { margin-top: 20px; padding: 15px; border-radius: 6px; display: none; background: #0d1117; border: 1px solid var(--accent); }
-        .total-score { font-size: 1.4rem; color: var(--accent); font-weight: bold; text-align: center; }
+        
+        /* Адаптивный фон и шрифты */
+        body { 
+            background: var(--bg); 
+            color: #c9d1d9; 
+            font-family: -apple-system, system-ui, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            padding: 10px; /* Меньше отступ на мобиле */
+            margin: 0; 
+        }
+
+        .container { 
+            background: var(--panel); 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            padding: 20px; 
+            width: 100%; 
+            max-width: 500px; /* Ширина на десктопе */
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            box-sizing: border-box; 
+        }
+
+        h2 { color: var(--accent); text-align: center; font-size: 1.1rem; margin-bottom: 15px; }
+
+        input, select { 
+            width: 100%; 
+            padding: 12px; /* Удобнее тыкать пальцем */
+            background: var(--bg); 
+            border: 1px solid var(--border); 
+            color: #fff; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            font-size: 16px; /* Чтобы iOS не зумил поле при вводе */
+        }
+
+        /* Умная сетка: 4 колонки на ПК, 3 или 2 на мобиле */
+        .grid-inputs { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); 
+            gap: 8px; 
+            margin: 15px 0; 
+            border-top: 1px solid var(--border); 
+            padding-top: 15px; 
+        }
+
+        .grid-inputs div { display: flex; flex-direction: column; align-items: center; }
+        .grid-inputs label { font-size: 0.7rem; margin-bottom: 3px; color: #8b949e; }
+        .grid-inputs input { text-align: center; padding: 8px 2px; }
+
+        button { 
+            width: 100%; 
+            padding: 16px; 
+            background: var(--success); 
+            border: none; 
+            color: #fff; 
+            font-weight: bold; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 1rem; 
+            -webkit-appearance: none; /* Убирает дефолтные стили Сафари */
+        }
     </style>
 </head>
 <body>
