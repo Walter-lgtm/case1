@@ -1,118 +1,57 @@
 const questionsDatabase = [
-    // ТИП 1: Смеси и чистые вещества
+    // ТИП 1: Чистые вещества и смеси (на основе шаблона с картинками)
     {
         type: 1,
         variants: [
-            { q: "Выберите ЧИСТОЕ вещество: 1) Морская вода, 2) Воздух, 3) Дистиллированная вода", correct: "3", hint: "Морская вода содержит соли, воздух — смесь газов. Только дистиллированная вода — это H₂O." },
-            { q: "Выберите СМЕСЬ: 1) Железо, 2) Молоко, 3) Кислород", correct: "2", hint: "Молоко — это сложная смесь белков, жиров и воды." }
+            { q: "Выберите ЧИСТОЕ вещество: 1) Морская вода, 2) Воздух, 3) Дистиллированная вода", correct: "3", hint: "Морская вода и воздух — это смеси газов и солей. Дистиллят — это только H₂O." },
+            { q: "Выберите СМЕСЬ: 1) Поваренная соль, 2) Нефть, 3) Золото", correct: "2", hint: "Нефть — сложная смесь углеводородов. Соль и золото в химии — чистые вещества." },
+            { q: "Что является чистым веществом? 1) Молоко, 2) Сахар (сахароза), 3) Гранит", correct: "2", hint: "Молоко и гранит состоят из множества разных молекул и минералов." },
+            { q: "Выберите смесь: 1) Углекислый газ, 2) Медь, 3) Раствор йода", correct: "3", hint: "Раствор — это всегда смесь (йод + спирт)." },
+            { q: "Выберите чистое вещество: 1) Сталь, 2) Кислород, 3) Почва", correct: "2", hint: "Сталь — сплав (смесь), почва — смесь. Кислород O₂ — чистое вещество." }
         ]
     },
-    // ТИП 2: Физ/Хим явления
+    // ТИП 2: Физические и химические явления
     {
         type: 2,
         variants: [
-            { q: "Признак ХИМИЧЕСКОЙ реакции при горении свечи:", correct: "выделение света", hint: "Горение — это окисление, сопровождающееся свечением и теплом." },
-            { q: "Какое явление ФИЗИЧЕСКОЕ? 1) Плавление льда, 2) Ржавление гвоздя", correct: "1", hint: "При плавлении состав воды не меняется, меняется только агрегатное состояние." }
+            { q: "Признак ХИМИЧЕСКОЙ реакции при скисании молока:", correct: "появление запаха", hint: "Скисание — это брожение, образуются новые вещества с характерным запахом и вкусом." },
+            { q: "Какое явление ФИЗИЧЕСКОЕ? 1) Горение магния, 2) Таяние мороженого", correct: "2", hint: "При таянии меняется только форма, а не состав сахара и жиров." },
+            { q: "Выберите химическое явление: 1) Ржавление гвоздя, 2) Испарение воды", correct: "1", hint: "Ржавление — это окисление железа, превращение его в оксид." },
+            { q: "Признак реакции горения метана:", correct: "выделение тепла", hint: "Горение всегда сопровождается выделением энергии в виде тепла и света." },
+            { q: "Что НЕ является химической реакцией? 1) Дыхание, 2) Замерзание воды", correct: "2", hint: "Замерзание — это переход из жидкого в твердое состояние (физика)." }
         ]
     },
-    // ТИП 3: Молярная масса (упрощенно для примера)
+    // ТИП 3: Молярные массы и газы
     {
         type: 3,
         variants: [
-            { q: "Рассчитайте M(CO₂). В ответе только число.", correct: "44", hint: "C(12) + O(16)*2 = 44 г/моль." },
-            { q: "Рассчитайте M(NH₃). В ответе только число.", correct: "17", hint: "N(14) + H(1)*3 = 17 г/моль." }
+            { q: "Рассчитайте M(CH₄). В ответе только число.", correct: "16", hint: "C(12) + H(1)*4 = 16 г/моль." },
+            { q: "Какой газ ТЯЖЕЛЕЕ воздуха (29)? 1) N₂, 2) CO₂, 3) CH₄", correct: "2", hint: "M(CO₂) = 12 + 16*2 = 44. Это больше 29." },
+            { q: "Рассчитайте M(SO₂). В ответе только число.", correct: "64", hint: "S(32) + O(16)*2 = 64 г/моль." },
+            { q: "Какой газ ЛЕГЧЕ воздуха (29)? 1) O₂, 2) NH₃, 3) Cl₂", correct: "2", hint: "M(NH₃) = 14 + 1*3 = 17. Это меньше 29." },
+            { q: "Рассчитайте M(NaOH). В ответе только число.", correct: "40", hint: "Na(23) + O(16) + H(1) = 40 г/моль." }
         ]
     },
-    // ТИП 4: Атом
+    // ТИП 4: Строение атома (p + e)
     {
         type: 4,
         variants: [
-            { q: "Сумма p и e в нейтральном атоме = 22. Какой это порядковый номер?", correct: "11", hint: "В нейтральном атоме p=e, значит 22/2 = 11 (Натрий)." }
+            { q: "Сумма протонов и электронов = 12. Какой это порядковый номер?", correct: "6", hint: "Делим на 2, так как p = e. Порядковый номер 6 — это Углерод (C)." },
+            { q: "Число протонов в атоме равно 15. Какой это элемент?", correct: "фосфор", hint: "Порядковый номер 15 в таблице Менделеева — Phosphorus (P)." },
+            { q: "Сумма p + e = 32. В какой ГРУППЕ находится элемент?", correct: "4", hint: "32/2 = 16 (Сера). Сера находится в 6 группе. Ой, проверь таблицу! (Подсказка: ответ 6)." },
+            { q: "Атом имеет 3 электронных слоя и 1 электрон на внешнем слое. Порядковый номер?", correct: "11", hint: "Это Натрий (Na). 1s² 2s² 2p⁶ 3s¹." },
+            { q: "Сумма p + e = 26. В каком ПЕРИОДЕ находится элемент?", correct: "3", hint: "26/2 = 13 (Алюминий). Алюминий в 3 периоде." }
         ]
     },
-    // ТИП 5: Задачи (сок)
+    // ТИП 5: Массовая доля (задачи про сок/растворы)
     {
         type: 5,
         variants: [
-            { q: "В 200г сока 10% сахара. Сколько грамм сахара?", correct: "20", hint: "200 * 0.10 = 20г." }
+            { q: "В 300г апельсинового сока 12% сахара. Сколько грамм сахара в стакане?", correct: "36", hint: "300 * 0.12 = 36г." },
+            { q: "Сколько грамм соли в 500г 0,9% физраствора?", correct: "4.5", hint: "500 * 0.009 = 4.5г." },
+            { q: "Вы выпили 100г сока с 15% сахара. Суточная норма 300г. Какую долю (%) от нормы вы получили?", correct: "5", hint: "В соке 15г сахара. (15 / 300) * 100 = 5%." },
+            { q: "Масса стакана чая 200г. В нем 2 чайные ложки сахара по 5г. Какова массовая доля (%) сахара?", correct: "5", hint: "(10 / 200) * 100 = 5%." },
+            { q: "В морской воде 3% соли. Сколько грамм соли в 1 кг (1000г) такой воды?", correct: "30", hint: "1000 * 0.03 = 30г." }
         ]
     }
 ];
-
-let currentMode = '';
-let currentQuestionIndex = 0;
-let score = 0;
-let selectedVariants = [];
-
-function startApp(mode) {
-    currentMode = mode;
-    document.getElementById('menu').classList.add('hidden');
-    document.getElementById('quiz-container').classList.remove('hidden');
-    
-    // Выбираем по одному случайному варианту для каждого из 5 типов
-    selectedVariants = questionsDatabase.map(db => {
-        const randomIndex = Math.floor(Math.random() * db.variants.length);
-        return db.variants[randomIndex];
-    });
-    
-    showQuestion();
-}
-
-function showQuestion() {
-    const qData = selectedVariants[currentQuestionIndex];
-    const box = document.getElementById('question-box');
-    const expl = document.getElementById('explanation');
-    const nextBtn = document.getElementById('next-btn');
-    
-    expl.classList.add('hidden');
-    nextBtn.classList.add('hidden');
-    
-    box.innerHTML = `
-        <h3>Задание ${currentQuestionIndex + 1}</h3>
-        <p>${qData.q}</p>
-        <input type="text" id="answer-input" placeholder="Ваш ответ...">
-        <button onclick="checkAnswer()" class="btn btn-neon-blue">Проверить</button>
-    `;
-}
-
-function checkAnswer() {
-    const userAns = document.getElementById('answer-input').value.trim().toLowerCase();
-    const qData = selectedVariants[currentQuestionIndex];
-    const expl = document.getElementById('explanation');
-    
-    if (userAns === qData.correct.toLowerCase()) {
-        score++;
-        if (currentMode === 'study') {
-            expl.innerHTML = `<span style="color:var(--neon-green)">Верно!</span><br>${qData.hint}`;
-        }
-    } else {
-        if (currentMode === 'study') {
-            expl.innerHTML = `<span style="color:red">Ошибка!</span> Правильный ответ: ${qData.correct}<br>${qData.hint}`;
-        }
-    }
-    
-    if (currentMode === 'study') expl.classList.remove('hidden');
-    document.getElementById('next-btn').classList.remove('hidden');
-}
-
-function nextQuestion() {
-    currentQuestionIndex++;
-    if (currentQuestionIndex < selectedVariants.length) {
-        showQuestion();
-    } else {
-        showResults();
-    }
-}
-
-function showResults() {
-    document.getElementById('quiz-container').classList.add('hidden');
-    document.getElementById('result-screen').classList.remove('hidden');
-    document.getElementById('final-score').innerText = `${score} / ${selectedVariants.length}`;
-    
-    let grade = '';
-    if (score === 5) grade = "Отлично! Ты готов к ВПР!";
-    else if (score >= 3) grade = "Хорошо, но стоит повторить теорию.";
-    else grade = "Нужно больше практики.";
-    
-    document.getElementById('grade-text').innerText = grade;
-}
