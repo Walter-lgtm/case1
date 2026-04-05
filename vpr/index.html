@@ -2,42 +2,195 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VPR-TRAINER 8.0 | Carbon & Neon</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VPR-TRAINER 8.0</title>
+    <style>
+        :root {
+            --bg-color: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --neon-blue: #00f2ff;
+            --neon-green: #39ff14;
+            --text-color: #e0e0e0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 15px;
+            margin: 0;
+            touch-action: manipulation;
+        }
+
+        .container { width: 100%; max-width: 500px; text-align: center; }
+        
+        .neon-text { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
+        .neon-green { color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green); }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px 0;
+            margin: 10px 0;
+            border: 2px solid var(--neon-blue);
+            background: transparent;
+            color: var(--neon-blue);
+            border-radius: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .btn-green { border-color: var(--neon-green); color: var(--neon-green); }
+        
+        .hidden { display: none; }
+        
+        input {
+            width: 90%;
+            background: #222;
+            border: 1px solid var(--neon-blue);
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 16px;
+        }
+
+        .explanation {
+            text-align: left;
+            font-size: 0.9rem;
+            border-left: 3px solid var(--neon-blue);
+            padding-left: 10px;
+            margin-top: 15px;
+            background: #112;
+        }
+    </style>
 </head>
 <body>
+
     <div class="container">
-        <header>
-            <h1>VPR-TRAINER <span class="neon-text">8.0</span></h1>
-            <p class="subtitle">Химия 8 класс | Часть 1</p>
+        <header id="main-header">
+            <h1>VPR <span class="neon-text">8.0</span></h1>
+            <p>Химия | Первая часть</p>
         </header>
 
+        <!-- МЕНЮ -->
         <div id="menu" class="card">
-            <button onclick="startApp('study')" class="btn btn-neon-blue">Режим Обучения</button>
-            <button onclick="startApp('test')" class="btn btn-neon-green">Режим Зачета</button>
+            <button class="btn" id="btn-study">Режим Обучения</button>
+            <button class="btn btn-green" id="btn-test">Режим Зачета</button>
         </div>
 
+        <!-- ИГРОВАЯ ЗОНА -->
         <div id="quiz-container" class="hidden">
-            <div class="stats">
-                <span id="progress">Вопрос 1 из 5</span>
-                <span id="score" class="hidden">Баллы: 0</span>
+            <div id="progress" style="margin-bottom: 10px; font-size: 0.8rem;"></div>
+            <div id="question-card" class="card">
+                <div id="q-text"></div>
+                <input type="text" id="ans-input" placeholder="Ответ..." autocomplete="off">
+                <button class="btn" id="btn-check">Проверить</button>
             </div>
-            <div id="question-box" class="card">
-                <!-- Сюда скрипт вставит контент -->
-            </div>
-            <div id="explanation" class="card explanation hidden"></div>
-            <button id="next-btn" onclick="nextQuestion()" class="btn btn-next hidden">Далее</button>
-            <button onclick="location.reload()" class="btn btn-exit">В меню</button>
+            <div id="expl-box" class="card explanation hidden"></div>
+            <button class="btn hidden" id="btn-next">Далее</button>
         </div>
 
-        <div id="result-screen" class="card hidden">
-            <h2>Результат</h2>
-            <div id="final-score" class="neon-text-big">0/10</div>
-            <p id="grade-text"></p>
-            <button onclick="location.reload()" class="btn btn-neon-blue">Повторить</button>
+        <!-- РЕЗУЛЬТАТ -->
+        <div id="result-screen" class="hidden">
+            <div class="card">
+                <h2>Итог</h2>
+                <div id="final-score" style="font-size: 3rem;" class="neon-green">0/5</div>
+                <p id="grade-text"></p>
+                <button class="btn" onclick="location.reload()">В меню</button>
+            </div>
         </div>
     </div>
-    <script src="script.js"></script>
+
+    <script>
+        // БАЗА ДАННЫХ
+        const db = [
+            { type: 1, variants: [{q: "Чистое вещество: 1) Соль, 2) Воздух, 3) Кофе", a: "1", h: "Воздух и кофе - смеси."}, {q: "Смесь: 1) Медь, 2) Нефть, 3) Вода", a: "2", h: "Нефть состоит из разных углеводородов."}]},
+            { type: 2, variants: [{q: "Физ. явление: 1) Горение, 2) Плавление льда", a: "2", h: "Состав воды не меняется."}, {q: "Хим. явление: 1) Ржавление, 2) Испарение", a: "1", h: "Образуется новое вещество - оксид."}]},
+            { type: 3, variants: [{q: "M(CO2) в г/моль (число):", a: "44", h: "12 + 16*2 = 44"}, {q: "M(CH4) в г/моль (число):", a: "16", h: "12 + 1*4 = 16"}]},
+            { type: 4, variants: [{q: "Сумма p + e = 22. Порядковый номер?", a: "11", h: "22 / 2 = 11 (Натрий)."}, {q: "Сумма p + e = 16. Порядковый номер?", a: "8", h: "16 / 2 = 8 (Кислород)."}]},
+            { type: 5, variants: [{q: "В 200г сока 10% сахара. Сколько грамм сахара?", a: "20", h: "200 * 0.1 = 20"}, {q: "В 300г воды 3% соли. Сколько грамм соли?", a: "9", h: "300 * 0.03 = 9"}]}
+        ];
+
+        let mode = '';
+        let currentIdx = 0;
+        let score = 0;
+        let sessionData = [];
+
+        // ЭЛЕМЕНТЫ
+        const menu = document.getElementById('menu');
+        const quiz = document.getElementById('quiz-container');
+        const res = document.getElementById('result-screen');
+        const qText = document.getElementById('q-text');
+        const input = document.getElementById('ans-input');
+        const expl = document.getElementById('expl-box');
+        const nextBtn = document.getElementById('btn-next');
+
+        // ЗАПУСК
+        function start(m) {
+            mode = m;
+            menu.classList.add('hidden');
+            quiz.classList.remove('hidden');
+            sessionData = db.map(item => item.variants[Math.floor(Math.random() * item.variants.length)]);
+            showQ();
+        }
+
+        function showQ() {
+            const data = sessionData[currentIdx];
+            document.getElementById('progress').innerText = `Вопрос ${currentIdx + 1} из 5`;
+            qText.innerText = data.q;
+            input.value = '';
+            expl.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+            document.getElementById('btn-check').classList.remove('hidden');
+        }
+
+        function check() {
+            const data = sessionData[currentIdx];
+            const userAns = input.value.trim().toLowerCase();
+            const isRight = userAns === data.a.toLowerCase();
+
+            if (isRight) score++;
+
+            if (mode === 'study') {
+                expl.classList.remove('hidden');
+                expl.innerHTML = isRight ? `<b class="neon-green">Верно!</b><br>${data.h}` : `<b style="color:red">Ошибка!</b> Ответ: ${data.a}<br>${data.h}`;
+            }
+
+            document.getElementById('btn-check').classList.add('hidden');
+            nextBtn.classList.remove('hidden');
+        }
+
+        // ПРИВЯЗКА СОБЫТИЙ (надежный способ для мобилок)
+        document.getElementById('btn-study').onclick = () => start('study');
+        document.getElementById('btn-test').onclick = () => start('test');
+        document.getElementById('btn-check').onclick = check;
+        nextBtn.onclick = () => {
+            currentIdx++;
+            if (currentIdx < 5) showQ();
+            else {
+                quiz.classList.add('hidden');
+                res.classList.remove('hidden');
+                document.getElementById('final-score').innerText = `${score}/5`;
+                document.getElementById('grade-text').innerText = score > 3 ? "Круто! Ты готов к ВПР." : "Надо подтянуться.";
+            }
+        };
+
+        // Чтобы скрипт не спал
+        console.log("System Ready");
+    </script>
 </body>
 </html>
