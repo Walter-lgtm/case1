@@ -3,64 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VPR-8 TRAINER | Carbon & Neon</title>
-    <style>
-        :root { --accent: #00f2ff; --bg: #0a0c10; --panel: #1a1d23; --border: #30363d; }
-        body { background: var(--bg); color: #e6edf3; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding: 20px; margin: 0; }
-        .trainer-card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 25px; width: 100%; max-width: 600px; box-shadow: 0 0 20px rgba(0,242,255,0.1); }
-        h2 { color: var(--accent); font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; border-left: 4px solid var(--accent); padding-left: 15px; }
-        .image-container { display: flex; justify-content: space-around; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .img-item { text-align: center; background: #fff; padding: 10px; border-radius: 8px; flex: 1; min-width: 150px; }
-        .img-item img { max-width: 100%; height: auto; border-radius: 4px; }
-        .img-label { color: #000; font-weight: bold; margin-top: 5px; display: block; }
-        .question-text { margin-bottom: 20px; line-height: 1.5; font-size: 1.1rem; }
-        input { width: 100%; padding: 12px; background: #0d1117; border: 1px solid var(--border); color: #fff; border-radius: 8px; margin-bottom: 15px; font-size: 1rem; }
-        button { width: 100%; padding: 15px; background: var(--accent); border: none; color: #0a0c10; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.3s; }
-        button:hover { box-shadow: 0 0 15px var(--accent); transform: translateY(-2px); }
-        #feedback { margin-top: 20px; padding: 15px; border-radius: 8px; display: none; text-align: center; font-weight: bold; }
-        .correct { background: rgba(35, 134, 54, 0.2); color: #3fb950; border: 1px solid #3fb950; }
-        .wrong { background: rgba(248, 81, 70, 0.2); color: #f85149; border: 1px solid #f85149; }
-    </style>
+    <title>VPR-TRAINER 8.0 | Carbon & Neon</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="trainer-card">
-    <h2>Задание 1.1</h2>
-    <div class="question-text">Внимательно рассмотрите предложенные рисунки. Укажите номер рисунка, на котором изображён объект, содержащий только одно (индивидуальное) химическое вещество.</div>
-    
-    <div class="image-container">
-        <div class="img-item">
-            <img src="https://ibb.co" alt="Рис 1">
-            <span class="img-label">Рис. 1</span>
+    <div class="container">
+        <header>
+            <h1>VPR-TRAINER <span class="neon-text">8.0</span></h1>
+            <p class="subtitle">Химия 8 класс | Часть 1</p>
+        </header>
+
+        <div id="menu" class="card">
+            <button onclick="startApp('study')" class="btn btn-neon-blue">Режим Обучения</button>
+            <button onclick="startApp('test')" class="btn btn-neon-green">Режим Зачета</button>
         </div>
-        <div class="img-item">
-            <img src="https://ibb.co" alt="Рис 2">
-            <span class="img-label">Рис. 2</span>
+
+        <div id="quiz-container" class="hidden">
+            <div class="stats">
+                <span id="progress">Вопрос 1 из 5</span>
+                <span id="score" class="hidden">Баллы: 0</span>
+            </div>
+            <div id="question-box" class="card">
+                <!-- Сюда скрипт вставит контент -->
+            </div>
+            <div id="explanation" class="card explanation hidden"></div>
+            <button id="next-btn" onclick="nextQuestion()" class="btn btn-next hidden">Далее</button>
+            <button onclick="location.reload()" class="btn btn-exit">В меню</button>
         </div>
-        <div class="img-item">
-            <img src="https://ibb.co" alt="Рис 3">
-            <span class="img-label">Рис. 3</span>
+
+        <div id="result-screen" class="card hidden">
+            <h2>Результат</h2>
+            <div id="final-score" class="neon-text-big">0/10</div>
+            <p id="grade-text"></p>
+            <button onclick="location.reload()" class="btn btn-neon-blue">Повторить</button>
         </div>
     </div>
-
-    <input type="text" id="userAnswer" placeholder="Введите номер рисунка...">
-    <button onclick="check()">ПРОВЕРИТЬ ОТВЕТ</button>
-    <div id="feedback"></div>
-</div>
-
-<script>
-    function check() {
-        const ans = document.getElementById('userAnswer').value.trim();
-        const feedback = document.getElementById('feedback');
-        feedback.style.display = 'block';
-        
-        if(ans === "3") {
-            feedback.className = 'correct';
-            feedback.innerHTML = "БЕЗУПРЕЧНО. Соль (NaCl) — это индивидуальное вещество.";
-        } else {
-            feedback.className = 'wrong';
-            feedback.innerHTML = "ОШИБКА. Вспомни, что кофе и монеты — это смеси или сплавы.";
-        }
-    }
-</script>
+    <script src="script.js"></script>
 </body>
 </html>
