@@ -228,19 +228,29 @@
     // Функция отрисовки (обновленная для работы с фото)
     function showQ() {
     const data = sessionData[currentIdx];
-    document.getElementById('progress').innerText = `Вопрос ${currentIdx + 1} из 5`;
+    if (!data) return; // Страховка от пустого индекса
+
+    const progressEl = document.getElementById('progress');
+    const checkBtn = document.getElementById('btn-check');
+
+    if (progressEl) progressEl.innerText = `Вопрос ${currentIdx + 1} из 5`;
     
-    // Если в базе есть код картинки (строка не пустая) — показываем её
     let imgHtml = "";
     if (data.img && data.img.length > 10) { 
-        imgHtml = `<img src="${data.img}" style="width:100%; max-height:250px; object-fit:contain; border-radius:10px; margin-bottom:15px; border: 1px solid #333;">`;
+        imgHtml = `<img src="${data.img}" style="width:100%; max-height:250px; display:block; object-fit:contain; border-radius:10px; margin-bottom:15px; border: 1px solid #333;">`;
     }
     
-    qText.innerHTML = `${imgHtml}<div>${data.q}</div>`;
+    // Безопасная вставка: картинка + текст
+    qText.innerHTML = imgHtml; 
+    const textDiv = document.createElement('div');
+    textDiv.textContent = data.q;
+    qText.appendChild(textDiv);
+
     input.value = '';
+    input.focus(); // Автофокус на поле ввода для удобства падаванов
     expl.classList.add('hidden');
     nextBtn.classList.add('hidden');
-    document.getElementById('btn-check').classList.remove('hidden');
+    if (checkBtn) checkBtn.classList.remove('hidden');
 }
 
     function start(m) {
