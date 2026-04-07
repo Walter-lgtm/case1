@@ -287,6 +287,23 @@
             document.getElementById('grade-text').innerText = score === 5 ? "Шикарно! Ты готов." : "Попробуй еще раз!";
         }
     };
+    input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+        // Если кнопка "Проверить" видна — жмем её, иначе жмем "Далее"
+        const checkBtn = document.getElementById('btn-check');
+        if (!checkBtn.classList.contains('hidden')) {
+            check();
+        } else if (!nextBtn.classList.contains('hidden')) {
+            nextBtn.click();
+        }
+    }
+});
+
+// Добавь в функцию check() для режима теста:
+if (mode === 'test') {
+    expl.classList.remove('hidden');
+    expl.innerHTML = `<b style="color:#aaa">Ответ сохранен. Идем дальше...</b>`;
+}
 </script>
 </body>
 </html>
