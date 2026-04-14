@@ -1,1 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OGE-HEISENBERG v1.0</title>
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --card: #151515;
+            --accent: #00f2ff;
+            --correct: #39ff14;
+            --wrong: #ff4444;
+            --text: #e0e0e0;
+        }
 
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .app-container { width: 100%; max-width: 600px; }
+
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 { color: var(--accent); text-shadow: 0 0 10px var(--accent); margin: 0; }
+
+        .card {
+            background: var(--card);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .q-text { font-size: 1.1rem; line-height: 1.5; margin-bottom: 15px; white-space: pre-wrap; }
+        
+        /* Стилизация под бланк ОГЭ */
+        .oge-input-container {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin: 20px 0;
+        }
+
+        .oge-cell {
+            width: 40px;
+            height: 50px;
+            background: #222;
+            border: 2px solid #444;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+
+        .oge-cell:focus { border-color: var(--accent); outline: none; background: #2a2a2a; }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-primary { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
+        .btn-primary:hover { background: var(--accent); color: #000; }
+        
+        .hidden { display: none; }
+        .explanation { border-left: 4px solid var(--accent); padding-left: 15px; background: #1a1a2e; margin-top: 15px; font-size: 0.9rem; }
+        
+        .result-score { font-size: 4rem; color: var(--correct); text-shadow: 0 0 20px var(--correct); }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>OGE <span style="font-weight:100">CHEMISTRY</span></h1>
+            <p id="progress-text">Тренажер 10 типов</p>
+        </div>
+
+        <!-- Меню -->
+        <div id="menu" class="card">
+            <p>Готов к тренировке? Мы собрали 50 заданий (10 типов по 5 вариантов). Система будет выдавать случайный вариант.</p>
+            <button class="btn btn-primary" onclick="startApp()">Начать экзамен</button>
+        </div>
+
+        <!-- Тренажер -->
+        <div id="quiz" class="hidden">
+            <div class="card">
+                <div id="question-text" class="q-text"></div>
+                <div id="image-container"></div>
+                
+                <div class="oge-input-container" id="input-fields">
+                    <!-- Клетки генерируются JS -->
+                </div>
+
+                <button id="btn-check" class="btn btn-primary">Проверить</button>
+                <div id="expl-box" class="explanation hidden"></div>
+                <button id="btn-next" class="btn btn-primary hidden">Далее</button>
+            </div>
+        </div>
+
+        <!-- Результат -->
+        <div id="result" class="hidden">
+            <div class="card" style="text-align:center">
+                <h2>Ваш результат:</h2>
+                <div id="final-score" class="result-score">0/10</div>
+                <p id="feedback"></p>
+                <button class="btn btn-primary" onclick="location.reload()">В меню</button>
+            </div>
+        </div>
+    </div>
+    
