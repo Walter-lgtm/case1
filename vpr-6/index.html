@@ -1,1 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPR-6: Испытание Математикой</title>
+    <style>
+        :root { --gold: #ffd700; --deep-blue: #0b192e; --neon: #00f2ff; }
+        body { background: var(--deep-blue); color: white; font-family: 'Courier New', monospace; display: flex; justify-content: center; padding: 20px; }
+        .app-card { background: rgba(255,255,255,0.05); border: 2px solid var(--neon); border-radius: 15px; padding: 25px; width: 100%; max-width: 600px; box-shadow: 0 0 30px rgba(0,242,255,0.2); }
+        h1 { color: var(--gold); text-align: center; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; }
+        .task { background: rgba(0,0,0,0.3); margin-bottom: 15px; padding: 15px; border-radius: 8px; border-left: 4px solid var(--gold); }
+        .task p { margin: 0 0 10px 0; font-size: 1.1rem; }
+        input { width: 80px; background: transparent; border: none; border-bottom: 2px solid var(--neon); color: var(--neon); font-size: 1.2rem; text-align: center; outline: none; }
+        button { width: 100%; padding: 15px; background: var(--neon); color: var(--deep-blue); border: none; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 20px; transition: 0.3s; }
+        button:hover { background: var(--gold); transform: scale(1.02); }
+        #results { margin-top: 20px; padding: 15px; text-align: center; border-radius: 8px; display: none; }
+        .status { font-style: italic; color: var(--gold); margin-top: 10px; display: block; }
+    </style>
+</head>
+<body>
 
+<div class="app-card">
+    <h1>⚔️ ВПР-6: ПУТЬ ПАДАВАНА ⚔️</h1>
+    <div id="quiz">
+        <div class="task"><p>1. Вычислите: -18 + 45</p><input type="text" id="q1"></div>
+        <div class="task"><p>2. Вычислите: 3/7 + 2/7 (ответ цифрой)</p><input type="text" id="q2" placeholder="5/7"></div>
+        <div class="task"><p>3. Число уменьшили в 4 раза и получили 12. Какое это было число?</p><input type="text" id="q3"></div>
+        <div class="task"><p>4. Вычислите: 1.25 * 4</p><input type="text" id="q4"></div>
+        <div class="task"><p>5. Найдите 20% от числа 150</p><input type="text" id="q5"></div>
+    </div>
+    <button onclick="calculate()">ЗАВЕРШИТЬ ИСПЫТАНИЕ</button>
+    <div id="results"></div>
+</div>
+
+<script>
+    function calculate() {
+        const answers = { q1: "27", q2: "5/7", q3: "48", q4: "5", q5: "30" };
+        let score = 0;
+        for (let key in answers) {
+            if (document.getElementById(key).value.trim() === answers[key]) score++;
+        }
+
+        let mark = 2;
+        if (score === 3) mark = 3;
+        if (score === 4) mark = 4;
+        if (score === 5) mark = 5;
+
+        const resDiv = document.getElementById('results');
+        resDiv.style.display = 'block';
+        resDiv.style.background = score > 2 ? 'rgba(0,255,0,0.1)' : 'rgba(255,0,0,0.1)';
+        
+        let message = score === 5 ? "Великолепно! Ты готов к ВПР." : "Нужно больше тренировок в Храме Математики.";
+
+        resDiv.innerHTML = `
+            <h2>Результат: ${score} из 5</h2>
+            <p>Твоя оценка: <strong>${mark}</strong></p>
+            <span class="status">${message}</span>
+        `;
+    }
+</script>
+</body>
+</html>
