@@ -3,101 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>L & ⅂ — MATH GENERATOR</title>
+    <title>VPR-6: RANDOM GENERATOR</title>
     <style>
         :root { --gold: #ffd700; --deep-blue: #0b192e; --neon: #00f2ff; }
-        body { background: var(--deep-blue); color: white; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        body { background: var(--deep-blue); color: white; font-family: 'Courier New', monospace; display: flex; justify-content: center; padding: 20px; }
         .app-card { background: rgba(255,255,255,0.05); border: 2px solid var(--neon); border-radius: 15px; padding: 25px; width: 100%; max-width: 600px; box-shadow: 0 0 30px rgba(0,242,255,0.2); }
-        h1 { color: var(--gold); text-align: center; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; }
+        h1 { color: var(--gold); text-align: center; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; }
         .task { background: rgba(0,0,0,0.3); margin-bottom: 15px; padding: 15px; border-radius: 8px; border-left: 4px solid var(--gold); }
-        .task p { margin: 0 0 10px 0; font-size: 1.1rem; }
-        input { width: 120px; background: transparent; border: none; border-bottom: 2px solid var(--neon); color: var(--neon); font-size: 1.2rem; text-align: center; outline: none; }
-        .controls { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-        button { width: 100%; padding: 15px; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; transition: 0.3s; }
-        .btn-check { background: var(--neon); color: var(--deep-blue); }
-        .btn-reset { background: transparent; color: var(--neon); border: 1px solid var(--neon); }
-        button:hover { transform: scale(1.02); opacity: 0.9; }
-        #results { margin-top: 20px; padding: 15px; text-align: center; border-radius: 8px; display: none; border: 2px solid var(--gold); font-size: 1.3rem; }
+        input { width: 100px; background: transparent; border: none; border-bottom: 2px solid var(--neon); color: var(--neon); font-size: 1.2rem; text-align: center; outline: none; }
+        button { width: 100%; padding: 15px; background: var(--neon); color: var(--deep-blue); border: none; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 20px; }
+        #results { margin-top: 20px; padding: 15px; text-align: center; border-radius: 8px; display: none; border: 1px solid var(--gold); }
     </style>
 </head>
 <body>
 
 <div class="app-card">
-    <h1>VPR-6 GENERATOR</h1>
+    <h1>⚔️ VPR-6: RANDOM GENERATOR ⚔️</h1>
     <div id="quiz"></div>
-    
-    <div class="controls">
-        <button class="btn-check" onclick="calculate()">ПРОВЕРИТЬ ЭТАЛОН</button>
-        <button class="btn-reset" onclick="location.reload()">НОВОЕ ИСПЫТАНИЕ</button>
-    </div>
-
+    <button onclick="calculate()">ПРОВЕРИТЬ ЗНАНИЯ</button>
     <div id="results"></div>
+    <button onclick="location.reload()" style="background: transparent; color: var(--neon); border: 1px solid var(--neon); margin-top: 10px;">НОВОЕ ИСПЫТАНИЕ</button>
 </div>
 
 <script>
     let currentAnswers = {};
 
-    function generate() {
+    function generateTasks() {
         const quiz = document.getElementById('quiz');
-        quiz.innerHTML = ''; // Очистка перед генерацией
-
-        // 1. Отрицательные числа
-        let a1 = Math.floor(Math.random() * 40) + 10;
-        let b1 = Math.floor(Math.random() * 60) + 20;
+        
+        let a1 = Math.floor(Math.random() * 30) + 10;
+        let b1 = Math.floor(Math.random() * 50) + 20;
         currentAnswers.q1 = (b1 - a1).toString();
-        render(1, `Вычислите: -${a1} + ${b1}`, 'q1');
+        
+        let den = Math.floor(Math.random() * 7) + 3;
+        currentAnswers.q2 = `5/${den}`;
 
-        // 2. Дроби
-        let den = Math.floor(Math.random() * 9) + 4;
-        let n1 = Math.floor(Math.random() * 3) + 1;
-        let n2 = Math.floor(Math.random() * 3) + 1;
-        currentAnswers.q2 = `${n1+n2}/${den}`;
-        render(2, `Вычислите: ${n1}/${den} + ${n2}/${den}`, 'q2');
-
-        // 3. Уравнение
-        let x = Math.floor(Math.random() * 12) + 4;
-        let div = Math.floor(Math.random() * 5) + 2;
+        let x = Math.floor(Math.random() * 10) + 5;
+        let div = Math.floor(Math.random() * 4) + 2;
         currentAnswers.q3 = (x * div).toString();
-        render(3, `Число уменьшили в ${div} раза и получили ${x}. Какое это было число?`, 'q3');
 
-        // 4. Десятичные (умножение на 2)
-        let d1 = (Math.random() * 4 + 1).toFixed(1);
+        let d1 = (Math.random() * 2 + 1).toFixed(1);
         currentAnswers.q4 = (parseFloat(d1) * 2).toString().replace('.', ',');
-        render(4, `Вычислите: ${d1.replace('.', ',')} * 2`, 'q4');
 
-        // 5. Проценты (10, 20 или 50%)
-        const percs = [10, 20, 50];
-        let p = percs[Math.floor(Math.random() * percs.length)];
-        let base = (Math.floor(Math.random() * 10) + 1) * 40;
-        currentAnswers.q5 = (base * p / 100).toString();
-        render(5, `Найдите ${p}% от числа ${base}`, 'q5');
-    }
+        let total = (Math.floor(Math.random() * 10) + 1) * 50;
+        currentAnswers.q5 = (total * 0.2).toString();
 
-    function render(num, text, id) {
-        document.getElementById('quiz').innerHTML += `
-            <div class="task"><p>${num}. ${text}</p><input type="text" id="${id}" autocomplete="off"></div>
+        quiz.innerHTML = `
+            <div class="task"><p>1. Вычислите: -${a1} + ${b1}</p><input type="text" id="q1"></div>
+            <div class="task"><p>2. Вычислите: 2/${den} + 3/${den}</p><input type="text" id="q2"></div>
+            <div class="task"><p>3. Число уменьшили в ${div} раза и получили ${x}. Какое это было число?</p><input type="text" id="q3"></div>
+            <div class="task"><p>4. Вычислите: ${d1.replace('.', ',')} * 2</p><input type="text" id="q4"></div>
+            <div class="task"><p>5. Найдите 20% от числа ${total}</p><input type="text" id="q5"></div>
         `;
     }
 
     function calculate() {
+        const getVal = (id) => document.getElementById(id).value.replace(/\s+/g, '').replace('.', ',');
         let score = 0;
-        const normalize = (val) => val.replace(/\s+/g, '').replace('.', ',');
-        
         for (let key in currentAnswers) {
-            if (normalize(document.getElementById(key).value) === normalize(currentAnswers[key])) score++;
+            if (getVal(key) === currentAnswers[key].replace('.', ',')) score++;
         }
 
         let mark = score < 3 ? 2 : (score === 3 ? 3 : (score === 4 ? 4 : 5));
         const resDiv = document.getElementById('results');
         resDiv.style.display = 'block';
-        resDiv.innerHTML = `Баллы: ${score}/5 | Оценка: ${mark}`;
-        
-        if(score === 5) resDiv.style.borderColor = '#00ff00';
-        else if(score < 3) resDiv.style.borderColor = '#ff0000';
-        else resDiv.style.borderColor = var(--gold);
+        resDiv.innerHTML = `<h2>Результат: ${score} из 5</h2><p>Оценка: <strong>${mark}</strong></p>`;
     }
 
-    generate();
+    generateTasks();
 </script>
 </body>
 </html>
