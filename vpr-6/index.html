@@ -3,6 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPR-6: ГЕНЕРАТОР ИСПЫТАНИЙ</title>
+    <style>
+        :root { --gold: #ffd700; --deep-blue: #0b192e; --neon: #00f2ff; }
+        body { background: var(--deep-blue); color: white; font-family: 'Courier New', monospace; display: flex; justify-content: center; padding: 20px; }
+        .app-card { background: rgba(255,255,255,0.05); border: 2px solid var(--neon); border-radius: 15px; padding: 25px; width: 100%; max-width: 600px; box-shadow: 0 0 30px rgba(0,242,255,0.2); }
+        h1 { color: var(--gold); text-align: center; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; }
+        .task { background: rgba(0,0,0,0.3); margin-bottom: 15px; padding: 15px; border-radius: 8px; border-left: 4px solid var(--gold); }
+        input { width: 100px; background: transparent; border: none; border-bottom: 2px solid var(--neon); color: var(--neon); font-size: 1.2rem; text-align: center; outline: none; }
+        button { width: 100%; padding: 15px; background: var(--neon); color: var(--deep-blue); border: none; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 20px; }
+        #results { margin-top: 20px; padding: 15px; text-align: center; border-radius: 8px; display: none; border: 1px solid var(--gold); }
+    </style>
+</head>
+<body>
+
+<div class="app-card">
+    <h1>⚔️ VPR-6: RANDOM GENERATOR ⚔️</h1>
+    <div id="quiz"></div>
+    <button onclick="calculate()">ПРОВЕРИТЬ ЗНАНИЯ</button>
+    <div id="results"></div>
+    <button onclick="location.reload()" style="background: transparent; color: var(--neon); border: 1px solid var(--neon); margin-top: 10px;">НОВОЕ ИСПЫТАНИЕ</button>
+</div>
+
+<script>
+    // Хранилище правильных ответов
+    let currentAnswers = {};
+
+    function generateTasks() {
+        const quiz = document.getElementById('quiz');
+        
+        // 1. Отрицательные числа
+        let a1 = Math.floor(Math.random() * 30) + 10;
+        let b1 = Math.floor(Math.random() * 50) + 20;
+        currentAnswers.q1 = (b1 - a1).toString();
+        renderTask(1, `Вычислите: -${a1} + ${b1}`, 'q1');
+
+        // 2. Дроби (одинаковые знаменатели)
+        let den = Math.floor(Math.random() * 7) + 3;
+        let n1 = 1, n2 = 2;
+        currentAnswers.q2 = `${n1+n2}/${den}`;
+        renderTask(2, `Вычислите: ${n1}/${den} + ${n2}/${den}`, 'q2');
+
+        // 3. Уравнение (обратный счет)
+        let x = Math.floor(Math.random() * 10) + 5;
+        let div = Math.floor(Math.random() * 4) + 2;
+        currentAnswers.q3 = (x * div).toString();
+        renderTask(3, `Число уменьшили в ${div} раза и получили ${x}. Какое это было число?`, 'q3');
+
+        // 4. Десятичные дроби
+        let d1 = (Math.random() * 2 + 1).toFixed(2);
+        currentAnswers.q4 = (d1 * 2).toString().replace('.', ','); 
+        renderTask(4, `Вычислите: ${d1} * 2 (используй запятую)`, 'q4');
+
+        // 5. Проценты
+        let perc = 20;
+        let total = (Math.floor(Math.random() * 10) + 1) * 50;
+        currentAnswers.q5 = (total * perc / 100).toString();
+        renderTask(5, `Найдите ${perc}% от числа ${total}`, 'q5');
+    }
+
+    function renderTask(num, text, id) {
+        document.getElementById('quiz').innerHTML += `
+            <div class="task"><p>${num}. ${text}</p><input type="text" id="${id}" autocomplete="off"></div>
+        `;
+    }
+
+    function calculate() {
+        let score = 0;
+        const getVal = (id) => document.getElementById(id).value.replace(/\s+/g, '').replace('.', ',');
+        
+        for (let key in currentAnswers) {
+            if (getVal(key) === currentAnswers[key].replace('.', ',')) score++;
+        }
+
+        let mark = score < 3 ? 2 : (score === 3 ? 3 : (score === 4 ? 4 : 5));
+        const resDiv = document.getElementById('results');
+        resDiv.style.display = 'block';
+        resDiv.innerHTML = `<h2>Баллы: ${score} | Оценка: ${mark}</h2>`;
+    }
+
+    // Запуск генерации при загрузке
+    generateTasks();
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VPR-6: Испытание Математикой</title>
     <style>
         :root { --gold: #ffd700; --deep-blue: #0b192e; --neon: #00f2ff; }
