@@ -24,7 +24,7 @@
     <h1>⚔️ ВПР-6: ПУТЬ ПАДАВАНА ⚔️</h1>
     <div id="quiz">
         <div class="task"><p>1. Вычислите: -18 + 45</p><input type="text" id="q1"></div>
-        <div class="task"><p>2. Вычислите: 3/7 + 2/7 (ответ цифрой)</p><input type="text" id="q2" placeholder="5/7"></div>
+        <div class="task"><p>2. Вычислите: 3/7 + 2/7</p><input type="text" id="q2"></div>
         <div class="task"><p>3. Число уменьшили в 4 раза и получили 12. Какое это было число?</p><input type="text" id="q3"></div>
         <div class="task"><p>4. Вычислите: 1.25 * 4</p><input type="text" id="q4"></div>
         <div class="task"><p>5. Найдите 20% от числа 150</p><input type="text" id="q5"></div>
@@ -35,11 +35,21 @@
 
 <script>
     function calculate() {
-        const answers = { q1: "27", q2: "5/7", q3: "48", q4: "5", q5: "30" };
-        let score = 0;
-        for (let key in answers) {
-            if (document.getElementById(key).value.trim() === answers[key]) score++;
-        }
+    // Убираем лишние пробелы из ввода падаванов для точности
+    const getVal = (id) => document.getElementById(id).value.replace(/\s+/g, '');
+    
+    const answers = { 
+        q1: "27", 
+        q2: "5/7", 
+        q3: "48", 
+        q4: "5", 
+        q5: "30" 
+    };
+
+    let score = 0;
+    for (let key in answers) {
+        if (getVal(key) === answers[key]) score++;
+    }
 
         let mark = 2;
         if (score === 3) mark = 3;
