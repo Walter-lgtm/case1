@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L & ⅂ — ELEMENT CHARACTERISTICS</title>
+    <style>
+        :root { --acid-green: #a2ff00; --deep-chem: #0a1a1a; --neon-blue: #00d4ff; }
+        body { background: var(--deep-chem); color: #e0f0f0; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding: 20px; line-height: 1.4; }
+        .lab-card { background: rgba(0, 40, 40, 0.8); border: 2px solid var(--neon-blue); border-radius: 10px; padding: 25px; width: 100%; max-width: 750px; box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); }
+        h1 { color: var(--acid-green); text-align: center; text-transform: uppercase; font-size: 1.4rem; border-bottom: 1px solid var(--neon-blue); padding-bottom: 10px; }
+        .target-box { background: #000; border: 1px dashed var(--acid-green); padding: 15px; text-align: center; margin: 20px 0; font-size: 1.5rem; }
+        .plan-step { margin-bottom: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: center; }
+        .plan-step label { font-size: 0.9rem; color: #aaa; }
+        input, select { background: #111; border: 1px solid var(--neon-blue); color: white; padding: 5px; border-radius: 4px; }
+        .controls { display: flex; gap: 10px; margin-top: 25px; }
+        button { flex: 1; padding: 12px; font-weight: bold; cursor: pointer; border: none; border-radius: 5px; }
+        .btn-check { background: var(--acid-green); color: #000; }
+        .btn-new { background: transparent; color: var(--neon-blue); border: 1px solid var(--neon-blue); }
+        #log { margin-top: 20px; white-space: pre-wrap; font-family: monospace; font-size: 0.85rem; color: var(--acid-green); }
+    </style>
+</head>
+<body>
+
+<div class="lab-card">
+    <h1>🔬 Характеристика элемента по ПСХЭ</h1>
+    <p style="text-align: center; font-size: 0.8rem;">Заполни план для элемента ниже:</p>
+    
+    <div class="target-box" id="targetElement">ЗАГРУЗКА...</div>
+
+    <div id="form">
+        <!-- Поля согласно твоему алгоритму -->
+        <div class="plan-step"><label>Период / Группа / Подгруппа:</label>
+            <div style="display:flex; gap:2px;">
+                <input type="text" id="period" placeholder="Пер." style="width:30px">
+                <input type="text" id="group" placeholder="Гр." style="width:30px">
+                <select id="subgroup"><option value="A">А</option><option value="B">Б</option></select>
+            </div>
+        </div>
+
+        <div class="plan-step"><label>Заряд ядра / p+ / e-:</label>
+            <input type="text" id="nuclear" placeholder="Число">
+        </div>
+
+        <div class="plan-step"><label>n0 (нейтроны) / Энерг. уровни:</label>
+            <div style="display:flex; gap:2px;">
+                <input type="text" id="neutrons" placeholder="n0" style="width:50px">
+                <input type="text" id="levels" placeholder="Уровни" style="width:50px">
+            </div>
+        </div>
+
+        <div class="plan-step"><label>Распред. e- (напр. 2 8 1):</label>
+            <input type="text" id="e_dist" placeholder="через пробел">
+        </div>
+
+        <div class="plan-step"><label>Внешние e- / Валентные e-:</label>
+            <div style="display:flex; gap:2px;">
+                <input type="text" id="outer_e" placeholder="Внеш" style="width:50px">
+                <input type="text" id="val_e" placeholder="Вал" style="width:50px">
+            </div>
+        </div>
+
+        <div class="plan-step"><label>Свойства (Ме / неМе):</label>
+            <select id="type"><option value="metal">Металл</option><option value="nonmetal">Неметалл</option></select>
+        </div>
+
+        <div class="plan-step"><label>Формула высшего оксида:</label>
+            <input type="text" id="oxide" placeholder="Напр: R2O">
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-check" onclick="check()">ПРОВЕРИТЬ</button>
+        <button class="btn-new" onclick="init()">СЛЕДУЮЩИЙ</button>
+    </div>
+
+    <div id="log"></div>
+</div>
+
+<script>
+    const db = [
+        { s: 'Li', n: 3, m: 7, p: 2, g: 1, type: 'metal', dist: '2 1', levels: 2, ox: 'R2O' },
+        { s: 'Be', n: 4, m: 9, p: 2, g: 2, type: 'metal', dist: '2 2', levels: 2, ox: 'RO' },
+        { s: 'C',  n: 6, m: 12, p: 2, g: 4, type: 'nonmetal', dist: '2 4', levels: 2, ox: 'RO2' },
+        { s: 'N',  n: 7, m: 14, p: 2, g: 5, type: 'nonmetal', dist: '2 5', levels: 2, ox: 'R2O5' },
+        { s: 'O',  n: 8, m: 16, p: 2, g: 6, type: 'nonmetal', dist: '2 6', levels: 2, ox: '-' },
+        { s: 'F',  n: 9, m: 19, p: 2, g: 7, type: 'nonmetal', dist: '2 7', levels: 2, ox: '-' },
+        { s: 'Na', n: 11, m: 23, p: 3, g: 1, type: 'metal', dist: '2 8 1', levels: 3, ox: 'R2O' },
+        { s: 'Mg', n: 12, m: 24, p: 3, g: 2, type: 'metal', dist: '2 8 2', levels: 3, ox: 'RO' },
+        { s: 'Al', n: 13, m: 27, p: 3, g: 3, type: 'metal', dist: '2 8 3', levels: 3, ox: 'R2O3' },
+        { s: 'P',  n: 15, m: 31, p: 3, g: 5, type: 'nonmetal', dist: '2 8 5', levels: 3, ox: 'R2O5' },
+        { s: 'S',  n: 16, m: 32, p: 3, g: 6, type: 'nonmetal', dist: '2 8 6', levels: 3, ox: 'RO3' },
+        { s: 'Cl', n: 17, m: 35, p: 3, g: 7, type: 'nonmetal', dist: '2 8 7', levels: 3, ox: 'R2O7' }
+    ];
+
+    let current = {};
+
+    function init() {
+        current = db[Math.floor(Math.random() * db.length)];
+        document.getElementById('targetElement').innerText = current.s;
+        document.getElementById('log').innerText = '';
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(i => i.value = '');
+    }
+
+    function check() {
+        const log = document.getElementById('log');
+        let errors = [];
+
+        if (document.getElementById('period').value != current.p) errors.push("Период");
+        if (document.getElementById('group').value != current.g) errors.push("Группа");
+        if (document.getElementById('nuclear').value != current.n) errors.push("Заряд/Протоны");
+        if (document.getElementById('neutrons').value != (current.m - current.n)) errors.push("Нейтроны");
+        if (document.getElementById('e_dist').value.trim() != current.dist) errors.push("Распределение e-");
+        if (document.getElementById('type').value != current.type) errors.push("Тип (Ме/неМе)");
+        if (document.getElementById('oxide').value.toUpperCase().replace(/\s/g,'') != current.ox) errors.push("Высший оксид");
+
+        if (errors.length === 0) {
+            log.innerHTML = "✅ ВЕЛИКОЛЕПНО! Элемент полностью идентифицирован.";
+            log.style.color = "var(--acid-green)";
+        } else {
+            log.innerHTML = "❌ ОШИБКА В ПУНКТАХ: " + errors.join(", ");
+            log.style.color = "red";
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>
