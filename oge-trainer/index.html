@@ -144,12 +144,12 @@
         {
             type: 2,
             variants: [
-                { q: "На рисунке изображена модель ядра атома. Запишите номер периода (X) и заряд ядра (Y).", img: "", a: "23", h: "7 частиц в ядре: 3 протона (Литий) и 4 нейтрона. Литий во 2 периоде, заряд +3." },
-                { q: "На рисунке изображена модель ядра атома. Запишите число электронов на внешнем слое (X) и номер периода (Y).", img: "", a: "52", h: "В ядре 7 протонов — это Азот. V группа (5 электронов), 2 период." },
-                { q: "На рисунке изображена модель атома. Запишите номер группы (X) и заряд ядра (Y).", img: "", a: "46", h: "Всего 6 электронов — это Углерод. IV группа, заряд +6." },
-                { q: "На рисунке изображена модель ядра. Запишите номер периода (X) и номер группы (Y).", img: "", a: "24", h: "6 протонов — Углерод. 2 период, IV группа." },
-                { q: "На рисунке изображена модель атома. Запишите номер периода (X) и заряд ядра (Y).", img: "", a: "312", h: "Слои 2, 8, 2 — это Магний (12 электронов). 3 период, заряд +12." }
-            ]
+    { q: "На рисунке изображена модель ядра атома. Запишите период(X) и заряд(Y).", atomData: {p:3, n:4}, a: "23", h: "3 протона = Литий." },
+    { q: "Запишите число электронов на внешнем слое(X) и номер периода(Y).", atomData: {p:7, n:7}, a: "52", h: "7 протонов = Азот." },
+    { q: "Запишите номер группы(X) и заряд ядра(Y).", atomData: {layers:[2,4]}, a: "46", h: "Всего 6 электронов = Углерод." },
+    { q: "Запишите номер периода(X) и номер группы(Y).", atomData: {p:6, n:6}, a: "24", h: "6 протонов = Углерод." },
+    { q: "Запишите номер периода(X) и величину заряда ядра(Y).", atomData: {layers:[2,8,2]}, a: "312", h: "12 электронов = Магний." }
+    ]
         },
         {
             type: 3,
@@ -253,17 +253,27 @@
         document.getElementById('btn-next').classList.add('hidden');
         document.getElementById('btn-check').classList.remove('hidden');
         
+        // --- 1. БЛОК ГРАФИКИ (Добавляем это) ---
+        const imgContainer = document.getElementById('image-container');
+        imgContainer.innerHTML = ''; 
+        if (data.atomData) {
+            imgContainer.appendChild(drawAtom(data.atomData));
+        }
+        // --- КОНЕЦ БЛОКА ГРАФИКИ ---
+
+        // --- 2. БЛОК КЛЕТОК (Твой старый код, оставляем его) ---
         const container = document.getElementById('input-fields');
         container.innerHTML = '';
-        // Создаем клетки в зависимости от длины ответа
         for(let i=0; i < data.a.length; i++) {
             const input = document.createElement('input');
             input.type = 'text';
             input.className = 'oge-cell';
             input.maxLength = 1;
             input.id = `cell-${i}`;
-            // Автопереход на следующую клетку
-            input.oninput = function() { if(this.value && document.getElementById(`cell-${i+1}`)) document.getElementById(`cell-${i+1}`).focus(); };
+            input.oninput = function() { 
+                if(this.value && document.getElementById(`cell-${i+1}`)) 
+                    document.getElementById(`cell-${i+1}`).focus(); 
+            };
             container.appendChild(input);
         }
     }
@@ -305,6 +315,50 @@
             document.getElementById('feedback').innerText = score > 7 ? "Отличный результат! К ОГЭ готов." : "Нужно еще потренироваться!";
         }
     };
+        function drawAtom(data) {
+    const svgNS = "http://w3.org";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("viewBox", "0 0 200 200");
+    svg.setAttribute("width", "200");
+    
+    // Рисуем ядро
+    const core = document.createElementNS(svgNS, "circle");
+    core.setAttribute("cx", "100"); core.setAttribute("cy", "100");
+    core.setAttribute("r", "20"); core.setAttribute("fill", "#333");
+    core.setAttribute("stroke", "var(--accent)");
+    svg.appendChild(core);
+
+    if (data.p) { // Если рисуем ядро (протоны/нейтроны)
+        const text = document.createElementNS(svgNS, "text");
+        text.setAttribute("x", "100"); text.setAttribute("y", "105");
+        text.setAttribute("text-anchor", "middle"); text.setAttribute("fill", "white");
+        text.setAttribute("font-size", "12");
+        text.textContent = `+${data.p}`; // Показываем заряд
+        svg.appendChild(text);
+    } 
+    
+    if (data.layers) { // Если рисуем слои и электроны
+        data.layers.forEach((count, i) => {
+            const r = 40 + (i * 25);
+            const orbit = document.createElementNS(svgNS, "circle");
+            orbit.setAttribute("cx", "100"); orbit.setAttribute("cy", "100");
+            orbit.setAttribute("r", r); orbit.setAttribute("fill", "none");
+            orbit.setAttribute("stroke", "#444");
+            svg.appendChild(orbit);
+            
+            for(let j=0; j<count; j++) {
+                const angle = (j / count) * 2 * Math.PI;
+                const ex = 100 + r * Math.cos(angle);
+                const ey = 100 + r * Math.sin(angle);
+                const electron = document.createElementNS(svgNS, "circle");
+                electron.setAttribute("cx", ex); electron.setAttribute("cy", ey);
+                electron.setAttribute("r", "4"); electron.setAttribute("fill", "var(--accent)");
+                svg.appendChild(electron);
+            }
+        });
+    }
+    return svg;
+}
 </script>
 </body>
 </html>
