@@ -86,39 +86,31 @@
     </div> <!-- Закрытие quiz-screen -->
 </div> <!-- Закрытие основного container -->
 
-<!-- БЛАНК ДЛЯ ПЕЧАТИ (Снаружи основного контейнера) -->
-<!-- БЛАНК ДЛЯ ПЕЧАТИ (ОБНОВЛЕННЫЙ) -->
 <div id="print-area" class="print-only">
-    <div class="print-card">
-        <div style="text-align: right; font-weight: bold; margin-bottom: 10px; font-size: 0.8rem;">
-            Экземпляр участника контроля знаний
-        </div>
-        <h1 style="text-align: center; border-bottom: 2px solid #000; margin-top: 0; padding-bottom: 10px;">
-            ПРОТОКОЛ ТЕСТИРОВАНИЯ: ХИМИЯ-11
-        </h1>
+    <div style="border: 2px solid #000; padding: 20px; font-family: 'Times New Roman', serif;">
+        <h2 style="text-align: center; text-decoration: underline;">ПРОТОКОЛ КОНТРОЛЬНОЙ РАБОТЫ</h2>
         
-        <!-- БЛОК С ФИО (ГЛАВНЫЙ АКЦЕНТ) -->
-        <div style="margin: 20px 0; border: 2px solid #000; padding: 15px;">
-            <p style="margin: 0; font-size: 1.2rem;">
-                <strong>УЧАСТНИК:</strong> 
-                <span id="resFio" style="text-transform: uppercase; font-weight: bold; text-decoration: underline;"></span>
-            </p>
-            <p style="margin: 10px 0 0 0; font-size: 0.9rem; color: #333;">
-                <strong>Дата и время:</strong> <span id="resDate"></span>
-            </p>
-        </div>
-        
-        <div style="display: flex; justify-content: space-around; background: #f0f0f0; padding: 10px; border: 1px solid #000; margin-bottom: 20px;">
-            <p style="margin: 0;"><strong>ИТОГОВЫЙ БАЛЛ:</strong> <span id="resScore" style="font-size: 1.4rem;"></span> / 10</p>
-            <p style="margin: 0;"><strong>ОЦЕНКА:</strong> <span id="resGrade" style="font-size: 1.4rem; font-weight: bold;"></span></p>
+        <div style="margin: 20px 0; font-size: 1.2rem;">
+            <p><strong>УЧАСТНИК:</strong> <span id="resFio" style="text-transform: uppercase; font-weight: bold;">____________________</span></p>
+            <p><strong>ПРЕДМЕТ:</strong> ХИМИЯ (11 КЛАСС)</p>
+            <p><strong>ДАТА:</strong> <span id="resDate"></span></p>
         </div>
 
-        <hr>
-        <h3 style="margin-top: 10px;">ОТВЕТЫ УЧАСТНИКА:</h3>
-        <div id="resDetails" style="line-height: 1.5; font-size: 0.95rem;"></div>
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0; border: 1px solid #000;">
+            <tr>
+                <td style="border: 1px solid #000; padding: 10px; width: 50%;"><strong>ИТОГОВЫЙ БАЛЛ:</strong></td>
+                <td style="border: 1px solid #000; padding: 10px; text-align: center;"><span id="resScore" style="font-size: 1.3rem; font-weight: bold;"></span> / 10</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #000; padding: 10px;"><strong>ОЦЕНКА:</strong></td>
+                <td style="border: 1px solid #000; padding: 10px; text-align: center;"><span id="resGrade" style="font-size: 1.3rem; font-weight: bold;"></span></td>
+            </tr>
+        </table>
+
+        <div id="resDetails" style="margin-top: 20px; font-size: 1rem;"></div>
         
-        <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 10px; font-size: 0.75rem; color: #666; font-style: italic;">
-            * Данный протокол сформирован автоматически. Ошибка невозможна. Время — наше.
+        <div style="margin-top: 30px; text-align: right;">
+            <p>____________________ / Подпись учителя</p>
         </div>
     </div>
 </div>
@@ -128,74 +120,63 @@
 
     function startTest() {
         const fio = document.getElementById('userFio').value.trim();
-        if (fio.length < 5) return alert("Пожалуйста, введите полное ФИО.");
-        if (localStorage.getItem('done_chem11')) return alert("Доступ закрыт. Вы уже выполняли эту работу.");
+        if (fio.length < 5) return alert("Введите ФИО!");
         
+        // СРАЗУ записываем ФИО в бланк, пока оно не потерялось
+        document.getElementById('resFio').innerText = fio;
+        
+        if (localStorage.getItem('done_chem11')) return alert("Доступ закрыт!");
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('quiz-screen').style.display = 'block';
-        window.scrollTo(0,0);
     }
 
     function submitTest() {
         const fio = document.getElementById('userFio').value.trim();
         const keys = {
-    ans1: "123", 
-    ans2: "6", 
-    ans3: "123", 
-    ans4: "1",     // Cu
-    ans5: "8",
-    ans6: "+6",    // Степень окисления оставляем со знаком (это важно для ОВР)
-    ans7: "2",     // Al2O3
-    ans8: "50", 
-    ans9: "5", 
-    ans10: "2"     // F
-};
+            ans1: "123", ans2: "6", ans3: "123", ans4: "1", ans5: "8",
+            ans6: "+6", ans7: "2", ans8: "50", ans9: "5", ans10: "2"
+        };
         
         let score = 0;
         let userAns = {};
         let detailsHtml = "";
 
-        // Сбор ответов и проверка
         for(let i=1; i<=10; i++) {
             let val = document.getElementById('ans'+i).value.trim();
             userAns['q'+i] = val;
             let isCorrect = val.toLowerCase() === keys['ans'+i].toLowerCase();
             if(isCorrect) score++;
-            
-            // Формируем строки для бланка
-            detailsHtml += `<div style="border-bottom: 1px solid #eee; padding: 5px 0;">
-                <b>Задание ${i}:</b> ${val} ${isCorrect ? '✅' : '❌'}
-            </div>`;
+            detailsHtml += `<div style="border-bottom: 1px solid #000; padding: 5px 0;">Задание ${i}: ${val} ${isCorrect ? '(Верно)' : '(Неверно)'}</div>`;
         }
 
         let grade = score >= 9 ? 5 : (score >= 7 ? 4 : (score >= 4 ? 3 : 2));
 
-        // Отправка данных в Google Таблицу
+        // Отправка данных
         fetch(GOOGLE_URL, {
             method: 'POST',
             mode: 'no-cors',
             body: JSON.stringify({fio: fio, score: score, grade: grade, answers: userAns})
         });
 
-        // Блокировка повторного прохождения
         localStorage.setItem('done_chem11', 'true');
 
-        // Заполнение бланка ПЕРЕД выводом на печать
+        // ЗАПОЛНЕНИЕ СТРОГОГО БЛАНКА
         document.getElementById('resFio').innerText = fio;
-        document.getElementById('resDate').innerText = new Date().toLocaleString();
+        document.getElementById('resDate').innerText = new Date().toLocaleDateString();
         document.getElementById('resScore').innerText = score;
         document.getElementById('resGrade').innerText = grade;
         document.getElementById('resDetails').innerHTML = detailsHtml;
 
-        // Прячем кнопку и показываем инструкцию
+        // ПОДГОТОВКА К ПЕЧАТИ
         document.getElementById('finalBtn').style.display = 'none';
         document.getElementById('print-instruction').style.display = 'block';
-        // Силовая инициализация отрисовки для Firefox
-        const printArea = document.getElementById('print-area');
-        printArea.style.visibility = 'visible'; 
-        printArea.offsetHeight; // Принудительный пересчет геометрии
+        
+        // Магия для Firefox: делаем блок видимым в DOM перед вызовом печати
+        const area = document.getElementById('print-area');
+        area.style.display = 'block'; 
+        area.style.visibility = 'visible';
+        area.offsetHeight; 
 
-        // Финальный вызов печати с задержкой для стабильности PDF
         setTimeout(() => {
             window.print();
         }, 1500);
