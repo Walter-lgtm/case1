@@ -64,13 +64,13 @@
 
             <div class="task"><p>2. Определите число валентных электронов у атома Хрома (Cr). Запишите только цифру.</p><input type="text" id="ans2"></div>
             <div class="task"><p>3. Даны химические элементы: 1) F, 2) Cl, 3) Br. Расположите номера этих элементов в порядке убывания их электроотрицательности. (Запишите последовательность цифр без пробелов).</p><input type="text" id="ans3" placeholder="Например: 123"></div>
-            <div class="task"><p>4. В результате электролиза раствора CuCl2 на катоде выделилось вещество. Запишите его химическую формулу.</p><input type="text" id="ans4"></div>
+            <div class="task"><p>4. В результате электролиза раствора CuCl2 на катоде выделилось вещество: 1) Cu, 2) H2, 3) Cl2. Запишите номер верного ответа.</p><input type="text" id="ans4" placeholder="Введите цифру"></div>
             <div class="task"><p>5. К 200г 10% раствора соли добавили 50г воды. Вычислите массовую долю соли в полученном растворе. (В %, запишите только число, точность до целых).</p><input type="text" id="ans5"></div>
             <div class="task"><p>6. Определите степень окисления серы в ионе (SO4)2-. Запишите со знаком (напр: +2).</p><input type="text" id="ans6"></div>
-            <div class="task"><p>7. Из списка (NaOH, Al2O3, HCl) выберите амфотерный оксид. Запишите его формулу.</p><input type="text" id="ans7"></div>
+            <div class="task"><p>7. Из списка веществ: 1) NaOH, 2) Al2O3, 3) HCl выберите амфотерный оксид. Запишите номер верного ответа.</p><input type="text" id="ans7" placeholder="Введите цифру"></div>
             <div class="task"><p>8. Вычислите массу соли (в граммах), которую нужно растворить в 150г воды для получения 25% раствора. (Точность до целых).</p><input type="text" id="ans8"></div>
             <div class="task"><p>9. Запишите сумму коэффициентов в уравнении реакции: 2H2 + O2 = 2H2O</p><input type="text" id="ans9"></div>
-            <div class="task"><p>10. Запишите химический символ элемента, являющегося самым сильным неметаллом в ПСХЭ.</p><input type="text" id="ans10"></div>
+            <div class="task"><p>10. Даны химические элементы: 1) Cs, 2) F, 3) O, 4) Fr. Выберите номер элемента, который является самым сильным неметаллом в ПСХЭ. (Запишите только цифру).</p><input type="text" id="ans10" placeholder="Введите номер ответа"></div>
         </div>
 
        <!-- БЛОК ЗАВЕРШЕНИЯ -->
@@ -84,20 +84,38 @@
 </div> <!-- Закрытие основного container -->
 
 <!-- БЛАНК ДЛЯ ПЕЧАТИ (Снаружи основного контейнера) -->
+<!-- БЛАНК ДЛЯ ПЕЧАТИ (ОБНОВЛЕННЫЙ) -->
 <div id="print-area" class="print-only">
     <div class="print-card">
-        <h1 style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px;">ПРОТОКОЛ ТЕСТИРОВАНИЯ: ХИМИЯ-11</h1>
-        <div style="margin: 20px 0; font-size: 1.1rem;">
-            <p><strong>Участник:</strong> <span id="resFio"></span></p>
-            <p><strong>Дата/Время:</strong> <span id="resDate"></span></p>
-            <p><strong>Итоговый балл:</strong> <span id="resScore"></span> / 10</p>
-            <p><strong>Оценка по шкале:</strong> <span id="resGrade"></span></p>
+        <div style="text-align: right; font-weight: bold; margin-bottom: 10px; font-size: 0.8rem;">
+            Экземпляр участника контроля знаний
         </div>
+        <h1 style="text-align: center; border-bottom: 2px solid #000; margin-top: 0; padding-bottom: 10px;">
+            ПРОТОКОЛ ТЕСТИРОВАНИЯ: ХИМИЯ-11
+        </h1>
+        
+        <!-- БЛОК С ФИО (ГЛАВНЫЙ АКЦЕНТ) -->
+        <div style="margin: 20px 0; border: 2px solid #000; padding: 15px;">
+            <p style="margin: 0; font-size: 1.2rem;">
+                <strong>УЧАСТНИК:</strong> 
+                <span id="resFio" style="text-transform: uppercase; font-weight: bold; text-decoration: underline;"></span>
+            </p>
+            <p style="margin: 10px 0 0 0; font-size: 0.9rem; color: #333;">
+                <strong>Дата и время:</strong> <span id="resDate"></span>
+            </p>
+        </div>
+        
+        <div style="display: flex; justify-content: space-around; background: #f0f0f0; padding: 10px; border: 1px solid #000; margin-bottom: 20px;">
+            <p style="margin: 0;"><strong>ИТОГОВЫЙ БАЛЛ:</strong> <span id="resScore" style="font-size: 1.4rem;"></span> / 10</p>
+            <p style="margin: 0;"><strong>ОЦЕНКА:</strong> <span id="resGrade" style="font-size: 1.4rem; font-weight: bold;"></span></p>
+        </div>
+
         <hr>
-        <h3>ОТВЕТЫ УЧАСТНИКА:</h3>
-        <div id="resDetails" style="line-height: 1.6;"></div>
-        <div style="margin-top: 50px; border-top: 1px solid #ccc; padding-top: 10px; font-size: 0.8rem; color: #666;">
-            * Данный документ сформирован автоматически и является подтверждением прохождения контроля знаний.
+        <h3 style="margin-top: 10px;">ОТВЕТЫ УЧАСТНИКА:</h3>
+        <div id="resDetails" style="line-height: 1.5; font-size: 0.95rem;"></div>
+        
+        <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 10px; font-size: 0.75rem; color: #666; font-style: italic;">
+            * Данный протокол сформирован автоматически. Ошибка невозможна. Время — наше.
         </div>
     </div>
 </div>
@@ -120,14 +138,14 @@
         const keys = {
     ans1: "123", 
     ans2: "6", 
-    ans3: "123", // Фтор(1) > Хлор(2) > Бром(3)
-    ans4: "Cu", 
+    ans3: "123", 
+    ans4: "1",     // Cu
     ans5: "8",
-    ans6: "+6", 
-    ans7: "Al2O3", 
+    ans6: "+6",    // Степень окисления оставляем со знаком (это важно для ОВР)
+    ans7: "2",     // Al2O3
     ans8: "50", 
     ans9: "5", 
-    ans10: "F"
+    ans10: "2"     // F
 };
         
         let score = 0;
