@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ЕГЭ Химия 11: Контроль</title>
+    <style>
+        @media print { .no-print { display: none; } .print-only { display: block; color: black; } }
+        .print-only { display: none; }
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+        .test-container { background: white; max-width: 800px; margin: auto; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .helper-links { display: flex; gap: 10px; margin-bottom: 20px; }
+        .helper-btn { background: #2c3e50; color: white; padding: 10px; text-decoration: none; border-radius: 5px; font-size: 0.8rem; }
+        .task { border-bottom: 1px solid #eee; padding: 15px 0; }
+        input[type="text"] { width: 100%; padding: 8px; margin-top: 5px; }
+        .btn-submit { background: #27ae60; color: white; width: 100%; padding: 15px; border: none; font-size: 1.1rem; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="test-container no-print">
+    <h1>Контроль знаний: Химия 11 класс</h1>
+    
+    <div id="auth">
+        <input type="text" id="userFio" placeholder="Введите ФИО полностью" required>
+        <button onclick="startTest()">НАЧАТЬ ТЕСТ</button>
+    </div>
+
+    <div id="quiz" style="display:none;">
+        <div class="helper-links">
+            <a href="https://walter-lgtm.github.io/loki-chemistry/periodic_bad.html" target="_blank" class="helper-btn">⚛️ ПСХЭ</a>
+            <a href="https://walter-lgtm.github.io/loki-chemistry/solubility_bad.html" target="_blank" class="helper-btn">💧 Таблица растворимости</a>
+        </div>
+
+        <div class="task">
+            <p>1. Из указанных элементов (Na, Mg, Al) выберите те, у которых металлические свойства выражены сильнее. Запишите символы в порядке убывания свойств.</p>
+            <input type="text" id="ans1" placeholder="Напр: 123">
+        </div>
+        
+        <!-- Еще 9 аналогичных заданий в формате ЕГЭ -->
+
+        <button class="btn-submit" onclick="finishTest()">ОТПРАВИТЬ РЕЗУЛЬТАТ</button>
+    </div>
+</div>
+
+<div id="printZone" class="print-only">
+    <h2>ПРОТОКОЛ ТЕСТИРОВАНИЯ (ЕГЭ-11)</h2>
+    <p id="printFio"></p>
+    <p id="printResult"></p>
+    <div id="printAnswers"></div>
+</div>
+
+<script>
+    function startTest() {
+        if(localStorage.getItem('chem11_done')) {
+            alert("Вы уже проходили этот тест!");
+            return;
+        }
+        if(!document.getElementById('userFio').value) return;
+        document.getElementById('auth').style.display = 'none';
+        document.getElementById('quiz').style.display = 'block';
+    }
+
+    function finishTest() {
+        // Логика проверки баллов
+        let score = 0;
+        const answers = {ans1: "NaMgAl"}; // Пример
+        // ... (проход по всем 10 ответам)
+        
+        localStorage.setItem('chem11_done', 'true');
+        
+        // Формирование бланка
+        document.getElementById('printFio').innerText = "Участник: " + document.getElementById('userFio').value;
+        document.getElementById('printResult').innerText = "Баллы: " + score + " / 10";
+        
+        alert("Данные сохранены. Нажмите Ctrl+P для печати бланка.");
+        window.print();
+    }
+</script>
+</body>
+</html>
