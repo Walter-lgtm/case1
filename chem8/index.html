@@ -75,12 +75,19 @@
     ];
 
     function startTest() {
-        const fio = document.getElementById('userFio').value.trim();
-        if (fio.length < 5) return alert("Введите ФИО!");
-        generateQuiz();
-        document.getElementById('auth-screen').style.display = 'none';
-        document.getElementById('quiz-screen').style.display = 'block';
+    const fio = document.getElementById('userFio').value.trim();
+    if (fio.length < 5) return alert("Введите ФИО!");
+    
+    // ПРОВЕРКА: Если в памяти браузера есть метка, блокируем доступ
+    if (localStorage.getItem('done_vpr8')) {
+        alert("Доступ закрыт! Вы уже выполняли эту работу.");
+        return;
     }
+    
+    generateQuiz();
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('quiz-screen').style.display = 'block';
+}
 
     function generateQuiz() {
         const container = document.getElementById('questions');
