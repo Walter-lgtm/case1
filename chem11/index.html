@@ -5,141 +5,172 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>L & ⅂ — CHEMISTRY EXAM 11</title>
     <style>
-    .print-only { display: none; }
+        :root { --steel: #2c3e50; --ice: #00d4ff; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #333; }
+        
+        /* Стили для экрана */
+        .container { max-width: 850px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .no-print { display: block; }
+        .print-only { display: none; }
 
-    @media print {
-        /* Скрываем всё, что имеет класс no-print */
-        .no-print, .helper-nav, .btn-main, #auth-screen, #quiz-screen, #print-instruction { 
-            display: none !important; 
+        /* МАГИЯ ПЕЧАТИ: Скрываем всё, кроме бланка */
+        @media print {
+            .no-print, .helper-nav, .btn-main, #print-instruction, .task, h1, p, input { 
+                display: none !important; 
+            }
+            .print-only { 
+                display: block !important; 
+                position: absolute;
+                top: 0; left: 0; width: 100%;
+                color: black !important;
+            }
+            body { background: white !important; padding: 0; margin: 0; }
+            .print-card { border: 2px solid #000; padding: 20px; min-height: 100vh; }
         }
-        /* Бланк делаем видимым и выводим в начало страницы */
-        .print-only { 
-            display: block !important; 
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-        }
-        body { background: white !important; }
-    }
-    .print-card { border: 2px solid #000; padding: 20px; }
+        /* Стили элементов управления */
+        .helper-nav { position: sticky; top: 0; background: white; padding: 10px 0; border-bottom: 2px solid var(--ice); display: flex; gap: 10px; z-index: 100; }
+        .btn-link { background: var(--steel); color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; font-size: 0.9rem; }
+        .task { background: #fafafa; border-left: 5px solid var(--steel); padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .task p { margin: 0 0 15px 0; font-weight: bold; }
+        input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; box-sizing: border-box; }
+        .btn-main { background: #27ae60; color: white; border: none; padding: 15px 30px; border-radius: 5px; cursor: pointer; width: 100%; font-size: 1.2rem; font-weight: bold; margin-top: 20px; }
+        #auth-screen { text-align: center; padding: 50px 0; }
 </style>
 </head>
 <body>
 
 <div class="container no-print">
+    <!-- ЭКРАН ВХОДА -->
     <div id="auth-screen">
-        <h1>🔐 КОНТРОЛЬНАЯ РАБОТА 11 КЛАСС: ХИМИЯ</h1>
-        <p>Для доступа к контрольной работе введите ФИО:</p>
-        <input type="text" id="userFio" placeholder="Фамилия Имя Отчество" style="width: 300px; margin-bottom: 20px;"><br>
-        <button class="btn-main" style="width: 320px;" onclick="startTest()">ВОЙТИ В СИСТЕМУ</button>
+        <h1>🔐 КОНТРОЛЬНАЯ РАБОТА: ХИМИЯ-11</h1>
+        <p>Для доступа введите Ваше ФИО:</p>
+        <input type="text" id="userFio" placeholder="Иванов Иван Иванович" style="max-width: 400px;"><br>
+        <button class="btn-main" style="max-width: 400px;" onclick="startTest()">НАЧАТЬ ТЕСТ</button>
     </div>
 
+    <!-- ЭКРАН ТЕСТА -->
     <div id="quiz-screen" style="display:none;">
         <div class="helper-nav">
-            <a href="https://walter-lgtm.github.io/loki-chemistry/periodic_bad.html" target="_blank" class="btn-link">⚛️ ПСХЭ</a>
-            <a href="https://walter-lgtm.github.io/loki-chemistry/solubility_bad.html" target="_blank" class="btn-link">💧 Растворимость</a>
+            <a href="https://walter-lgtm.github.io/loki-chemistry/periodic_bad.html="_blank" class="btn-link">⚛️ ПСХЭ</a>
+            <a href="https://walter-lgtm.github.io/loki-chemistry/periodic_bad.html" target="_blank" class="btn-link">💧 Таблица растворимости</a>
         </div>
 
         <div id="tasks-container">
-            <!-- Задания -->
-            <div class="task"><p>1. Из ряда элементов Li, Na, K выберите те, у которых радиус атома увеличивается. Запишите символы в порядке возрастания радиуса.</p><input type="text" id="ans1"></div>
+            <!-- Задание №1 (Обновленное под цифры) -->
+            <div class="task">
+                <p>1. Даны химические элементы: 1) Li, 2) Na, 3) K. Выберите номера элементов в порядке возрастания их атомного радиуса. (Запишите последовательность цифр без пробелов).</p>
+                <input type="text" id="ans1" placeholder="Например: 123">
+            </div>
+
             <div class="task"><p>2. Определите число валентных электронов у атома Хрома (Cr). Запишите только цифру.</p><input type="text" id="ans2"></div>
-            <div class="task"><p>3. Расположите элементы F, Cl, Br в порядке убывания их электроотрицательности.</p><input type="text" id="ans3"></div>
-            <div class="task"><p>4. В результате электролиза раствора CuCl2 на катоде выделилось вещество. Запишите его формулу.</p><input type="text" id="ans4"></div>
-            <div class="task"><p>5. К 200г 10% раствора соли добавили 50г воды. Вычислите массовую долю соли в полученном растворе. (В %, точность до целых).</p><input type="text" id="ans5"></div>
-            <div class="task"><p>6. Определите степень окисления серы в ионе (SO4)2-.</p><input type="text" id="ans6"></div>
-            <div class="task"><p>7. Выберите из списка (NaOH, Al2O3, HCl) амфотерный оксид. Запишите формулу.</p><input type="text" id="ans7"></div>
-            <div class="task"><p>8. Вычислите массу соли, которую нужно растворить в 150г воды для получения 25% раствора. (В граммах, точность до сотых).</p><input type="text" id="ans8"></div>
-            <div class="task"><p>9. Запишите сумму коэффициентов в уравнении: 2H2 + O2 = 2H2O</p><input type="text" id="ans9"></div>
-            <div class="task"><p>10. Какое вещество является сильнейшим неметаллом в ПСХЭ?</p><input type="text" id="ans10"></div>
+            <div class="task"><p>3. Расположите элементы F, Cl, Br в порядке убывания их электроотрицательности. Запишите символы без пробелов.</p><input type="text" id="ans3"></div>
+            <div class="task"><p>4. В результате электролиза раствора CuCl2 на катоде выделилось вещество. Запишите его химическую формулу.</p><input type="text" id="ans4"></div>
+            <div class="task"><p>5. К 200г 10% раствора соли добавили 50г воды. Вычислите массовую долю соли в полученном растворе. (В %, запишите только число, точность до целых).</p><input type="text" id="ans5"></div>
+            <div class="task"><p>6. Определите степень окисления серы в ионе (SO4)2-. Запишите со знаком (напр: +2).</p><input type="text" id="ans6"></div>
+            <div class="task"><p>7. Из списка (NaOH, Al2O3, HCl) выберите амфотерный оксид. Запишите его формулу.</p><input type="text" id="ans7"></div>
+            <div class="task"><p>8. Вычислите массу соли (в граммах), которую нужно растворить в 150г воды для получения 25% раствора. (Точность до целых).</p><input type="text" id="ans8"></div>
+            <div class="task"><p>9. Запишите сумму коэффициентов в уравнении реакции: 2H2 + O2 = 2H2O</p><input type="text" id="ans9"></div>
+            <div class="task"><p>10. Запишите химический символ элемента, являющегося самым сильным неметаллом в ПСХЭ.</p><input type="text" id="ans10"></div>
         </div>
 
-        <!-- Инструкция, видимая только перед печатью -->
-<div id="print-instruction" style="display:none; background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; margin: 20px 0; border-radius: 8px; color: #856404;">
-    <strong>💡 ИНСТРУКЦИЯ ПО СОХРАНЕНИЮ:</strong><br>
-    В открывшемся окне печати в поле <b>"Принтер"</b> (или "Назначение") выберите <b>"Сохранить как PDF"</b>. 
-    После этого отправьте полученный файл преподавателю.
-</div>
+       <!-- БЛОК ЗАВЕРШЕНИЯ -->
+        <div id="print-instruction" style="display:none; background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; margin: 20px 0; border-radius: 8px; color: #856404;">
+            <strong>💡 ИНСТРУКЦИЯ ПО СОХРАНЕНИЮ:</strong><br>
+            В окне печати в поле <b>"Принтер"</b> (или "Назначение") выберите <b>"Сохранить как PDF"</b>.
+        </div>
 
-<button class="btn-main" id="finalBtn" onclick="submitTest()">ОТПРАВИТЬ И СФОРМИРОВАТЬ БЛАНК</button>
-</div>
+        <button class="btn-main" id="finalBtn" onclick="submitTest()">ОТПРАВИТЬ И СФОРМИРОВАТЬ БЛАНК</button>
+    </div> <!-- Закрытие quiz-screen -->
+</div> <!-- Закрытие основного container -->
 
+<!-- БЛАНК ДЛЯ ПЕЧАТИ (Снаружи основного контейнера) -->
 <div id="print-area" class="print-only">
     <div class="print-card">
-        <h1>ПРОТОКОЛ ТЕСТИРОВАНИЯ ХИМИЯ-11</h1>
-        <p><strong>Участник:</strong> <span id="resFio"></span></p>
-        <p><strong>Дата:</strong> <span id="resDate"></span></p>
+        <h1 style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px;">ПРОТОКОЛ ТЕСТИРОВАНИЯ: ХИМИЯ-11</h1>
+        <div style="margin: 20px 0; font-size: 1.1rem;">
+            <p><strong>Участник:</strong> <span id="resFio"></span></p>
+            <p><strong>Дата/Время:</strong> <span id="resDate"></span></p>
+            <p><strong>Итоговый балл:</strong> <span id="resScore"></span> / 10</p>
+            <p><strong>Оценка по шкале:</strong> <span id="resGrade"></span></p>
+        </div>
         <hr>
-        <p><strong>Итоговый балл:</strong> <span id="resScore"></span> / 10</p>
-        <p><strong>Оценка:</strong> <span id="resGrade"></span></p>
-        <h3>Ваши ответы:</h3>
-        <div id="resDetails"></div>
+        <h3>ОТВЕТЫ УЧАСТНИКА:</h3>
+        <div id="resDetails" style="line-height: 1.6;"></div>
+        <div style="margin-top: 50px; border-top: 1px solid #ccc; padding-top: 10px; font-size: 0.8rem; color: #666;">
+            * Данный документ сформирован автоматически и является подтверждением прохождения контроля знаний.
+        </div>
     </div>
 </div>
 
 <script>
-    const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbyU9bPajbY7Ic_YI1jJCYrkFfZCj-6f2Pv9fK7mPLrifbU0KXXmH2ZISrO7zpexEPxv/exec"; // <--- ТВОЯ ССЫЛКА СЮДА
+    const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbyU9bPajbY7Ic_YI1jJCYrkFfZCj-6f2Pv9fK7mPLrifbU0KXXmH2ZISrO7zpexEPxv/exec";
 
     function startTest() {
-        const fio = document.getElementById('userFio').value;
-        if (fio.length < 5) return alert("Введите полное ФИО");
-        if (localStorage.getItem('done_chem11')) return alert("Доступ закрыт. Работа уже была выполнена.");
+        const fio = document.getElementById('userFio').value.trim();
+        if (fio.length < 5) return alert("Пожалуйста, введите полное ФИО.");
+        if (localStorage.getItem('done_chem11')) return alert("Доступ закрыт. Вы уже выполняли эту работу.");
         
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('quiz-screen').style.display = 'block';
+        window.scrollTo(0,0);
     }
 
     function submitTest() {
-    const fio = document.getElementById('userFio').value;
-    const keys = {
-        ans1: "LiNaK", ans2: "6", ans3: "FClBr", ans4: "Cu", ans5: "8",
-        ans6: "+6", ans7: "Al2O3", ans8: "50", ans9: "5", ans10: "F"
-    };
-    
-    let score = 0;
-    let userAns = {};
-    for(let i=1; i<=10; i++) {
-        let val = document.getElementById('ans'+i).value.trim();
-        userAns['q'+i] = val;
-        if(val.toLowerCase() === keys['ans'+i].toLowerCase()) score++;
+        const fio = document.getElementById('userFio').value.trim();
+        const keys = {
+            ans1: "123", ans2: "6", ans3: "FClBr", ans4: "Cu", ans5: "8",
+            ans6: "+6", ans7: "Al2O3", ans8: "50", ans9: "5", ans10: "F"
+        };
+        
+        let score = 0;
+        let userAns = {};
+        let detailsHtml = "";
+
+        // Сбор ответов и проверка
+        for(let i=1; i<=10; i++) {
+            let val = document.getElementById('ans'+i).value.trim();
+            userAns['q'+i] = val;
+            let isCorrect = val.toLowerCase() === keys['ans'+i].toLowerCase();
+            if(isCorrect) score++;
+            
+            // Формируем строки для бланка
+            detailsHtml += `<div style="border-bottom: 1px solid #eee; padding: 5px 0;">
+                <b>Задание ${i}:</b> ${val} ${isCorrect ? '✅' : '❌'}
+            </div>`;
+        }
+
+        let grade = score >= 9 ? 5 : (score >= 7 ? 4 : (score >= 4 ? 3 : 2));
+
+        // Отправка данных в Google Таблицу
+        fetch(GOOGLE_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({fio: fio, score: score, grade: grade, answers: userAns})
+        });
+
+        // Блокировка повторного прохождения
+        localStorage.setItem('done_chem11', 'true');
+
+        // Заполнение бланка ПЕРЕД выводом на печать
+        document.getElementById('resFio').innerText = fio;
+        document.getElementById('resDate').innerText = new Date().toLocaleString();
+        document.getElementById('resScore').innerText = score;
+        document.getElementById('resGrade').innerText = grade;
+        document.getElementById('resDetails').innerHTML = detailsHtml;
+
+        // Прячем кнопку и показываем инструкцию
+        document.getElementById('finalBtn').style.display = 'none';
+        document.getElementById('print-instruction').style.display = 'block';
+        // Силовая инициализация отрисовки для Firefox
+        const printArea = document.getElementById('print-area');
+        printArea.style.visibility = 'visible'; 
+        printArea.offsetHeight; // Принудительный пересчет геометрии
+
+        // Финальный вызов печати с задержкой для стабильности PDF
+        setTimeout(() => {
+            window.print();
+        }, 1500);
     }
-
-    let grade = score >= 9 ? 5 : (score >= 7 ? 4 : (score >= 4 ? 3 : 2));
-
-    // Отправка в Google
-    fetch(GOOGLE_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify({fio: fio, score: score, grade: grade, answers: userAns})
-    });
-
-    localStorage.setItem('done_chem11', 'true');
-
-    // Заполнение бланка
-    document.getElementById('resFio').innerText = fio;
-    document.getElementById('resDate').innerText = new Date().toLocaleString();
-    document.getElementById('resScore').innerText = score;
-    document.getElementById('resGrade').innerText = grade;
-    
-    let details = "";
-    for(let i=1; i<=10; i++) {
-        details += `<p style="border-bottom: 1px dotted #ccc; padding: 5px;">Вопрос ${i}: <b>${userAns['q'+i]}</b></p>`;
-    }
-    document.getElementById('resDetails').innerHTML = details;
-
-    // СИЛОВАЯ ПЕРЕРИСОВКА (необходима для Firefox, чтобы данные "проявились")
-    document.getElementById('print-area').offsetHeight; 
-
-    // Показываем инструкцию (она в no-print, поэтому на бланк не попадет)
-    document.getElementById('print-instruction').style.display = 'block';
-    document.getElementById('finalBtn').style.display = 'none';
-
-    // Ожидание 1.5 секунды для полной отрисовки всех элементов перед печатью
-    setTimeout(() => {
-        window.print();
-    }, 1500);
-}
 </script>
 </body>
 </html>
