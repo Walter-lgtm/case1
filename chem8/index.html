@@ -127,6 +127,8 @@
 
     fetch(GOOGLE_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify({fio: fio, score: score, grade: grade})});
     
+    localStorage.setItem('done_vpr8', 'true'); 
+    
     document.getElementById('resFio').innerText = fio;
     document.getElementById('resDate').innerText = new Date().toLocaleString();
     document.getElementById('resScore').innerText = score;
