@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>ВПР ХИМИЯ-8: ТРЕНАЖЕР</title>
+    <title>ВПР ХИМИЯ-8: RANDOM GENERATOR</title>
     <style>
         :root { --steel: #2c3e50; --ice: #00d4ff; }
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; }
@@ -15,6 +15,8 @@
         @media print {
             .no-print { display: none !important; }
             .print-only { display: block !important; position: absolute; top: 0; left: 0; width: 100%; }
+            body { background: white; }
+            .print-card { border: 2px solid #000; padding: 20px; }
         }
     </style>
 </head>
@@ -22,10 +24,10 @@
 
 <div class="container no-print" id="mainApp">
     <div id="auth-screen" style="text-align: center;">
-        <h1>🧪 ВПР ХИМИЯ: 8 КЛАСС</h1>
-        <p>Введите ФИО для начала работы:</p>
+        <h1>🧪 ВПР ХИМИЯ: 8 КЛАСС (RANDOM)</h1>
+        <p>Введите ФИО участника:</p>
         <input type="text" id="userFio" placeholder="Иванов Иван" style="max-width: 400px; margin-bottom: 20px;"><br>
-        <button class="btn-main" style="max-width: 400px;" onclick="startTest()">НАЧАТЬ ТРЕНИРОВКУ</button>
+        <button class="btn-main" style="max-width: 400px;" onclick="startTest()">НАЧАТЬ</button>
     </div>
 
     <div id="quiz-screen" style="display:none;">
@@ -34,30 +36,19 @@
             <a href="https://walter-lgtm.github.io/loki-chemistry/solubility_bad.html" target="_blank" style="background:#2c3e50; color:white; padding:8px; text-decoration:none; border-radius:4px; font-size:0.8rem;">💧 Растворимость</a>
         </div>
 
-        <div id="questions">
-            <div class="task"><p>1. Выберите метод разделения смеси песка и воды: 1) выпаривание, 2) фильтрование, 3) дистилляция. (Цифра)</p><input type="text" id="ans1"></div>
-            <div class="task"><p>2. Выберите физическое явление: 1) горение свечи, 2) плавление льда, 3) ржавление железа. (Цифра)</p><input type="text" id="ans2"></div>
-            <div class="task"><p>3. Вычислите молярную массу (M) углекислого газа CO2. (Только число)</p><input type="text" id="ans3"></div>
-            <div class="task"><p>4. Определите число протонов в атоме Фосфора (P). (Только число)</p><input type="text" id="ans4"></div>
-            <div class="task"><p>5. Определите степень окисления кислорода в большинстве соединений. (Напр: -2)</p><input type="text" id="ans5"></div>
-            <div class="task"><p>6. К какому классу относится вещество NaOH: 1) оксид, 2) основание, 3) кислота, 4) соль. (Цифра)</p><input type="text" id="ans6"></div>
-            <div class="task"><p>7. Тип реакции 2H2 + O2 = 2H2O: 1) разложение, 2) замещение, 3) соединение. (Цифра)</p><input type="text" id="ans7"></div>
-            <div class="task"><p>8. Газ, поддерживающий дыхание и горение: 1) водород, 2) азот, 3) кислород. (Цифра)</p><input type="text" id="ans8"></div>
-            <div class="task"><p>9. Массовая доля соли в растворе (10г соли + 90г воды) в %. (Только число)</p><input type="text" id="ans9"></div>
-            <div class="task"><p>10. Сколько энергетических уровней у атома Натрия (Na)? (Цифра)</p><input type="text" id="ans10"></div>
-        </div>
+        <div id="questions"></div>
         
         <div id="print-instruction" style="display:none; background: #fff3cd; padding: 15px; margin: 20px 0; border-radius: 8px;">
-            💡 Сохраните результат как PDF и отправьте учителю.
+            💡 Сохраните результат как PDF.
         </div>
-        <button class="btn-main" id="finalBtn" onclick="submitTest()">ЗАВЕРШИТЬ И ПЕЧАТАТЬ БЛАНК</button>
+        <button class="btn-main" id="finalBtn" onclick="submitTest()">ЗАВЕРШИТЬ И ПЕЧАТАТЬ</button>
     </div>
 </div>
 
 <div id="print-area" class="print-only">
-    <div style="border: 2px solid #000; padding: 20px;">
+    <div class="print-card">
         <h2 style="text-align: center; text-decoration: underline;">ПРОТОКОЛ ВПР (8 КЛАСС)</h2>
-        <p><strong>УЧАСТНИК:</strong> <span id="resFio" style="text-transform: uppercase; font-weight: bold;"></span></p>
+        <p><strong>УЧАСТНИК:</strong> <span id="resFio" style="text-transform: uppercase;"></span></p>
         <p><strong>ДАТА:</strong> <span id="resDate"></span></p>
         <p><strong>РЕЗУЛЬТАТ:</strong> <span id="resScore"></span> / 10 (Оценка: <span id="resGrade"></span>)</p>
         <hr>
@@ -68,38 +59,59 @@
 
 <script>
     const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbzZGNZ7TBfeJi6LgyyNv6t6pyEbkXHaODR3nVZJ9aErfXBmsB6n6Y2DBRhJHgKNAS4c/exec";
+    let currentKeys = {};
+
+    const pool = [
+        [{q: "Метод разделения смеси ПЕСКА И ВОДЫ: 1) выпаривание, 2) фильтрование, 3) отстаивание. (Цифра)", a: "2"}, {q: "Метод разделения смеси СОЛИ И ВОДЫ: 1) выпаривание, 2) фильтрование, 3) дистилляция. (Цифра)", a: "1"}],
+        [{q: "Выберите ХИМИЧЕСКОЕ явление: 1) таяние льда, 2) горение магния, 3) кипение воды. (Цифра)", a: "2"}, {q: "Выберите ФИЗИЧЕСКОЕ явление: 1) ковка меди, 2) гниение листьев, 3) скисание молока. (Цифра)", a: "1"}],
+        [{q: "Вычислите молярную массу CO2. (Число)", a: "44"}, {q: "Вычислите молярную массу метана CH4. (Число)", a: "16"}],
+        [{q: "Число протонов в атоме Алюминия (Al). (Число)", a: "13"}, {q: "Число протонов в атоме Хлора (Cl). (Число)", a: "17"}],
+        [{q: "Степень окисления водорода в H2O. (Напр: +1)", a: "+1"}, {q: "Степень окисления серы в H2S. (Напр: -2)", a: "-2"}],
+        [{q: "К какому классу относится H2SO4: 1) оксид, 2) основание, 3) кислота. (Цифра)", a: "3"}, {q: "К какому классу относится CaO: 1) оксид, 2) основание, 3) соль. (Цифра)", a: "1"}],
+        [{q: "Тип реакции CaCO3 = CaO + CO2: 1) соединение, 2) разложение, 3) обмен. (Цифра)", a: "2"}, {q: "Тип реакции Zn + 2HCl = ZnCl2 + H2: 1) соединение, 2) замещение, 3) разложение. (Цифра)", a: "2"}],
+        [{q: "Газ, который ЛЕГЧЕ воздуха: 1) кислород, 2) азот, 3) водород. (Цифра)", a: "3"}, {q: "Газ, который тяжелее воздуха и поддерживает горение: 1) водород, 2) кислород, 3) метан. (Цифра)", a: "2"}],
+        [{q: "Массовая доля соли в растворе (20г соли + 180г воды) в %. (Число)", a: "10"}, {q: "Массовая доля сахара в растворе (50г сахара + 150г воды) в %. (Число)", a: "25"}],
+        [{q: "Сколько электронных слоев у атома Калия (K)? (Цифра)", a: "4"}, {q: "Сколько электронных слоев у атома Лития (Li)? (Цифра)", a: "2"}]
+    ];
 
     function startTest() {
         const fio = document.getElementById('userFio').value.trim();
         if (fio.length < 5) return alert("Введите ФИО!");
+        generateQuiz();
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('quiz-screen').style.display = 'block';
     }
 
+    function generateQuiz() {
+        const container = document.getElementById('questions');
+        container.innerHTML = '';
+        pool.forEach((options, index) => {
+            const variant = options[Math.floor(Math.random() * options.length)];
+            const qNum = index + 1;
+            currentKeys['ans' + qNum] = variant.a;
+            container.innerHTML += `<div class="task"><p>${qNum}. ${variant.q}</p><input type="text" id="ans${qNum}" autocomplete="off"></div>`;
+        });
+    }
+
     function submitTest() {
         const fio = document.getElementById('userFio').value.trim();
-        const keys = {ans1:"2", ans2:"2", ans3:"44", ans4:"15", ans5:"-2", ans6:"2", ans7:"3", ans8:"3", ans9:"10", ans10:"3"};
         let score = 0; let detailsHtml = "";
-        for(let i=1; i<=10; i++) {
+        for(let i=1; i<=pool.length; i++) {
             let val = document.getElementById('ans'+i).value.trim();
-            let isCorrect = val === keys['ans'+i];
+            let isCorrect = val === currentKeys['ans'+i];
             if(isCorrect) score++;
-            detailsHtml += `<p>Задание ${i}: ${val} ${isCorrect ? '✅' : '❌'}</p>`;
+            detailsHtml += `<p>Задание ${i}: ${val} ${isCorrect ? '✅' : '❌'} (Правильно: ${currentKeys['ans'+i]})</p>`;
         }
         let grade = score >= 9 ? 5 : (score >= 7 ? 4 : (score >= 4 ? 3 : 2));
-        
         fetch(GOOGLE_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify({fio: fio, score: score, grade: grade})});
-        
         document.getElementById('resFio').innerText = fio;
-        document.getElementById('resDate').innerText = new Date().toLocaleDateString();
+        document.getElementById('resDate').innerText = new Date().toLocaleString();
         document.getElementById('resScore').innerText = score;
         document.getElementById('resGrade').innerText = grade;
         document.getElementById('resDetails').innerHTML = detailsHtml;
-
         document.getElementById('finalBtn').style.display = 'none';
         document.getElementById('print-instruction').style.display = 'block';
         document.getElementById('print-area').style.display = 'block';
-
         setTimeout(() => { window.print(); }, 1500);
     }
 </script>
