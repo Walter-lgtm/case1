@@ -5,24 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>L & ⅂ — CHEMISTRY EXAM 11</title>
     <style>
-    /* Прячем бланк на экране */
     .print-only { display: none; }
 
     @media print {
-        /* Прячем всё лишнее при печати */
-        .no-print, .helper-nav, .btn-main, #print-instruction { 
+        /* Скрываем всё, что имеет класс no-print */
+        .no-print, .helper-nav, .btn-main, #auth-screen, #quiz-screen, #print-instruction { 
             display: none !important; 
         }
-        /* Показываем бланк и заставляем его быть видимым */
+        /* Бланк делаем видимым и выводим в начало страницы */
         .print-only { 
             display: block !important; 
-            color: black !important; 
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
         }
         body { background: white !important; }
     }
-    /* Добавим рамку для наглядности в самом бланке */
-    .print-card { border: 2px solid #000; padding: 20px; margin: 10px; }
+    .print-card { border: 2px solid #000; padding: 20px; }
 </style>
 </head>
 <body>
@@ -124,18 +124,21 @@
     
     let details = "";
     for(let i=1; i<=10; i++) {
-        details += `<p>Вопрос ${i}: <b>${userAns['q'+i]}</b></p>`;
+        details += `<p style="border-bottom: 1px dotted #ccc; padding: 5px;">Вопрос ${i}: <b>${userAns['q'+i]}</b></p>`;
     }
     document.getElementById('resDetails').innerHTML = details;
+
+    // СИЛОВАЯ ПЕРЕРИСОВКА (необходима для Firefox, чтобы данные "проявились")
+    document.getElementById('print-area').offsetHeight; 
 
     // Показываем инструкцию (она в no-print, поэтому на бланк не попадет)
     document.getElementById('print-instruction').style.display = 'block';
     document.getElementById('finalBtn').style.display = 'none';
 
-    // ВАЖНО: Ждем чуть дольше (1 секунду), чтобы браузер перерисовал страницу
+    // Ожидание 1.5 секунды для полной отрисовки всех элементов перед печатью
     setTimeout(() => {
         window.print();
-    }, 1000);
+    }, 1500);
 }
 </script>
 </body>
