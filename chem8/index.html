@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>ВПР ХИМИЯ-8: RANDOM GENERATOR</title>
+    <title>ХИМИЯ-8: ЗАДАНИЯ НА ДОПОЛНИТЕЛЬНУЮ ОЦЕНКУ</title>
     <style>
         :root { --steel: #2c3e50; --ice: #00d4ff; }
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; }
@@ -24,7 +24,7 @@
 
 <div class="container no-print" id="mainApp">
     <div id="auth-screen" style="text-align: center;">
-        <h1>🧪 ВПР ХИМИЯ: 8 КЛАСС (RANDOM)</h1>
+        <h1>🧪 ХИМИЯ: 8 КЛАСС</h1>
         <p>Введите ФИО участника:</p>
         <input type="text" id="userFio" placeholder="Иванов Иван" style="max-width: 400px; margin-bottom: 20px;"><br>
         <button class="btn-main" style="max-width: 400px;" onclick="startTest()">НАЧАТЬ</button>
@@ -94,26 +94,44 @@
     }
 
     function submitTest() {
-        const fio = document.getElementById('userFio').value.trim();
-        let score = 0; let detailsHtml = "";
-        for(let i=1; i<=pool.length; i++) {
-            let val = document.getElementById('ans'+i).value.trim();
-            let isCorrect = val === currentKeys['ans'+i];
-            if(isCorrect) score++;
-            detailsHtml += `<p>Задание ${i}: ${val} ${isCorrect ? '✅' : '❌'} (Правильно: ${currentKeys['ans'+i]})</p>`;
-        }
-        let grade = score >= 9 ? 5 : (score >= 7 ? 4 : (score >= 4 ? 3 : 2));
-        fetch(GOOGLE_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify({fio: fio, score: score, grade: grade})});
-        document.getElementById('resFio').innerText = fio;
-        document.getElementById('resDate').innerText = new Date().toLocaleString();
-        document.getElementById('resScore').innerText = score;
-        document.getElementById('resGrade').innerText = grade;
-        document.getElementById('resDetails').innerHTML = detailsHtml;
-        document.getElementById('finalBtn').style.display = 'none';
-        document.getElementById('print-instruction').style.display = 'block';
-        document.getElementById('print-area').style.display = 'block';
-        setTimeout(() => { window.print(); }, 1500);
+    const fio = document.getElementById('userFio').value.trim();
+    let score = 0; 
+    let detailsHtml = "";
+    
+    for(let i=1; i<=pool.length; i++) {
+        let val = document.getElementById('ans'+i).value.trim();
+        let isCorrect = val === currentKeys['ans'+i];
+        if(isCorrect) score++;
+        // УБРАЛИ ПОДСКАЗКУ, оставили только вердикт
+        detailsHtml += `<p>Задание ${i}: ${val} ${isCorrect ? '✅' : '❌'}</p>`;
     }
+
+    // СУРОВАЯ ШКАЛА: 5 только за 10/10
+    let grade = 2;
+    if (score === 10) {
+        grade = 5;
+    } else if (score >= 8) {
+        grade = 4;
+    } else if (score >= 5) {
+        grade = 3;
+    } else {
+        grade = 2;
+    }
+
+    fetch(GOOGLE_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify({fio: fio, score: score, grade: grade})});
+    
+    document.getElementById('resFio').innerText = fio;
+    document.getElementById('resDate').innerText = new Date().toLocaleString();
+    document.getElementById('resScore').innerText = score;
+    document.getElementById('resGrade').innerText = grade;
+    document.getElementById('resDetails').innerHTML = detailsHtml;
+    
+    document.getElementById('finalBtn').style.display = 'none';
+    document.getElementById('print-instruction').style.display = 'block';
+    document.getElementById('print-area').style.display = 'block';
+    
+    setTimeout(() => { window.print(); }, 1500);
+}
 </script>
 </body>
 </html>
