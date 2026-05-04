@@ -5,39 +5,111 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WW | ORGANIC STATION</title>
     <style>
-        /* Стиль Steel & Ice */
-        :root { --main-ice: #00f2ff; --steel: #2c3e50; }
-        body { font-family: 'Courier New', monospace; background: #0b0e14; color: white; margin: 0; padding: 20px; }
-        .nav-block { position: fixed; top: 10px; right: 10px; background: var(--steel); padding: 10px; border: 1px solid var(--main-ice); }
-        .task-card { background: rgba(255,255,255,0.05); border-left: 4px solid var(--main-ice); padding: 15px; margin: 15px 0; }
-        input { background: transparent; border: none; border-bottom: 2px solid var(--main-ice); color: var(--main-ice); font-size: 1.2rem; width: 80px; text-align: center; }
-        .hidden { display: none; }
-        #official-blank { border: 5px double white; padding: 30px; text-align: center; }
-    </style>
-</head>
-<body>
+    :root { 
+        --main-ice: #00f2ff; 
+        --steel: #2c3e50; 
+        --bg-dark: #0b0e14;
+    }
+    
+    body { 
+        font-family: 'Courier New', monospace; 
+        background: var(--bg-dark); 
+        color: white; 
+        margin: 0; 
+        padding: 0; 
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    /* Навигация (адаптивная) */
+    .nav-block { 
+        position: absolute; top: 10px; right: 10px; 
+        background: var(--steel); padding: 8px; 
+        border: 1px solid var(--main-ice); font-size: 0.8rem;
+    }
+
+    /* Центровка блока входа */
+    #auth {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        text-align: center;
+    }
+
+    #auth h1 { color: var(--main-ice); margin-bottom: 30px; font-size: 1.8rem; }
+
+    /* Поля ввода и кнопки */
+    input[type="text"] { 
+        background: transparent; border: none; 
+        border-bottom: 2px solid var(--main-ice); 
+        color: var(--main-ice); font-size: 1.2rem; 
+        text-align: center; outline: none; transition: 0.3s;
+        width: 100%; max-width: 400px;
+    }
+
+    button {
+        margin-top: 30px; background: transparent; 
+        border: 1px solid var(--main-ice); color: var(--main-ice);
+        padding: 15px 30px; cursor: pointer; font-family: inherit;
+        text-transform: uppercase; letter-spacing: 2px;
+    }
+
+    button:hover { background: var(--main-ice); color: var(--bg-dark); }
+
+    /* Контейнер теста */
+    #test-container { padding: 15px; max-width: 800px; margin: 0 auto; }
+    
+    .task-card { 
+        background: rgba(255,255,255,0.05); border-left: 4px solid var(--main-ice); 
+        padding: 15px; margin: 20px 0; 
+    }
+
+    /* Адаптивность под смартфоны */
+    @media (max-width: 600px) {
+        #auth h1 { font-size: 1.4rem; }
+        .task-card { font-size: 0.9rem; }
+        .nav-block { position: static; text-align: center; margin-bottom: 20px; }
+        #official-blank { padding: 15px; border-width: 2px; }
+    }
+
+    .hidden { display: none !important; }
+    
+    #official-blank { 
+        border: 5px double white; padding: 30px; text-align: center; 
+        margin: 20px; background: #fff; color: #000; /* Приоритет PDF-печати */
+    }
+</style>
 
 <div id="app">
     <div class="nav-block">
-        <a href="https://example.com" target="_blank">Справочник ПСХЭ</a>
+        <a href="https://example.com" target="_blank" style="color: var(--main-ice); text-decoration: none;">📋 ТАБЛИЦА РАСТВОРИМОСТИ / ПСХЭ</a>
     </div>
 
-    <h1>СТАНЦИЯ /ORGANIC (10 КЛАСС)</h1>
+    <!-- ВХОД (Центрирован) -->
     <div id="auth">
-        <input type="text" id="userName" placeholder="ФИО ВЕРХНИМ РЕГИСТРОМ" style="width: 300px;">
-        <button onclick="startTest()">НАЧАТЬ ИСПЫТАНИЕ</button>
+        <h1>STATION /ORGANIC</h1>
+        <input type="text" id="userName" placeholder="ВВЕДИТЕ ФИО" autocomplete="off">
+        <button onclick="startTest()">ДЕЙСТВОВАТЬ ПО СХЕМЕ WW</button>
     </div>
 
+    <!-- ТЕСТ -->
     <div id="test-container" class="hidden">
         <div id="quiz"></div>
-        <button onclick="finishTest()">ЗАВЕРШИТЬ И ОТПРАВИТЬ</button>
+        <button onclick="finishTest()" style="width: 100%;">ЗАВЕРШИТЬ ИСПЫТАНИЕ</button>
     </div>
 
+    <!-- БЛАНК -->
     <div id="official-blank" class="hidden">
+        <p>МИНИСТЕРСТВО ЦИФРОВЫХ ЛАБОРАТОРИЙ WW</p>
+        <hr>
         <h2 id="blank-fio"></h2>
-        <div id="result-status"></div>
-        <p>КЛЮЧ ДОСТУПА: [PROTECTED]</p>
-        <p><i>Нажмите Ctrl+P и сохраните как PDF для отчета</i></p>
+        <div id="result-status" style="font-size: 1.5rem; margin: 20px 0;"></div>
+        <p style="font-size: 0.8rem;">ID: <span id="session-id"></span></p>
+        <button onclick="window.print()" id="print-btn">СОХРАНИТЬ В PDF</button>
     </div>
 </div>
 
