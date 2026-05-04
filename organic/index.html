@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WW | ORGANIC STATION</title>
+    <style>
+        /* Стиль Steel & Ice */
+        :root { --main-ice: #00f2ff; --steel: #2c3e50; }
+        body { font-family: 'Courier New', monospace; background: #0b0e14; color: white; margin: 0; padding: 20px; }
+        .nav-block { position: fixed; top: 10px; right: 10px; background: var(--steel); padding: 10px; border: 1px solid var(--main-ice); }
+        .task-card { background: rgba(255,255,255,0.05); border-left: 4px solid var(--main-ice); padding: 15px; margin: 15px 0; }
+        input { background: transparent; border: none; border-bottom: 2px solid var(--main-ice); color: var(--main-ice); font-size: 1.2rem; width: 80px; text-align: center; }
+        .hidden { display: none; }
+        #official-blank { border: 5px double white; padding: 30px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div class="nav-block">
+        <a href="https://example.com" target="_blank">Справочник ПСХЭ</a>
+    </div>
+
+    <h1>СТАНЦИЯ /ORGANIC (10 КЛАСС)</h1>
+    <div id="auth">
+        <input type="text" id="userName" placeholder="ФИО ВЕРХНИМ РЕГИСТРОМ" style="width: 300px;">
+        <button onclick="startTest()">НАЧАТЬ ИСПЫТАНИЕ</button>
+    </div>
+
+    <div id="test-container" class="hidden">
+        <div id="quiz"></div>
+        <button onclick="finishTest()">ЗАВЕРШИТЬ И ОТПРАВИТЬ</button>
+    </div>
+
+    <div id="official-blank" class="hidden">
+        <h2 id="blank-fio"></h2>
+        <div id="result-status"></div>
+        <p>КЛЮЧ ДОСТУПА: [PROTECTED]</p>
+        <p><i>Нажмите Ctrl+P и сохраните как PDF для отчета</i></p>
+    </div>
+</div>
+
+<script>
+// Pool заданий по УМК Габриелян (Базовый уровень)
+const pool = [
+    { q: "Укажите количество атомов углерода в главной цепи 2,3-диметилпентана", a: "5" },
+    { q: "Общая формула алкадиенов CnH2n-X. Введите число X", a: "2" },
+    { q: "Сколько первичных атомов углерода в молекуле 2,2-диметилбутана?", a: "4" },
+    { q: "Сколько двойных связей содержит молекула бутадиена-1,3?", a: "2" },
+    { q: "Введите число атомов водорода в молекуле бензола", a: "6" },
+    { q: "Какое количество функциональных групп -OH содержит глицерин?", a: "3" },
+    { q: "Число гибридных sp3-орбиталей у атома углерода в метане?", a: "4" }
+];
+
+function startTest() {
+    if(localStorage.getItem('done_organic')) {
+        alert("ОШИБКА: Доступ заблокирован. Тест уже выполнен.");
+        return;
+    }
+    document.getElementById('auth').classList.add('hidden');
+    document.getElementById('test-container').classList.remove('hidden');
+    
+    // Рандомизация (выбор 5 случайных из пула)
+    const shuffled = pool.sort(() => 0.5 - Math.random()).slice(0, 5);
+    const quizDiv = document.getElementById('quiz');
+    shuffled.forEach((item, index) => {
+        quizDiv.innerHTML += `<div class="task-card">
+            <p>${index + 1}. ${item.q}</p>
+            <input type="text" class="ans" data-correct="${item.a}">
+        </div>`;
+    });
+}
+
+function finishTest() {
+    const inputs = document.querySelectorAll('.ans');
+    let score = 0;
+    inputs.forEach(i => {
+        if(i.value.trim() === i.dataset.correct) score++;
+    });
+
+    const fio = document.getElementById('userName').value.toUpperCase();
+    const finalGrade = (score === 5) ? 5 : (score === 4) ? 4 : (score === 3) ? 3 : 2;
+
+    // Синхронизация с Google
+    fetch('https://script.google.com/macros/s/AKfycbyC6lxDWbGd7Yb0XRvbz0LeR5m6Vz0pCBH-rCgFMBkMifQd_I4Bj61rO6KJ1i8-jqo5WA/exec', {
+    method: 'POST',
+    mode: 'no-cors', // Чтобы избежать проблем с кросс-доменными запросами
+    body: JSON.stringify({
+        fio: fio, 
+        score: score, 
+        grade: finalGrade, 
+        station: '/organic',
+        time: (Date.now() - startTime) / 1000 // Если добавим таймер
+    })
+});
+    // Блокировка
+    localStorage.setItem('done_organic', 'true');
+
+    // Отрисовка бланка
+    document.getElementById('test-container').classList.add('hidden');
+    const blank = document.getElementById('official-blank');
+    blank.classList.remove('hidden');
+    document.getElementById('blank-fio').innerText = fio;
+    document.getElementById('result-status').innerHTML = `Баллы: ${score} / 5 <br> Оценка: ${finalGrade}`;
+}
+</script>
+</body>
+</html>
