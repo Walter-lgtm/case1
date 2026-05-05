@@ -5,250 +5,138 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WW | ORGANIC STATION</title>
     <style>
-    :root { 
-        --main-ice: #00f2ff; 
-        --steel: #2c3e50; 
-        --bg-dark: #0b0e14;
-    }
-    
-    body { 
-        font-family: 'Courier New', monospace; 
-        background: var(--bg-dark); 
-        color: white; 
-        margin: 0; 
-        padding: 0; 
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
+        :root { --main-ice: #00f2ff; --steel: #2c3e50; --bg-dark: #0b0e14; }
+        body { font-family: 'Courier New', monospace; background: var(--bg-dark); color: white; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        #auth { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
+        #auth h1 { color: var(--main-ice); letter-spacing: 5px; }
+        
+        .input-group { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 20px; }
+        input[type="text"] { background: transparent; border: none; border-bottom: 2px solid var(--main-ice); color: var(--main-ice); font-size: 1.2rem; text-align: center; outline: none; }
+        
+        button { margin-top: 20px; background: transparent; border: 1px solid var(--main-ice); color: var(--main-ice); padding: 15px 30px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; }
+        button:hover { background: var(--main-ice); color: var(--bg-dark); }
 
-    /* Блок входа (центровка) */
-    #auth {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-        text-align: center;
-    }
-
-    #auth h1 { color: var(--main-ice); margin-bottom: 30px; font-size: 1.8rem; }
-
-    /* Поля ввода */
-    .input-group {
-        width: 100%;
-        max-width: 400px;
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    input[type="text"] { 
-        background: transparent; border: none; 
-        border-bottom: 2px solid var(--main-ice); 
-        color: var(--main-ice); font-size: 1.2rem; 
-        text-align: center; outline: none; transition: 0.3s;
-        width: 100%;
-    }
-
-    button {
-        margin-top: 30px; background: transparent; 
-        border: 1px solid var(--main-ice); color: var(--main-ice);
-        padding: 15px 30px; cursor: pointer; font-family: inherit;
-        text-transform: uppercase; letter-spacing: 2px;
-    }
-
-    button:hover { background: var(--main-ice); color: var(--bg-dark); }
-
-    /* Контейнер теста */
-    #test-container { padding: 15px; max-width: 800px; margin: 0 auto; width: 100%; box-sizing: border-box; }
-    
-    .task-card { 
-        background: rgba(255,255,255,0.05); border-left: 4px solid var(--main-ice); 
-        padding: 15px; margin: 20px 0; 
-    }
-
-    @media (max-width: 600px) {
-        #auth h1 { font-size: 1.4rem; }
-        .task-card { font-size: 0.9rem; }
-        #official-blank { padding: 15px; border-width: 2px; }
-    }
-
-    .hidden { display: none !important; }
-    
-    #official-blank { 
-        border: 5px double black; padding: 30px; text-align: center; 
-        margin: 20px; background: #fff; color: #000; 
-    }
-        .opt-btn {
-        margin: 5px;
-        padding: 8px 15px;
-        font-size: 0.9rem;
-        border: 1px solid var(--main-ice);
-        background: transparent;
-        color: var(--main-ice);
-        cursor: pointer;
-        transition: 0.2s;
-        font-family: 'Courier New', monospace;
-    }
-    
-    .opt-btn:hover {
-        background: rgba(0, 242, 255, 0.1);
-    }
-
-    .input-zone { 
-        display: flex; 
-        flex-wrap: wrap; 
-        gap: 5px; 
-        margin-top: 10px;
-    }
+        #test-container { padding: 15px; max-width: 800px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+        .task-card { background: rgba(255,255,255,0.05); border-left: 4px solid var(--main-ice); padding: 20px; margin: 25px 0; }
+        .ascii-box { background: #000; padding: 10px; border: 1px solid #333; overflow-x: auto; font-size: 0.8rem; line-height: 1.2; margin: 10px 0; }
+        
+        .opt-btn { margin: 5px; padding: 10px; border: 1px solid var(--main-ice); background: transparent; color: var(--main-ice); cursor: pointer; transition: 0.2s; font-size: 0.85rem; }
+        .input-zone { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+        
+        .hidden { display: none !important; }
+        #official-blank { border: 5px double black; padding: 30px; text-align: center; margin: 20px; background: #fff; color: #000; }
+        
+        @media (max-width: 600px) { .task-card { font-size: 0.9rem; padding: 10px; } .opt-btn { width: 100%; } }
     </style>
 </head>
 <body>
 
 <div id="app">
-    <!-- ВХОД -->
     <div id="auth">
         <h1>STATION /ORGANIC</h1>
         <div class="input-group">
             <input type="text" id="userName" placeholder="ФИО ПОЛНОСТЬЮ" autocomplete="off">
             <input type="text" id="userClass" placeholder="КЛАСС (НАПР. 10-А)" autocomplete="off">
         </div>
-        <button onclick="startTest()">ДЕЙСТВОВАТЬ ПО СХЕМЕ WW</button>
+        <button onclick="startTest()">Действовать по схеме WW</button>
     </div>
 
-    <!-- ТЕСТ -->
     <div id="test-container" class="hidden">
         <div id="quiz"></div>
-        <button id="finish-btn" onclick="finishTest()" style="width: 100%;">ЗАВЕРШИТЬ ИСПЫТАНИЕ</button>
+        <button id="finish-btn" onclick="finishTest()" style="width: 100%; margin-top: 40px; background: var(--main-ice); color: #000;">ЗАВЕРШИТЬ ИСПЫТАНИЕ</button>
     </div>
 
-    <!-- БЛАНК -->
     <div id="official-blank" class="hidden">
         <p>МИНИСТЕРСТВО ЦИФРОВЫХ ЛАБОРАТОРИЙ WW</p>
         <hr>
         <h2 id="blank-fio"></h2>
         <h3 id="blank-class"></h3>
-        <div id="result-status" style="font-size: 1.5rem; margin: 20px 0;"></div>
-        <p>СТАТУС: ПОДТВЕРЖДЕНО</p>
-        <button onclick="window.print()">СОХРАНИТЬ В PDF</button>
+        <div id="result-status" style="font-size: 1.5rem; margin: 20px 0; font-weight: bold;"></div>
+        <p>СТАТУС: ПРОТОКОЛ ЗАФИКСИРОВАН</p>
+        <button onclick="window.print()" style="border-color: black; color: black;">СОХРАНИТЬ В PDF</button>
     </div>
 </div>
 
 <script>
 let startTime;
-
 const pool = [
-    // --- ТИП: КНОПКИ (ВЫБОР) ---
+    // ТИП 1
+    { q: "<b>Задание 1.1.</b> Выберите <b>молекулярную</b> формулу 2,2-диметилбутана:", type: "choice", options: ["C<sub>6</sub>H<sub>12</sub>", "C<sub>6</sub>H<sub>14</sub>", "C<sub>5</sub>H<sub>12</sub>", "C<sub>4</sub>H<sub>10</sub>"], a: "C<sub>6</sub>H<sub>14</sub>" },
+    { q: "<b>Задание 1.2.</b> Выберите <b>структурную</b> формулу 2,2-диметилбутана:", type: "choice", options: ["CH<sub>3</sub>-C(CH<sub>3</sub>)<sub>2</sub>-CH<sub>2</sub>-CH<sub>3</sub>", "CH<sub>3</sub>-CH(CH<sub>3</sub>)-CH(CH<sub>3</sub>)-CH<sub>3</sub>", "CH<sub>3</sub>-CH(CH<sub>3</sub>)-CH<sub>2</sub>-CH<sub>2</sub>-CH<sub>3</sub>"], a: "CH<sub>3</sub>-C(CH<sub>3</sub>)<sub>2</sub>-CH<sub>2</sub>-CH<sub>3</sub>" },
+    
+    // ТИП 2 (ASCII)
     { 
-        q: "Выберите общую формулу АЛКИНОВ:", 
-        type: "choice", 
-        options: ["CnH2n+2", "CnH2n", "CnH2n-2", "CnH2n-6"], 
-        a: "CnH2n-2" 
+        q: "<b>Задание 2.</b> Ниже представлены структуры:<br><div class='ascii-box'>1) CH<sub>3</sub>-CH<sub>2</sub>-CH<sub>2</sub>-CH<sub>3</sub><br>2) CH<sub>3</sub>-CH(CH<sub>3</sub>)-CH<sub>3</sub><br>3) CH<sub>2</sub>=CH-CH<sub>2</sub>-CH<sub>3</sub><br>4) CH<sub>3</sub>-CH<sub>2</sub>-CH<sub>3</sub><br>5) CH<sub>3</sub>-CH=CH-CH<sub>3</sub></div><br>2.1. Выберите две структуры — <b>ИЗОМЕРЫ</b> (введите цифры без пробелов):", 
+        type: "input", a: "12" 
     },
+    { q: "2.2. Из тех же структур выберите две — <b>ГОМОЛОГИ</b> (введите цифры без пробелов):", type: "input", a: "14" },
+
+    // ТИП 3
+    { q: "<b>Задание 3.</b> Расположите фракции нефти в порядке <b>возрастания</b> молярной массы: 1) Бензин, 2) Дизель, 3) Лигроин, 4) Мазут. <br>Введите цифровой код (напр. 1234):", type: "input", a: "1324" },
+
+    // ТИП 4
     { 
-        q: "Тип гибридизации атомов углерода в БЕНЗОЛЕ:", 
+        q: "<b>Задание 4.</b> Выберите реагенты для цепочки: Бензол &rarr; Хлорбензол &rarr; Фенолят натрия:", 
         type: "choice", 
-        options: ["sp", "sp2", "sp3", "не гибридизированы"], 
-        a: "sp2" 
-    },
-    { 
-        q: "Качественная реакция на многоатомные спирты:", 
-        type: "choice", 
-        options: ["Cu(OH)2", "Ag2O", "Br2(водн.)", "FeCl3"], 
-        a: "Cu(OH)2" 
+        options: [
+            "1) Cl<sub>2</sub>+AlCl<sub>3</sub>; 2) NaOH(водн.)", 
+            "1) HCl; 2) Na", 
+            "1) Cl<sub>2</sub>+UV; 2) NaOH(спирт.)", 
+            "1) Cl<sub>2</sub>+FeBr<sub>3</sub>; 2) NaCl"
+        ], a: "1) Cl<sub>2</sub>+AlCl<sub>3</sub>; 2) NaOH(водн.)" 
     },
 
-    // --- ТИП: ЦИФРОВОЙ ВВОД (СООТВЕТСТВИЕ И КОДЫ) ---
-    { 
-        q: "Установите соответствие (Цифровой код): 1.Этан 2.Этилен 3.Ацетилен. (А:sp3, Б:sp2, В:sp). Введите буквы по порядку 123 (напр. АБВ):", 
-        type: "input", 
-        a: "АБВ" 
-    },
-    { 
-        q: "Введите код гибридизации для БУТАДИЕНА-1,3 (1-sp, 2-sp2, 3-sp3):", 
-        type: "input", 
-        a: "2222" 
-    },
-    { 
-        q: "Сколько изомеров у ПЕНТАНА (числом):", 
-        type: "input", 
-        a: "3" 
-    },
-    { 
-        q: "Количество сигма-связей в молекуле метана:", 
-        type: "input", 
-        a: "4" 
-    },
-    { 
-        q: "Малярная масса метилового спирта (г/моль):", 
-        type: "input", 
-        a: "32" 
-    }
+    // ТИП 5
+    { q: "<b>Задание 5.</b> Экономичный автомобиль (бензин C<sub>8</sub>H<sub>18</sub>, &rho;=750 г/л) тратит 6л на 100км. <br>Сколько литров CO<sub>2</sub> (н.у.) выделится за <b>1 км</b> пробега? <br>(Ответ до десятых, через запятую или точку):", type: "input", a: "70.8" }
 ];
 
 function startTest() {
     const fio = document.getElementById('userName').value.trim();
     const uClass = document.getElementById('userClass').value.trim();
-    if(!fio || !uClass) { alert("ВВЕДИТЕ ДАННЫЕ!"); return; }
-    if(localStorage.getItem('done_organic')) { alert("ДОСТУП ЗАБЛОКИРОВАН!"); return; }
+    if(!fio || !uClass) { alert("ДИРЕКТИВА: Введите данные!"); return; }
+    if(localStorage.getItem('done_organic')) { alert("БЛОКИРОВКА: Тест уже пройден."); return; }
 
     startTime = Date.now();
     document.getElementById('auth').classList.add('hidden');
     document.getElementById('test-container').classList.remove('hidden');
     
-    // Выбираем 7 случайных заданий
-    const shuffled = pool.sort(() => 0.5 - Math.random()).slice(0, 7);
     const quizDiv = document.getElementById('quiz');
     quizDiv.innerHTML = "";
     
-    shuffled.forEach((item, index) => {
-        let inputHtml = "";
-        if(item.type === "choice") {
-            // Рисуем кнопки для выбора
-            item.options.forEach(opt => {
-                inputHtml += `<button class="opt-btn" onclick="selectOpt(this, ${index})">${opt}</button>`;
-            });
-            inputHtml += `<input type="hidden" class="ans" id="ans-${index}" data-correct="${item.a}">`;
-        } else {
-            // Обычный ввод
-            inputHtml = `<input type="text" class="ans" data-correct="${item.a}" placeholder="Ответ...">`;
-        }
+    pool.forEach((item, index) => {
+        let inputHtml = (item.type === "choice") 
+            ? item.options.map(opt => `<button class="opt-btn" onclick="selectOpt(this, ${index})">${opt}</button>`).join('') + `<input type="hidden" class="ans" id="ans-${index}" data-correct="${item.a}">`
+            : `<input type="text" class="ans" data-correct="${item.a}" placeholder="Введите ответ...">`;
 
-        quizDiv.innerHTML += `
-            <div class="task-card">
-                <p>${index + 1}. ${item.q}</p>
-                <div class="input-zone">${inputHtml}</div>
-            </div>`;
+        quizDiv.innerHTML += `<div class="task-card"><p>${item.q}</p><div class="input-zone">${inputHtml}</div></div>`;
     });
 }
 
-// Функция для выбора кнопкой
 function selectOpt(btn, idx) {
     const parent = btn.parentElement;
-    parent.querySelectorAll('.opt-btn').forEach(b => b.style.background = "transparent");
-    btn.style.background = "var(--main-ice)";
-    btn.style.color = "var(--bg-dark)";
-    document.getElementById(`ans-${idx}`).value = btn.innerText;
+    parent.querySelectorAll('.opt-btn').forEach(b => { b.style.background = "transparent"; b.style.color = "var(--main-ice)"; });
+    btn.style.background = "var(--main-ice)"; btn.style.color = "#000";
+    document.getElementById(`ans-${idx}`).value = btn.innerHTML;
 }
 
 function finishTest() {
     const inputs = document.querySelectorAll('.ans');
     let score = 0;
     inputs.forEach(i => {
-        if(i.value.trim().toUpperCase() === i.dataset.correct.toUpperCase()) score++;
+        let userAns = i.value.trim().replace(',', '.').replace(/<[^>]*>/g, "");
+        let corrAns = i.dataset.correct.replace(/<[^>]*>/g, "");
+        if(userAns === corrAns) score++;
     });
 
     const fio = document.getElementById('userName').value.toUpperCase();
     const uClass = document.getElementById('userClass').value.toUpperCase();
-    const finalGrade = (score >= 7) ? 5 : (score >= 5) ? 4 : (score >= 3) ? 3 : 2;
     const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+    const grade = (score >= 7) ? 5 : (score >= 5) ? 4 : (score >= 3) ? 3 : 2;
 
-    fetch('ТВОЙ_URL_ЗДЕСЬ', {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify({fio:fio, uClass:uClass, score:score, grade:finalGrade, station:'/organic', time:timeSpent})
+    fetch('https://script.google.com/macros/s/AKfycbyC6lxDWbGd7Yb0XRvbz0LeR5m6Vz0pCBH-rCgFMBkMifQd_I4Bj61rO6KJ1i8-jqo5WA/exec', {
+        method: 'POST', mode: 'no-cors',
+        body: JSON.stringify({fio:fio, uClass:uClass, score:score, grade:grade, station:'/organic', time:timeSpent})
     });
 
     localStorage.setItem('done_organic', 'true');
@@ -256,7 +144,7 @@ function finishTest() {
     document.getElementById('official-blank').classList.remove('hidden');
     document.getElementById('blank-fio').innerText = fio;
     document.getElementById('blank-class').innerText = "КЛАСС: " + uClass;
-    document.getElementById('result-status').innerHTML = `Баллы: ${score} / 7 <br> Оценка: ${finalGrade}`;
+    document.getElementById('result-status').innerHTML = `ИТОГ: ${score}/7 БАЛЛОВ | ОЦЕНКА: ${grade}`;
 }
 </script>
 </body>
