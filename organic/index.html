@@ -22,14 +22,7 @@
         min-height: 100vh;
     }
 
-    /* Навигация (адаптивная) */
-    .nav-block { 
-        position: absolute; top: 10px; right: 10px; 
-        background: var(--steel); padding: 8px; 
-        border: 1px solid var(--main-ice); font-size: 0.8rem;
-    }
-
-    /* Центровка блока входа */
+    /* Блок входа (центровка) */
     #auth {
         flex: 1;
         display: flex;
@@ -42,13 +35,21 @@
 
     #auth h1 { color: var(--main-ice); margin-bottom: 30px; font-size: 1.8rem; }
 
-    /* Поля ввода и кнопки */
+    /* Поля ввода */
+    .input-group {
+        width: 100%;
+        max-width: 400px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
     input[type="text"] { 
         background: transparent; border: none; 
         border-bottom: 2px solid var(--main-ice); 
         color: var(--main-ice); font-size: 1.2rem; 
         text-align: center; outline: none; transition: 0.3s;
-        width: 100%; max-width: 400px;
+        width: 100%;
     }
 
     button {
@@ -61,40 +62,44 @@
     button:hover { background: var(--main-ice); color: var(--bg-dark); }
 
     /* Контейнер теста */
-    #test-container { padding: 15px; max-width: 800px; margin: 0 auto; }
+    #test-container { padding: 15px; max-width: 800px; margin: 0 auto; width: 100%; box-sizing: border-box; }
     
     .task-card { 
         background: rgba(255,255,255,0.05); border-left: 4px solid var(--main-ice); 
         padding: 15px; margin: 20px 0; 
     }
 
-    /* Адаптивность под смартфоны */
     @media (max-width: 600px) {
         #auth h1 { font-size: 1.4rem; }
         .task-card { font-size: 0.9rem; }
-        .nav-block { position: static; text-align: center; margin-bottom: 20px; }
         #official-blank { padding: 15px; border-width: 2px; }
     }
 
     .hidden { display: none !important; }
     
     #official-blank { 
-        border: 5px double white; padding: 30px; text-align: center; 
-        margin: 20px; background: #fff; color: #000; /* Приоритет PDF-печати */
+        border: 5px double black; padding: 30px; text-align: center; 
+        margin: 20px; background: #fff; color: #000; 
     }
-</style>
+    </style>
+</head>
+<body>
 
-    <!-- ВХОД (Центрирован) -->
+<div id="app">
+    <!-- ВХОД -->
     <div id="auth">
         <h1>STATION /ORGANIC</h1>
-        <input type="text" id="userName" placeholder="ВВЕДИТЕ ФИО" autocomplete="off">
+        <div class="input-group">
+            <input type="text" id="userName" placeholder="ФИО ПОЛНОСТЬЮ" autocomplete="off">
+            <input type="text" id="userClass" placeholder="КЛАСС (НАПР. 10-А)" autocomplete="off">
+        </div>
         <button onclick="startTest()">ДЕЙСТВОВАТЬ ПО СХЕМЕ WW</button>
     </div>
 
     <!-- ТЕСТ -->
     <div id="test-container" class="hidden">
         <div id="quiz"></div>
-        <button onclick="finishTest()" style="width: 100%;">ЗАВЕРШИТЬ ИСПЫТАНИЕ</button>
+        <button id="finish-btn" onclick="finishTest()" style="width: 100%;">ЗАВЕРШИТЬ ИСПЫТАНИЕ</button>
     </div>
 
     <!-- БЛАНК -->
@@ -102,51 +107,58 @@
         <p>МИНИСТЕРСТВО ЦИФРОВЫХ ЛАБОРАТОРИЙ WW</p>
         <hr>
         <h2 id="blank-fio"></h2>
+        <h3 id="blank-class"></h3>
         <div id="result-status" style="font-size: 1.5rem; margin: 20px 0;"></div>
-        <p style="font-size: 0.8rem;">ID: <span id="session-id"></span></p>
-        <button onclick="window.print()" id="print-btn">СОХРАНИТЬ В PDF</button>
+        <p>СТАТУС: ПОДТВЕРЖДЕНО</p>
+        <button onclick="window.print()">СОХРАНИТЬ В PDF</button>
     </div>
 </div>
 
 <script>
-// Pool заданий по УМК Габриелян (Базовый уровень)
+let startTime; // Фиксация времени запуска
+
 const pool = [
-    // --- ГИБРИДИЗАЦИЯ (Химический код) ---
     { q: "Введите код гибридизации атомов углерода в ПРОПЕНЕ (1-sp, 2-sp2, 3-sp3) по порядку от CH2=:", a: "223" },
     { q: "Введите код гибридизации атомов углерода в ЭТИНЕ (1-sp, 2-sp2, 3-sp3):", a: "11" },
     { q: "Введите код гибридизации для БЕНЗОЛА (все атомы):", a: "222222" },
-    
-    // --- СТРУКТУРА И ИЗОМЕРИЯ ---
     { q: "Сколько ТРЕТИЧНЫХ атомов углерода в 2-метилпропане?", a: "1" },
     { q: "Сколько ИЗОМЕРОВ имеет бутан (C4H10)?", a: "2" },
-    { q: "Укажите число π-связей (пи-связей) в молекуле бутадиена-1,3:", a: "2" },
+    { q: "Укажите число π-связей в молекуле бутадиена-1,3:", a: "2" },
     { q: "Сколько атомов углерода в главной цепи 3-этилгексана?", a: "6" },
-    
-    // --- ФУНКЦИОНАЛЬНЫЕ ГРУППЫ И КЛАССЫ ---
     { q: "Сколько гидроксогрупп содержит этиленгликоль?", a: "2" },
     { q: "Введите число атомов кислорода в молекуле пропановой кислоты:", a: "2" },
     { q: "Число атомов водорода в молекуле циклогексана:", a: "12" },
-    
-    // --- РЕАКЦИИ (Коэффициенты) ---
     { q: "Коэффициент перед кислородом в реакции горения метана (CH4 + O2 → CO2 + H2O):", a: "2" },
     { q: "Сколько молекул водорода нужно для полного гидрирования 1 молекулы пропина?", a: "2" }
 ];
 
 function startTest() {
-    if(localStorage.getItem('done_organic')) {
-        alert("ОШИБКА: Доступ заблокирован. Тест уже выполнен.");
+    const fio = document.getElementById('userName').value.trim();
+    const uClass = document.getElementById('userClass').value.trim();
+
+    if(!fio || !uClass) {
+        alert("ОШИБКА: Введите ФИО и Класс!");
         return;
     }
+
+    if(localStorage.getItem('done_organic')) {
+        alert("ДОСТУП ЗАБЛОКИРОВАН: Тест уже выполнен.");
+        return;
+    }
+
+    startTime = Date.now(); // Запуск таймера
     document.getElementById('auth').classList.add('hidden');
     document.getElementById('test-container').classList.remove('hidden');
     
-    // Рандомизация (выбор 5 случайных из пула)
+    // Рандомизация 5 заданий
     const shuffled = pool.sort(() => 0.5 - Math.random()).slice(0, 5);
     const quizDiv = document.getElementById('quiz');
+    quizDiv.innerHTML = "";
+    
     shuffled.forEach((item, index) => {
         quizDiv.innerHTML += `<div class="task-card">
             <p>${index + 1}. ${item.q}</p>
-            <input type="text" class="ans" data-correct="${item.a}">
+            <input type="text" class="ans" data-correct="${item.a}" placeholder="Ответ...">
         </div>`;
     });
 }
@@ -159,29 +171,35 @@ function finishTest() {
     });
 
     const fio = document.getElementById('userName').value.toUpperCase();
+    const uClass = document.getElementById('userClass').value.toUpperCase();
     const finalGrade = (score === 5) ? 5 : (score === 4) ? 4 : (score === 3) ? 3 : 2;
+    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
 
-    // Синхронизация с Google
+    // Синхронизация с Google (Твой URL активен)
     fetch('https://script.google.com/macros/s/AKfycbyC6lxDWbGd7Yb0XRvbz0LeR5m6Vz0pCBH-rCgFMBkMifQd_I4Bj61rO6KJ1i8-jqo5WA/exec', {
-    method: 'POST',
-    mode: 'no-cors', // Чтобы избежать проблем с кросс-доменными запросами
-    body: JSON.stringify({
-        fio: fio, 
-        score: score, 
-        grade: finalGrade, 
-        station: '/organic',
-        time: (Date.now() - startTime) / 1000 // Если добавим таймер
-    })
-});
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify({
+            fio: fio,
+            uClass: uClass, // Добавлено поле класса
+            score: score, 
+            grade: finalGrade, 
+            station: '/organic',
+            time: timeSpent
+        })
+    });
+
     // Блокировка
     localStorage.setItem('done_organic', 'true');
 
-    // Отрисовка бланка
+    // Отрисовка официального бланка
     document.getElementById('test-container').classList.add('hidden');
     const blank = document.getElementById('official-blank');
     blank.classList.remove('hidden');
+    
     document.getElementById('blank-fio').innerText = fio;
-    document.getElementById('result-status').innerHTML = `Баллы: ${score} / 5 <br> Оценка: ${finalGrade}`;
+    document.getElementById('blank-class').innerText = "КЛАСС: " + uClass;
+    document.getElementById('result-status').innerHTML = `Баллы: ${score} / 5 <br> Оценка: ${finalGrade} <br> Время: ${timeSpent} сек.`;
 }
 </script>
 </body>
