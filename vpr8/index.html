@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WW | VPR-8 HEISENBERG EDITION</title>
     <style>
+        .top-nav { position: fixed; top: 10px; left: 10px; z-index: 1000; display: flex; gap: 10px; }
+        .nav-btn { 
+            background: rgba(0,0,0,0.8); border: 1px solid var(--h-green); 
+            color: var(--h-green); padding: 5px 10px; font-size: 0.7rem; 
+            text-decoration: none; text-transform: uppercase; cursor: pointer;
+        }
+        .nav-btn:hover { box-shadow: 0 0 10px var(--h-green); color: white; }
         :root { 
             --h-green: #457b3b; 
             --h-yellow: #f1c40f; 
@@ -83,7 +90,10 @@
     </style>
 </head>
 <body>
-
+<div class="top-nav">
+    <a href="https://walter-lgtm.github.io/loki-chemistry/periodic_bad.html" target="_blank" class="nav-btn">[ПСХЭ Heisenberg]</a>
+    <a href="https://walter-lgtm.github.io/loki-chemistry/solubility_bad.html" target="_blank" class="nav-btn">[Растворимость]</a>
+</div>
 <div id="app">
     <div id="auth">
         <div class="br-ba-logo"><span class="element">V</span><span class="element">Pr</span>-8 Laboratory</div>
@@ -145,15 +155,15 @@ const pool = [
         options: ["Выделение газа (выхлопных газов)", "Плавление льда", "Изменение формы", "Свечение лампочки"],
         a: "Выделение газа (выхлопных газов)"
     },
-    // ТИП 3.1 и 3.2
+    // ТИП 3.1 и 3.2 (Добавлена нумерация № п/п)
     {
         id: "3.1",
         q: "3.1. Рассчитайте молярные массы веществ (г/моль):",
         type: "table_select_simple",
         rows: [
-            { label: "O<sub>2</sub>", options: ["16", "32", "48", "64"], a: "32" },
-            { label: "CH<sub>4</sub>", options: ["12", "14", "16", "18"], a: "16" },
-            { label: "SO<sub>2</sub>", options: ["32", "48", "64", "80"], a: "64" }
+            { label: "1) O<sub>2</sub>", options: ["16", "32", "48", "64"], a: "32" },
+            { label: "2) CH<sub>4</sub>", options: ["12", "14", "16", "18"], a: "16" },
+            { label: "3) SO<sub>2</sub>", options: ["32", "48", "64", "80"], a: "64" }
         ]
     },
     {
@@ -171,9 +181,14 @@ const pool = [
             { label: "В", opts: ["Натрий", "Магний", "Калий", "Сера"], a: "Сера", per: ["1","2","3","4"], pa: "3", gr: ["I","II","III","VI"], ga: "VI", type: ["Металл","Неметалл"], ta: "Неметалл", ox: ["Na2O", "MgO", "K2O", "SO3"], oa: "SO3" }
         ]
     },
-    // ТИП 5.1 и 5.2
-    { id: "5.1", q: "5.1. Михаил съел 60г горошка (35% белка). Какую массу белков (г) он получил?", type: "input", a: "21" },
-    { id: "5.2", q: "5.2. Какую долю (%) от нормы (80г) это составляет?", type: "input", a: "26.3" },
+    // ТИП 5.1 и 5.2 (Добавлена таблица состава)
+    { 
+        id: "5.1", 
+        q: "5.1. Михаил съел 60г горошка. Данные состава:<br><table><tr><th>Компонент</th><th>Белки</th><th>Жиры</th><th>Углеводы</th></tr><tr><td>Доля, %</td><td>35,0</td><td>0,4</td><td>40,5</td></tr></table><br>Определите массу белков (г), которую получил организм:", 
+        type: "input", a: "21" 
+    },
+    { id: "5.2", q: "5.2. Какую долю (%) от суточной нормы (80г) составляет полученное количество белков?", type: "input", a: "26.3" },
+    
     // ТИП 6.1 - 6.5
     {
         id: "6.1",
@@ -190,24 +205,30 @@ const pool = [
     { id: "6.3", q: "6.3. Выберите свойства для Fe<sub>2</sub>O<sub>3</sub>:", type: "choice", options: ["Основные", "Кислотные", "Амфотерные"], a: "Амфотерные" },
     { id: "6.4", q: "6.4. Массовая доля (%) кислорода в Fe(OH)<sub>3</sub>:", type: "input", a: "44.86" },
     { id: "6.5", q: "6.5. Сколько атомов в 0,25 моль цинка?", type: "choice", options: ["1,505*10^23", "6,02*10^23", "3,01*10^23", "1,2*10^24"], a: "1,505*10^23" },
+    
     // ТИП 7.1 - 7.3
     {
         id: "7.1",
-        q: "7.1. Выберите ДВА уравнения реакций из описания (натрий+хлор и нитрат магния+щелочь):",
+        q: "7.1. Выберите ДВА верных уравнения реакций (натрий+хлор и обмен магния):",
         type: "multi",
         options: ["2Na + Cl2 = 2NaCl", "Mg(NO3)2 + 2KOH = 2KNO3 + Mg(OH)2", "Fe + H2O = FeO + H2", "Cu + HCl = CuCl2"],
         a: ["2Na + Cl2 = 2NaCl", "Mg(NO3)2 + 2KOH = 2KNO3 + Mg(OH)2"]
     },
-    { id: "7.2", q: "7.2. Укажите тип реакции (2):", type: "choice", options: ["Соединение", "Разложение", "Замещение", "Обмен"], a: "Обмен" },
+    { id: "7.2", q: "7.2. Укажите тип реакции (2) — нитрат магния и щелочь:", type: "choice", options: ["Соединение", "Разложение", "Замещение", "Обмен"], a: "Обмен" },
     { id: "7.3", q: "7.3. Выберите прибор для отделения Mg(OH)<sub>2</sub> от раствора:<br><img src='"+imgPath+"7.3V.png' class='task-img'>", type: "input", a: "2" },
-    // ТИП 8
+    
+    // ТИП 8 (Полный текст соответствия)
     {
         id: "8",
-        q: "8. Соответствие Название-Применение (Введите 4 цифры без пробелов):",
+        q: "8. Установите соответствие (А-вода, Б-соляная к-та, В-алюминий, Г-водород):<br>1) авиация, 2) школьный мел, 3) травление металлов, 4) ракетное топливо, 5) полив растений.<br>Введите 4 цифры без пробелов:",
         type: "input", a: "5314"
     },
-    // ТИП 9
-    { id: "9", q: "9. Выберите верные суждения о ТБ (Введите цифры без пробелов):", type: "input", a: "12" }
+    // ТИП 9 (Полный текст суждений)
+    { 
+        id: "9", 
+        q: "9. Верные суждения о ТБ:<br>1) Углекислый газ вызывает парниковый эффект.<br>2) Запрещено греть закрытую колбу.<br>3) Можно пробовать на вкус в лаборатории.<br>4) Можно хранить яды с едой.<br>Введите цифры без пробелов:", 
+        type: "input", a: "12" 
+    }
 ];
   function startTest() {
     const fio = document.getElementById('userName').value.trim();
