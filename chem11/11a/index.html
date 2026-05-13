@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WW | 11 CLASS CORE TERMINAL</title>
+    <style>
+        :root { 
+            --main-ice: #00f2ff; 
+            --steel: #2c3e50; 
+            --bg-dark: #0b0e14;
+            --glass: rgba(0, 242, 255, 0.05);
+        }
+        
+        body { 
+            font-family: 'Courier New', monospace; 
+            background: var(--bg-dark); 
+            color: #e0e0e0; 
+            margin: 0; 
+            padding: 0; 
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Навигационная панель ПСХЭ / Растворимость */
+        .top-nav { position: fixed; top: 10px; left: 10px; z-index: 1000; display: flex; gap: 10px; }
+        .nav-btn { 
+            background: rgba(0,0,0,0.8); border: 1px solid var(--main-ice); 
+            color: var(--main-ice); padding: 6px 12px; font-size: 0.75rem; 
+            text-decoration: none; text-transform: uppercase; cursor: pointer;
+            box-shadow: 0 0 5px rgba(0, 242, 255, 0.2);
+        }
+        .nav-btn:hover { box-shadow: 0 0 15px var(--main-ice); color: white; }
+
+        /* Центрированный блок авторизации */
+        #auth {
+            flex: 1; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            padding: 20px;
+        }
+        #auth h1 { color: var(--main-ice); letter-spacing: 5px; font-size: 2.2rem; margin-bottom: 5px; }
+        .subtitle { color: #557; font-size: 0.8rem; letter-spacing: 3px; margin-bottom: 30px; }
+
+        .input-group { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 15px; }
+        input[type="text"], select { 
+            background: rgba(255,255,255,0.03); border: 1px solid var(--main-ice); 
+            color: var(--main-ice); padding: 12px; font-size: 1.1rem; 
+            text-align: center; outline: none; transition: 0.3s;
+        }
+        input[type="text"]:focus { box-shadow: 0 0 10px rgba(0, 242, 255, 0.3); }
+
+        button.action-btn {
+            margin-top: 25px; background: transparent; 
+            border: 2px solid var(--main-ice); color: var(--main-ice);
+            padding: 15px 35px; cursor: pointer; font-family: inherit;
+            text-transform: uppercase; font-weight: bold; letter-spacing: 2px;
+            transition: 0.3s;
+        }
+        button.action-btn:hover { background: var(--main-ice); color: var(--bg-dark); box-shadow: 0 0 20px var(--main-ice); }
+
+        /* Контейнер заданий */
+        #test-container { padding: 15px; max-width: 900px; margin: 40px auto 0 auto; width: 100%; box-sizing: border-box; }
+        
+        .task-card { 
+            background: var(--glass); border-left: 5px solid var(--main-ice); 
+            padding: 25px; margin: 30px 0; border-radius: 0 4px 4px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .task-img { width: 100%; max-width: 500px; border: 1px solid var(--main-ice); margin: 15px 0; }
+        
+        /* Табличные структуры для матричных типов */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: rgba(0,0,0,0.2); }
+        th, td { border: 1px solid #2c3e50; padding: 12px; text-align: center; font-size: 0.9rem; }
+        th { background: var(--steel); color: var(--main-ice); }
+
+        /* Интерактивные кнопки вариантов */
+        .opt-btn { 
+            margin: 5px; padding: 10px 15px; border: 1px solid var(--main-ice); 
+            background: transparent; color: var(--main-ice); cursor: pointer; transition: 0.2s;
+            font-family: inherit;
+        }
+        .opt-btn:hover { background: rgba(0, 242, 255, 0.1); }
+        .opt-btn.selected { background: var(--main-ice); color: var(--bg-dark); font-weight: bold; }
+
+        .hidden { display: none !important; }
+        
+        /* Официальный бланк сертификата (PDF-ориентированный) */
+        #official-blank { 
+            border: 10px double black; padding: 40px; text-align: center; 
+            margin: 40px auto; background: #fff; color: #000; max-width: 800px;
+        }
+        .blank-title { font-family: serif; font-size: 1.8rem; letter-spacing: 1px; margin-bottom: 5px; }
+        .blank-meta { font-family: monospace; font-size: 0.9rem; color: #444; margin-bottom: 30px; }
+
+        @media (max-width: 600px) {
+            th, td { padding: 6px; font-size: 0.75rem; }
+            #auth h1 { font-size: 1.6rem; }
+            .top-nav { position: static; margin: 10px; justify-content: center; }
+            #test-container { margin-top: 10px; }
+        }
+        @media print { .no-print { display: none !important; } #official-blank { margin: 0; border-width: 5px; } }
+    </style>
+</head>
+<body>
+
+<!-- Навигация -->
+<div class="top-nav no-print">
+    <a href="github.io" target="_blank" class="nav-btn">[ ПСХЭ Heisenberg ]</a>
+    <a href="#" target="_blank" class="nav-btn">[ Таблица Растворимости ]</a>
+</div>
+
+<div id="app">
+    <!-- ИНИЦИАЛИЗАЦИЯ -->
+    <div id="auth" class="no-print">
+        <h1>STATION /11A</h1>
+        <div class="subtitle">HIGH SCHOOL ADVANCED SYSTEM</div>
+        <div class="input-group">
+            <input type="text" id="userName" placeholder="ФИО ВЫПУСКНИКА" autocomplete="off">
+            <input type="text" id="userClass" placeholder="КЛАСС (НАПР. 11-А)" autocomplete="off">
+        </div>
+        <button class="action-btn" onclick="startTest()">Запустить терминал</button>
+    </div>
+
+    <!-- ИСПЫТАТЕЛЬНЫЙ БЛОК -->
+    <div id="test-container" class="hidden no-print">
+        <div id="quiz"></div>
+        <button id="finish-btn" class="action-btn" onclick="finishTest()" style="width: 100%; margin: 40px 0; background: var(--main-ice); color: var(--bg-dark);">ФИКСИРОВАТЬ РЕЗУЛЬТАТ</button>
+    </div>
+
+    <!-- СЕРТИФИКАТ (HARD COPY) -->
+    <div id="official-blank" class="hidden">
+        <div class="blank-title">ПРОТОКОЛ НЕЗАВИСИМОЙ ОЦЕНКИ ЗНАНИЙ</div>
+        <div class="blank-meta">WW LABORATORIES // ВЫПУСКНОЙ СТАНДАРТ</div>
+        <hr style="border: 1px solid #000;">
+        <p style="margin-top: 30px;">Настоящий документ подтверждает, что учащийся:</p>
+        <h1 id="blank-fio" style="font-family: serif; text-transform: uppercase; margin: 10px 0;"></h1>
+        <h3 id="blank-class" style="font-family: monospace; letter-spacing: 2px;"></h3>
+        
+        <div id="result-status" style="font-size: 1.6rem; margin: 40px 0; font-family: serif; font-weight: bold; border: 2px solid #000; padding: 15px; display: inline-block;"></div>
+        
+        <p id="blank-date" style="font-family: monospace; font-size: 0.8rem; margin-top: 5px;"></p>
+        <hr style="border: 0; border-top: 1px dashed #000; margin-top: 40px;">
+        <p style="font-size: 0.7rem; color: #555;">Документ сгенерирован автоматически. Критерии оценки соответствуют ФГОС СОО.</p>
+        <button class="action-btn no-print" onclick="window.print()" style="border-color: #000; color: #000; margin-top: 20px;">ПЕЧАТЬ В PDF</button>
+    </div>
+</div>
+<script>
+let startTime;
+
+// Высокоуровневый pool заданий (Формат ЕГЭ)
+const pool = [
+    {
+        id: "1",
+        q: "<b>Задание 1 (Строение атома).</b> Определите, атомы каких из указанных элементов в основном состоянии имеют электронную конфигурацию внешнего энергетического уровня <b>ns<sup>1</sup></b>. <br>Ряд элементов: 1) Cr, 2) Cu, 3) Na, 4) Al, 5) Sc. <br>Введите цифры в порядке возрастания (без пробелов и запятых):",
+        type: "input",
+        a: "123" // У Хрома и Меди провал электрона (4s1), у Натрия классическая (3s1)
+    },
+    {
+        id: "2",
+        q: "<b>Задание 2 (Периодический закон).</b> Из указанного ряда элементов выберите три элемента-металла: 1) Si, 2) As, 3) P, 4) Fe, 5) Cr, 6) Mn. <br>Расположите выбранные элементы в порядке <b>уменьшения</b> их атомного радиуса. <br>Введите трехзначный цифровой код:",
+        type: "input",
+        a: "456" // Радиус уменьшается слева направо: Fe > Cr > Mn
+    },
+    {
+        id: "3",
+        q: "<b>Задание 3 (Химическая связь).</b> Из предложенного перечня выберите два вещества, в молекулах которых присутствует как <b>ковалентная полярная</b>, так и <b>ионная</b> химическая связь:",
+        type: "multi",
+        options: ["1) NH<sub>4</sub>Cl", "2) Na<sub>2</sub>O<sub>2</sub>", "3) KNO<sub>3</sub>", "4) CH<sub>3</sub>Cl", "5) BaCl<sub>2</sub>"],
+        a: ["1) NH<sub>4</sub>Cl", "3) KNO<sub>3</sub>"] // NH4+ и NO3- имеют КПС, с катионами связь ионная
+    },
+    {
+        id: "4",
+        q: "<b>Задание 4 (Типы решеток).</b> Установите соответствие между веществом и типом его кристаллической решётки при н.у. (введите 4 цифры по порядку АБВГ):<br>А) SiO<sub>2</sub>, Б) CO<sub>2</sub>, В) Fe, Г) CsCl.<br>1) Молекулярная, 2) Атомная, 3) Ионная, 4) Металлическая.",
+        type: "input",
+        a: "2143"
+    },
+    {
+        id: "5",
+        q: "<b>Задание 5 (Расчетная задача).</b> К 200 г 10%-ного раствора нитрата калия добавили 20 г этой же соли и 30 мл воды. Вычислите массовую долю (%) соли в полученном растворе. <br>(Ответ округлите <b>до десятых</b>, вводите через точку или запятую):",
+        type: "input",
+        a: "16.0" // (20+20)/(200+20+30) = 40/250 = 16.0%
+    }
+];
+function startTest() {
+    const fio = document.getElementById('userName').value.trim();
+    const uClass = document.getElementById('userClass').value.trim();
+
+    if(!fio || !uClass) {
+        alert("КРИТИЧЕСКАЯ ОШИБКА: Идентификация не пройдена. Заполните ФИО и Класс.");
+        return;
+    }
+
+    startTime = Date.now();
+    document.getElementById('auth').classList.add('hidden');
+    document.getElementById('test-container').classList.remove('hidden');
+    
+    const quizDiv = document.getElementById('quiz');
+    quizDiv.innerHTML = "";
+    
+    pool.forEach((item, index) => {
+        let inputHtml = "";
+        if(item.type === "multi") {
+            inputHtml = `<div class="input-zone">` + 
+                item.options.map(opt => `<button class="opt-btn" onclick="selectMulti(this, '${item.id}')">${opt}</button>`).join('') + 
+                `<input type="hidden" class="ans" id="ans-${item.id}" data-correct="${item.a.join('|')}"></div>`;
+        } else {
+            inputHtml = `<input type="text" class="ans" id="ans-${item.id}" data-correct="${item.a}" placeholder="Введите код или число...">`;
+        }
+
+        quizDiv.innerHTML += `
+            <div class="task-card">
+                <p>${index + 1}. ${item.q}</p>
+                <div style="margin-top: 15px;">${inputHtml}</div>
+            </div>`;
+    });
+}
+
+function selectMulti(btn, id) {
+    btn.classList.toggle('selected');
+    const parent = btn.parentElement;
+    const selected = Array.from(parent.querySelectorAll('.opt-btn.selected')).map(b => b.innerText);
+    document.getElementById('ans-' + id).value = selected.join('|');
+}
+
+function finishTest() {
+    const inputs = document.querySelectorAll('.ans');
+    let score = 0;
+
+    inputs.forEach(i => {
+        let userAns = i.value.trim().replace(',', '.').toUpperCase();
+        let corrAns = i.dataset.correct.toUpperCase();
+
+        if (corrAns.includes('|')) {
+            let userArr = userAns.split('|').sort();
+            let corrArr = corrAns.split('|').sort();
+            if (JSON.stringify(userArr) === JSON.stringify(corrArr)) score++;
+        } else {
+            // Если в ответе 16 или 16.0, убираем .0 для гибкости проверки
+            if(userAns.endsWith('.0')) userAns = userAns.slice(0, -2);
+            if(corrAns.endsWith('.0')) corrAns = corrAns.slice(0, -2);
+            if (userAns === corrAns) score++;
+        }
+    });
+
+    const fio = document.getElementById('userName').value.toUpperCase();
+    const uClass = document.getElementById('userClass').value.toUpperCase();
+    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+
+    // Строгие критерии ЕГЭ-уровня (5 из 5 = «5», 4 = «4», 3 = «3», <3 = «2»)
+    const finalGrade = (score === 5) ? 5 : (score === 4) ? 4 : (score === 3) ? 3 : 2;
+
+    // Мгновенная синхронизация (Вставь URL от Apps Script)
+    fetch('https://script.google.com/macros/s/AKfycbyFmUjreHlc_R6X2JLqCJMIxEQ2IJPbWXdR3WA6vci1eTr5nXOyyFQpNs7jEXAXRkbUBw/exec', {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify({
+            fio: fio,
+            uClass: uClass,
+            score: score,
+            grade: finalGrade,
+            time: timeSpent,
+            station: '/11a'
+        })
+    });
+
+    // Отрисовка официального бланка
+    document.getElementById('test-container').classList.add('hidden');
+    const blank = document.getElementById('official-blank');
+    blank.classList.remove('hidden');
+    
+    document.getElementById('blank-fio').innerText = fio;
+    document.getElementById('blank-class').innerText = "КЛАСС: " + uClass;
+    document.getElementById('blank-date').innerText = "ДАТА ГЕНЕРАЦИИ: " + new Date().toLocaleDateString() + " // ВРЕМЯ: " + timeSpent + " сек.";
+    document.getElementById('result-status').innerHTML = `ИТОГОВЫЙ БАЛЛ: ${score} / 5<br>ОЦЕНКА СИСТЕМЫ: ${finalGrade}`;
+}
+</script>
+</body>
+</html>
