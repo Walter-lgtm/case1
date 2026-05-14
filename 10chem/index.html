@@ -304,8 +304,8 @@ function finishTest() {
     const uClass = document.getElementById('userClass').value.toUpperCase();
     const timeSpent = Math.floor((Date.now() - startTime) / 1000);
 
-    // Шкала для 15 продвинутых заданий (14-15 = «5», 11-13 = «4», 8-10 = «3», <8 = «2»)
-    const finalGrade = (score >= 14) ? 5 : (score >= 11) ? 4 : (score >= 8) ? 3 : 2;
+    // КРИТЕРИЙ АБСОЛЮТНОЙ ЧИСТОТЫ: 5 только за 15/15. 12-14 = 4. 8-11 = 3. Меньше 8 = 2.
+    const finalGrade = (score === 15) ? 5 : (score >= 12) ? 4 : (score >= 8) ? 3 : 2;
 
     // Синхронизация данных с твоей Google Таблицей
     fetch('https://script.google.com/macros/s/AKfycbyC6lxDWbGd7Yb0XRvbz0LeR5m6Vz0pCBH-rCgFMBkMifQd_I4Bj61rO6KJ1i8-jqo5WA/exec', {
