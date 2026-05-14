@@ -139,7 +139,7 @@ const pool = [
         id: "2",
         q: "<b>Задание 2 (Изомерия).</b> Сколько структурных изомеров из класса предельных одноатомных спиртов соответствует молекулярной формуле C<sub>4</sub>H<sub>10</sub>O? <br>Введите ответ <b>только в виде одной цифры</b>:",
         type: "input",
-        a: "4" // бутанол-1, бутанол-2, 2-метилпропанол-1, 2-метилпропанол-2
+        a: "4"
     },
     {
         id: "3",
@@ -159,7 +159,7 @@ const pool = [
         q: "<b>Задание 5 (Качественные реакции).</b> Какое органическое вещество образуется при окислении этаналя избытком аммиачного раствора оксида серебра(I) при нагревании?",
         type: "choice",
         options: ["уксусная кислота", "ацетат аммония", "этанол", "серебро"],
-        a: "ацетат аммония" // CH3CHO + 2[Ag(NH3)2]OH -> CH3COONH4 + 2Ag + 3NH3 + H2O
+        a: "ацетат аммония"
     },
     {
         id: "6",
@@ -172,7 +172,7 @@ const pool = [
         q: "<b>Задание 7 (Химические свойства).</b> К какому классу соединений относится продукт межмолекулярной дегидратации пропанола-1 в присутствии концентрированной серной кислоты при температуре ниже 140 °C?",
         type: "choice",
         options: ["сложные эфиры", "простые эфиры", "алкены", "алканы"],
-        a: "простые эфиры" // дипропиловый эфир
+        a: "простые эфиры"
     },
     {
         id: "8",
@@ -180,9 +180,7 @@ const pool = [
         type: "select",
         options: ["выделение бесцветного газа", "выпадение осадка белого цвета", "появление фиолетового окрашивания", "растворение раствора с выделением тепла"],
         a: "появление фиолетового окрашивания"
-    }
-];
-  // Добавление оставшихся заданий в массив pool (9-15)
+    },
     {
         id: "9",
         q: "<b>Задание 9 (Карбоновые кислоты).</b> Из предложенного перечня выберите вещество, которое в отличие от других предельных одноосновных карбоновых кислот способно вступать в реакцию «серебряного зеркала»:",
@@ -213,19 +211,19 @@ const pool = [
         id: "13",
         q: "<b>Задание 13 (Вывод формулы по продуктам).</b> При сжигании 4,4 г органического вещества получили 8,8 г углекислого газа и 3,6 г воды. Плотность паров этого вещества по водороду равна 22. Определите число атомов <b>водорода</b> в молекуле. (Введите только одну цифру):",
         type: "input",
-        a: "4" // M = 44 г/моль (пропаналь или ацетон), формула C3H6O, но по массе продуктов 4.4г - это 0.1 моль CO2 и 0.2 моль H2O -> C2H4O
+        a: "4"
     },
     {
         id: "14",
         q: "<b>Задание 14 (Вывод формулы по массе).</b> Предельный одноатомный спирт содержит 21,62% кислорода по массе. Вычислите количество атомов <b>углерода</b> в молекуле этого спирта. (Введите только одну цифру):",
         type: "input",
-        a: "4" // M = 16 / 0.2162 = 74 г/моль -> C4H9OH
+        a: "4"
     },
     {
         id: "15",
         q: "<b>Задание 15 (Генетическая связь).</b> Напишите цифровой код вещества <b>X</b> в цепочке превращений: Метан &rarr; <b>X</b> &rarr; Этаналь &rarr; Этанол.<br>1) ацетилен, 2) этилен, 3) хлорметан, 4) метанол. <br>Введите одну цифру:",
         type: "input",
-        a: "1" // Метан -> Ацетилен -> Этаналь (реакция Кучерова)
+        a: "1"
     }
 ];
 
@@ -247,12 +245,17 @@ function startTest() {
     
     pool.forEach((item, index) => {
         let inputHtml = "";
-        if(item.type === "multi") {
+        
+        if(item.type === "choice") {
+            inputHtml = `<div class="input-zone">` + 
+                item.options.map(opt => `<button class="opt-btn" onclick="selectSingle(this, '${item.id}')">${opt}</button>`).join('') + 
+                `<input type="hidden" class="ans" id="ans-${item.id}" data-correct="${item.a}"></div>`;
+        } else if(item.type === "multi") {
             inputHtml = `<div class="input-zone">` + 
                 item.options.map(opt => `<button class="opt-btn" onclick="selectMulti(this, '${item.id}')">${opt}</button>`).join('') + 
                 `<input type="hidden" class="ans" id="ans-${item.id}" data-correct="${item.a.join('|')}"></div>`;
         } else if(item.type === "select") {
-            inputHtml = `<select class="ans" id="ans-${item.id}" data-correct="${item.a}"><option value="">Выбрать ответ...</option>${item.options.map(o=>`<option value="${o}">${o}</option>`)}</select>`;
+            inputHtml = `<select class="ans" id="ans-${item.id}" data-correct="${item.a}"><option value="">Выбрать ответ...</option>${item.options.map(o=>`<option value="${o}">${o}</option>`).join('')}</select>`;
         } else {
             inputHtml = `<input type="text" class="ans" id="ans-${item.id}" data-correct="${item.a}" placeholder="Введите ответ...">`;
         }
@@ -277,13 +280,6 @@ function selectMulti(btn, id) {
     const selected = Array.from(parent.querySelectorAll('.opt-btn.selected')).map(b => b.innerText);
     document.getElementById('ans-' + id).value = selected.join('|');
 }
-
-// Привязка обработчика для одиночного выбора кнопок динамически (если применимо)
-document.addEventListener('click', function(e) {
-    if(e.target && e.target.classList.contains('opt-btn') && !e.target.parentElement.querySelectorAll('.opt-btn')[0].getAttribute('onclick').includes('selectMulti')) {
-        // Логика одиночного выбора кнопок, если тип choice оформлен кнопками
-    }
-});
 
 function finishTest() {
     const inputs = document.querySelectorAll('.ans');
@@ -334,41 +330,6 @@ function finishTest() {
     document.getElementById('blank-class').innerText = "КЛАСС: " + uClass;
     document.getElementById('blank-date').innerText = "ДАТА КОНТРОЛЯ: " + new Date().toLocaleDateString() + " // ВРЕМЯ СИНТЕЗА: " + timeSpent + " сек.";
     document.getElementById('result-status').innerHTML = `ЭФФЕКТИВНОСТЬ: ${score} / 15 БАЛЛОВ<br>ИТОГОВАЯ ОЦЕНКА: ${finalGrade}`;
-}
-
-// Переопределение для одиночного выбора кнопок типа choice
-document.addEventListener('DOMContentLoaded', () => {
-    window.selectSingle = function(btn, id) {
-        btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        document.getElementById('ans-' + id).value = btn.innerText;
-    };
-    // Перезапись рендеринга одиночного выбора под кнопки
-    pool.forEach((item) => {
-        if(item.type === "choice") {
-            item.renderFix = true;
-        }
-    });
-});
-
-// Фикс для динамического рендеринга одиночного выбора кнопками вместо инпутов
-function renderChoiceButtons() {
-    pool.forEach((item, index) => {
-        if(item.type === "choice") {
-            const card = document.getElementsByClassName('task-card')[index];
-            if(card) {
-                const zone = card.getElementsByTagName('div')[0];
-                zone.innerHTML = `<div class="input-zone">` + 
-                    item.options.map(opt => `<button class="opt-btn" onclick="selectSingle(this, '${item.id}')">${opt}</button>`).join('') + 
-                    `<input type="hidden" class="ans" id="ans-${item.id}" data-correct="${item.a}"></div>`;
-            }
-        }
-    });
-}
-const oldStartTest = startTest;
-startTest = function() {
-    oldStartTest();
-    renderChoiceButtons();
 }
 </script>
 </body>
