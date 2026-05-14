@@ -84,11 +84,33 @@
             .opt-btn { width: 100%; box-sizing: border-box; }
         }
         @media print { .no-print { display: none !important; } #official-blank { margin: 0; border-width: 5px; } }
+        .timer-display { 
+    position: fixed; 
+    top: 15px; 
+    right: 15px; 
+    color: var(--main-ice); 
+    font-size: 1.4rem; 
+    background: rgba(11, 14, 20, 0.9); 
+    padding: 10px 20px; 
+    border: 2px solid var(--main-ice); 
+    font-weight: bold;
+    z-index: 1000;
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+}
+.timer-alert { 
+    color: #ff3300 !important; 
+    border-color: #ff3300 !important; 
+    box-shadow: 0 0 15px rgba(255, 51, 0, 0.4) !important;
+    animation: pulse 1s infinite; 
+}
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div id="app">
+    <!-- ТАБЛО ТАЙМЕРА (Скрыто до старта) -->
+    <div id="timer" class="timer-display hidden">[ 15:00 ]</div>
     <!-- ВХОД -->
     <div id="auth" class="no-print">
         <h1>STATION /10CHEM</h1>
@@ -226,8 +248,8 @@ const pool = [
         a: "1"
     }
 ];
-
-function startTest() {
+let timerInterval; // Переменная для контроля времени
+ffunction startTest() {
     const fio = document.getElementById('userName').value.trim();
     const uClass = document.getElementById('userClass').value.trim();
 
@@ -239,6 +261,9 @@ function startTest() {
     startTime = Date.now();
     document.getElementById('auth').classList.add('hidden');
     document.getElementById('test-container').classList.remove('hidden');
+    document.getElementById('timer').classList.remove('hidden'); // Показываем таймер
+    
+    startTimer(900); // Запуск на 15 минут (15 * 60 = 900 секунд)
     
     const quizDiv = document.getElementById('quiz');
     quizDiv.innerHTML = "";
@@ -267,6 +292,30 @@ function startTest() {
             </div>`;
     });
 }
+    function startTimer(duration) {
+    let timer = duration, minutes, seconds;
+    timerInterval = setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        const display = document.getElementById('timer');
+        display.textContent = `[ ${minutes}:${seconds} ]`;
+
+        // Красный пульсирующий алерт на последней минуте (60 секунд)
+        if (timer <= 60) {
+            display.classList.add('timer-alert');
+        }
+
+        if (--timer < 0) {
+            clearInterval(timerInterval);
+            alert("ВРЕМЯ ИСТЕКЛО! Система выполняет принудительную фиксацию результатов.");
+            finishTest(); // Автоматическая сдача
+        }
+    }, 1000);
+}
 
 function selectSingle(btn, id) {
     btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
@@ -282,6 +331,9 @@ function selectMulti(btn, id) {
 }
 
 function finishTest() {
+    clearInterval(timerInterval); // Сразу останавливаем таймер
+    document.getElementById('timer').classList.add('hidden'); // Прячем табло
+    
     const inputs = document.querySelectorAll('.ans');
     let score = 0;
 
@@ -304,11 +356,9 @@ function finishTest() {
     const uClass = document.getElementById('userClass').value.toUpperCase();
     const timeSpent = Math.floor((Date.now() - startTime) / 1000);
 
-    // КРИТЕРИЙ АБСОЛЮТНОЙ ЧИСТОТЫ: 5 только за 15/15. 12-14 = 4. 8-11 = 3. Меньше 8 = 2.
     const finalGrade = (score === 15) ? 5 : (score >= 12) ? 4 : (score >= 8) ? 3 : 2;
 
-    // Синхронизация данных с твоей Google Таблицей
-    fetch('https://script.google.com/macros/s/AKfycbyC6lxDWbGd7Yb0XRvbz0LeR5m6Vz0pCBH-rCgFMBkMifQd_I4Bj61rO6KJ1i8-jqo5WA/exec', {
+    fetch('https://script.google.com/macros/s/AKfycbyC6lxDWbGd7Yb0XRvbz0LeR5m6Vz0pCBH-rCgFMBkMifQd_I4Bj61rO6KJ1i8-jqo5WA/exec', { // Сюда верни свою боевую ссылку
         method: 'POST',
         mode: 'no-cors',
         body: JSON.stringify({
@@ -321,7 +371,6 @@ function finishTest() {
         })
     });
 
-    // Отрисовка бланка результатов
     document.getElementById('test-container').classList.add('hidden');
     const blank = document.getElementById('official-blank');
     blank.classList.remove('hidden');
