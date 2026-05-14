@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WW | 10 CLASS ORGANIC TERMINAL</title>
+    <style>
+        :root { 
+            --main-ice: #00f2ff; 
+            --steel: #2c3e50; 
+            --bg-dark: #0b0e14;
+            --glass: rgba(0, 242, 255, 0.05);
+        }
+        
+        body { 
+            font-family: 'Courier New', monospace; 
+            background: var(--bg-dark); 
+            color: #e0e0e0; 
+            margin: 0; 
+            padding: 0; 
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        #auth {
+            flex: 1; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            padding: 20px;
+        }
+        #auth h1 { color: var(--main-ice); letter-spacing: 5px; font-size: 2.2rem; margin-bottom: 5px; }
+        .subtitle { color: #557; font-size: 0.8rem; letter-spacing: 3px; margin-bottom: 30px; }
+
+        .input-group { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 15px; }
+        input[type="text"], select { 
+            background: rgba(255,255,255,0.03); border: 1px solid var(--main-ice); 
+            color: var(--main-ice); padding: 12px; font-size: 1.1rem; 
+            text-align: center; outline: none; transition: 0.3s;
+            font-family: inherit;
+        }
+        input[type="text"]:focus { box-shadow: 0 0 10px rgba(0, 242, 255, 0.3); }
+
+        button.action-btn {
+            margin-top: 25px; background: transparent; 
+            border: 2px solid var(--main-ice); color: var(--main-ice);
+            padding: 15px 35px; cursor: pointer; font-family: inherit;
+            text-transform: uppercase; font-weight: bold; letter-spacing: 2px;
+            transition: 0.3s;
+        }
+        button.action-btn:hover { background: var(--main-ice); color: var(--bg-dark); box-shadow: 0 0 20px var(--main-ice); }
+
+        #test-container { padding: 15px; max-width: 900px; margin: 20px auto; width: 100%; box-sizing: border-box; }
+        
+        .task-card { 
+            background: var(--glass); border-left: 5px solid var(--main-ice); 
+            padding: 25px; margin: 30px 0; border-radius: 0 4px 4px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: rgba(0,0,0,0.2); }
+        th, td { border: 1px solid #2c3e50; padding: 12px; text-align: center; font-size: 0.9rem; }
+        th { background: var(--steel); color: var(--main-ice); }
+
+        .opt-btn { 
+            margin: 5px; padding: 10px 15px; border: 1px solid var(--main-ice); 
+            background: transparent; color: var(--main-ice); cursor: pointer; transition: 0.2s;
+            font-family: inherit; font-size: 0.9rem;
+        }
+        .opt-btn:hover { background: rgba(0, 242, 255, 0.1); }
+        .opt-btn.selected { background: var(--main-ice); color: var(--bg-dark); font-weight: bold; }
+
+        .hidden { display: none !important; }
+        
+        #official-blank { 
+            border: 10px double black; padding: 40px; text-align: center; 
+            margin: 40px auto; background: #fff; color: #000; max-width: 800px;
+        }
+        .blank-title { font-family: serif; font-size: 1.8rem; letter-spacing: 1px; margin-bottom: 5px; }
+        .blank-meta { font-family: monospace; font-size: 0.9rem; color: #444; margin-bottom: 30px; }
+
+        @media (max-width: 600px) {
+            th, td { padding: 6px; font-size: 0.75rem; }
+            #auth h1 { font-size: 1.6rem; }
+            .opt-btn { width: 100%; box-sizing: border-box; }
+        }
+        @media print { .no-print { display: none !important; } #official-blank { margin: 0; border-width: 5px; } }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- ВХОД -->
+    <div id="auth" class="no-print">
+        <h1>STATION /10CHEM</h1>
+        <div class="subtitle">ORGANIC CHEMISTRY DIGITAL LAB</div>
+        <div class="input-group">
+            <input type="text" id="userName" placeholder="ФИО УЧАЩЕГОСЯ" autocomplete="off">
+            <input type="text" id="userClass" placeholder="КЛАСС (НАПР. 10-А)" autocomplete="off">
+        </div>
+        <button class="action-btn" onclick="startTest()">Открыть терминал</button>
+    </div>
+
+    <!-- ТЕСТ -->
+    <div id="test-container" class="hidden no-print">
+        <div id="quiz"></div>
+        <button id="finish-btn" class="action-btn" onclick="finishTest()" style="width: 100%; margin: 40px 0; background: var(--main-ice); color: var(--bg-dark);">ЗАВЕРШИТЬ СИНТЕЗ</button>
+    </div>
+
+    <!-- СЕРТИФИКАТ -->
+    <div id="official-blank" class="hidden">
+        <div class="blank-title">ПРОТОКОЛ КОНТРОЛЯ ЗНАНИЙ ПО ОРГАНИЧЕСКОЙ ХИМИИ</div>
+        <div class="blank-meta">WW LABORATORIES // КИСЛОРОДСОДЕРЖАЩИЕ ВЕЩЕСТВА</div>
+        <hr style="border: 1px solid #000;">
+        <p style="margin-top: 30px;">Настоящим подтверждается, что учащийся:</p>
+        <h1 id="blank-fio" style="font-family: serif; text-transform: uppercase; margin: 10px 0;"></h1>
+        <h3 id="blank-class" style="font-family: monospace; letter-spacing: 2px;"></h3>
+        
+        <div id="result-status" style="font-size: 1.6rem; margin: 40px 0; font-family: serif; font-weight: bold; border: 2px solid #000; padding: 15px; display: inline-block;"></div>
+        
+        <p id="blank-date" style="font-family: monospace; font-size: 0.8rem; margin-top: 5px;"></p>
+        <hr style="border: 0; border-top: 1px dashed #000; margin-top: 40px;">
+        <p style="font-size: 0.7rem; color: #555;">Документ сгенерирован автоматически на основе анализа цифрового бланка ответов.</p>
+        <button class="action-btn no-print" onclick="window.print()" style="border-color: #000; color: #000; margin-top: 20px;">ПЕЧАТЬ В PDF</button>
+    </div>
+</div>
+<script>
+let startTime;
+
+// База данных 15 высокоуровневых заданий для 10 класса
+const pool = [
+    {
+        id: "1",
+        q: "<b>Задание 1 (Номенклатура спиртов).</b> Укажите систематическое название по номенклатуре ИЮПАК для следующего спирта: CH<sub>3</sub>–CH(CH<sub>3</sub>)–CH(OH)–CH<sub>2</sub>–CH<sub>3</sub>:",
+        type: "choice",
+        options: ["2-метилпентанол-3", "4-метилпентанол-3", "2-метилбутанол-3", "гексанол-3"],
+        a: "2-метилпентанол-3"
+    },
+    {
+        id: "2",
+        q: "<b>Задание 2 (Изомерия).</b> Сколько структурных изомеров из класса предельных одноатомных спиртов соответствует молекулярной формуле C<sub>4</sub>H<sub>10</sub>O? <br>Введите ответ <b>только в виде одной цифры</b>:",
+        type: "input",
+        a: "4" // бутанол-1, бутанол-2, 2-метилпропанол-1, 2-метилпропанол-2
+    },
+    {
+        id: "3",
+        q: "<b>Задание 3 (Фенолы).</b> Из предложенного перечня выберите два вещества, с которыми реагирует фенол, в отличие от этанола:",
+        type: "multi",
+        options: ["1) натрий", "2) гидроксид натрия", "3) бромная вода", "4) хлороводород"],
+        a: ["2) гидроксид натрия", "3) бромная вода"]
+    },
+    {
+        id: "4",
+        q: "<b>Задание 4 (Строение карбонильных соединений).</b> Укажите тип гибридизации атома углерода карбонильной группы в молекулах альдегидов и кетонов (введите буквенно-цифровой код, например sp, sp2 или sp3):",
+        type: "input",
+        a: "sp2"
+    },
+    {
+        id: "5",
+        q: "<b>Задание 5 (Качественные реакции).</b> Какое органическое вещество образуется при окислении этаналя избытком аммиачного раствора оксида серебра(I) при нагревании?",
+        type: "choice",
+        options: ["уксусная кислота", "ацетат аммония", "этанол", "серебро"],
+        a: "ацетат аммония" // CH3CHO + 2[Ag(NH3)2]OH -> CH3COONH4 + 2Ag + 3NH3 + H2O
+    },
+    {
+        id: "6",
+        q: "<b>Задание 6 (Классификация).</b> Установите соответствие между тривиальным названием вещества и классом, к которому оно относится (введите последовательность из 4 цифр по порядку АБВГ):<br>А) формальдегид, Б) этиленгликоль, В) ацетон, Г) пикриновая кислота.<br>1) кетоны, 2) альдегиды, 3) многоатомные спирты, 4) фенолы.",
+        type: "input",
+        a: "2314"
+    },
+    {
+        id: "7",
+        q: "<b>Задание 7 (Химические свойства).</b> К какому классу соединений относится продукт межмолекулярной дегидратации пропанола-1 в присутствии концентрированной серной кислоты при температуре ниже 140 °C?",
+        type: "choice",
+        options: ["сложные эфиры", "простые эфиры", "алкены", "алканы"],
+        a: "простые эфиры" // дипропиловый эфир
+    },
+    {
+        id: "8",
+        q: "<b>Задание 8 (Качественный признак).</b> Выберите выпадающий вариант ответа: Какой визуальный признак наблюдается при добавлении нескольких каплей раствора хлорида железа(III) к раствору фенола?",
+        type: "select",
+        options: ["выделение бесцветного газа", "выпадение осадка белого цвета", "появление фиолетового окрашивания", "растворение раствора с выделением тепла"],
+        a: "появление фиолетового окрашивания"
+    }
+];
+  // Добавление оставшихся заданий в массив pool (9-15)
+    {
+        id: "9",
+        q: "<b>Задание 9 (Карбоновые кислоты).</b> Из предложенного перечня выберите вещество, которое в отличие от других предельных одноосновных карбоновых кислот способно вступать в реакцию «серебряного зеркала»:",
+        type: "choice",
+        options: ["уксусная кислота", "пропионовая кислота", "муравьиная кислота", "масляная кислота"],
+        a: "муравьиная кислота"
+    },
+    {
+        id: "10",
+        q: "<b>Задание 10 (Свойства кислот).</b> Какое вещество выделится в виде газа при взаимодействии избытка уксусной кислоты с порошком карбоната кальция? (Введите химическую формулу вещества, например CO2 или H2):",
+        type: "input",
+        a: "CO2"
+    },
+    {
+        id: "11",
+        q: "<b>Задание 11 (Номенклатура карбонильных).</b> Укажите систематическое название кетона состава C<sub>4</sub>H<sub>8</sub>O по номенклатуре ИЮПАК (введите строчными буквами, без пробелов, например пропанон):",
+        type: "input",
+        a: "бутанон"
+    },
+    {
+        id: "12",
+        q: "<b>Задание 12 (Качественные реакции кислот).</b> С помощью какого реагента можно экспериментально отличить олеиновую кислоту (непредельную) от стеариновой кислоты (предельной)?",
+        type: "choice",
+        options: ["раствор лакмуса", "бромная вода", "гидроксид натрия", "оксид меди(II)"],
+        a: "бромная вода"
+    },
+    {
+        id: "13",
+        q: "<b>Задание 13 (Вывод формулы по продуктам).</b> При сжигании 4,4 г органического вещества получили 8,8 г углекислого газа и 3,6 г воды. Плотность паров этого вещества по водороду равна 22. Определите число атомов <b>водорода</b> в молекуле. (Введите только одну цифру):",
+        type: "input",
+        a: "4" // M = 44 г/моль (пропаналь или ацетон), формула C3H6O, но по массе продуктов 4.4г - это 0.1 моль CO2 и 0.2 моль H2O -> C2H4O
+    },
+    {
+        id: "14",
+        q: "<b>Задание 14 (Вывод формулы по массе).</b> Предельный одноатомный спирт содержит 21,62% кислорода по массе. Вычислите количество атомов <b>углерода</b> в молекуле этого спирта. (Введите только одну цифру):",
+        type: "input",
+        a: "4" // M = 16 / 0.2162 = 74 г/моль -> C4H9OH
+    },
+    {
+        id: "15",
+        q: "<b>Задание 15 (Генетическая связь).</b> Напишите цифровой код вещества <b>X</b> в цепочке превращений: Метан &rarr; <b>X</b> &rarr; Этаналь &rarr; Этанол.<br>1) ацетилен, 2) этилен, 3) хлорметан, 4) метанол. <br>Введите одну цифру:",
+        type: "input",
+        a: "1" // Метан -> Ацетилен -> Этаналь (реакция Кучерова)
+    }
+];
+
+function startTest() {
+    const fio = document.getElementById('userName').value.trim();
+    const uClass = document.getElementById('userClass').value.trim();
+
+    if(!fio || !uClass) {
+        alert("КРИТИЧЕСКАЯ ОШИБКА: Идентификация отклонена. Заполните ФИО и Класс.");
+        return;
+    }
+
+    startTime = Date.now();
+    document.getElementById('auth').classList.add('hidden');
+    document.getElementById('test-container').classList.remove('hidden');
+    
+    const quizDiv = document.getElementById('quiz');
+    quizDiv.innerHTML = "";
+    
+    pool.forEach((item, index) => {
+        let inputHtml = "";
+        if(item.type === "multi") {
+            inputHtml = `<div class="input-zone">` + 
+                item.options.map(opt => `<button class="opt-btn" onclick="selectMulti(this, '${item.id}')">${opt}</button>`).join('') + 
+                `<input type="hidden" class="ans" id="ans-${item.id}" data-correct="${item.a.join('|')}"></div>`;
+        } else if(item.type === "select") {
+            inputHtml = `<select class="ans" id="ans-${item.id}" data-correct="${item.a}"><option value="">Выбрать ответ...</option>${item.options.map(o=>`<option value="${o}">${o}</option>`)}</select>`;
+        } else {
+            inputHtml = `<input type="text" class="ans" id="ans-${item.id}" data-correct="${item.a}" placeholder="Введите ответ...">`;
+        }
+
+        quizDiv.innerHTML += `
+            <div class="task-card">
+                <p>${index + 1}. ${item.q}</p>
+                <div style="margin-top: 15px;">${inputHtml}</div>
+            </div>`;
+    });
+}
+
+function selectSingle(btn, id) {
+    btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('ans-' + id).value = btn.innerText;
+}
+
+function selectMulti(btn, id) {
+    btn.classList.toggle('selected');
+    const parent = btn.parentElement;
+    const selected = Array.from(parent.querySelectorAll('.opt-btn.selected')).map(b => b.innerText);
+    document.getElementById('ans-' + id).value = selected.join('|');
+}
+
+// Привязка обработчика для одиночного выбора кнопок динамически (если применимо)
+document.addEventListener('click', function(e) {
+    if(e.target && e.target.classList.contains('opt-btn') && !e.target.parentElement.querySelectorAll('.opt-btn')[0].getAttribute('onclick').includes('selectMulti')) {
+        // Логика одиночного выбора кнопок, если тип choice оформлен кнопками
+    }
+});
+
+function finishTest() {
+    const inputs = document.querySelectorAll('.ans');
+    let score = 0;
+
+    inputs.forEach(i => {
+        let userAns = i.value.trim().replace(',', '.').toUpperCase();
+        let corrAns = i.dataset.correct.toUpperCase();
+
+        if (corrAns.includes('|')) {
+            let userArr = userAns.split('|').sort();
+            let corrArr = corrAns.split('|').sort();
+            if (JSON.stringify(userArr) === JSON.stringify(corrArr)) score++;
+        } else {
+            if(userAns.endsWith('.0')) userAns = userAns.slice(0, -2);
+            if(corrAns.endsWith('.0')) corrAns = corrAns.slice(0, -2);
+            if (userAns === corrAns) score++;
+        }
+    });
+
+    const fio = document.getElementById('userName').value.toUpperCase();
+    const uClass = document.getElementById('userClass').value.toUpperCase();
+    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+
+    // Шкала для 15 продвинутых заданий (14-15 = «5», 11-13 = «4», 8-10 = «3», <8 = «2»)
+    const finalGrade = (score >= 14) ? 5 : (score >= 11) ? 4 : (score >= 8) ? 3 : 2;
+
+    // Синхронизация данных с твоей Google Таблицей
+    fetch('https://script.google.com/macros/s/AKfycbyC6lxDWbGd7Yb0XRvbz0LeR5m6Vz0pCBH-rCgFMBkMifQd_I4Bj61rO6KJ1i8-jqo5WA/exec', {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify({
+            fio: fio,
+            uClass: uClass,
+            score: score,
+            grade: finalGrade,
+            time: timeSpent,
+            station: '/10chem'
+        })
+    });
+
+    // Отрисовка бланка результатов
+    document.getElementById('test-container').classList.add('hidden');
+    const blank = document.getElementById('official-blank');
+    blank.classList.remove('hidden');
+    
+    document.getElementById('blank-fio').innerText = fio;
+    document.getElementById('blank-class').innerText = "КЛАСС: " + uClass;
+    document.getElementById('blank-date').innerText = "ДАТА КОНТРОЛЯ: " + new Date().toLocaleDateString() + " // ВРЕМЯ СИНТЕЗА: " + timeSpent + " сек.";
+    document.getElementById('result-status').innerHTML = `ЭФФЕКТИВНОСТЬ: ${score} / 15 БАЛЛОВ<br>ИТОГОВАЯ ОЦЕНКА: ${finalGrade}`;
+}
+
+// Переопределение для одиночного выбора кнопок типа choice
+document.addEventListener('DOMContentLoaded', () => {
+    window.selectSingle = function(btn, id) {
+        btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        document.getElementById('ans-' + id).value = btn.innerText;
+    };
+    // Перезапись рендеринга одиночного выбора под кнопки
+    pool.forEach((item) => {
+        if(item.type === "choice") {
+            item.renderFix = true;
+        }
+    });
+});
+
+// Фикс для динамического рендеринга одиночного выбора кнопками вместо инпутов
+function renderChoiceButtons() {
+    pool.forEach((item, index) => {
+        if(item.type === "choice") {
+            const card = document.getElementsByClassName('task-card')[index];
+            if(card) {
+                const zone = card.getElementsByTagName('div')[0];
+                zone.innerHTML = `<div class="input-zone">` + 
+                    item.options.map(opt => `<button class="opt-btn" onclick="selectSingle(this, '${item.id}')">${opt}</button>`).join('') + 
+                    `<input type="hidden" class="ans" id="ans-${item.id}" data-correct="${item.a}"></div>`;
+            }
+        }
+    });
+}
+const oldStartTest = startTest;
+startTest = function() {
+    oldStartTest();
+    renderChoiceButtons();
+}
+</script>
+</body>
+</html>
