@@ -147,6 +147,7 @@
 </div>
 <script>
 let startTime;
+let timerInterval;
 
 // База данных 15 высокоуровневых заданий для 10 класса
 const pool = [
@@ -248,8 +249,8 @@ const pool = [
         a: "1"
     }
 ];
-let timerInterval; // Переменная для контроля времени
-ffunction startTest() {
+
+function startTest() {
     const fio = document.getElementById('userName').value.trim();
     const uClass = document.getElementById('userClass').value.trim();
 
@@ -261,9 +262,9 @@ ffunction startTest() {
     startTime = Date.now();
     document.getElementById('auth').classList.add('hidden');
     document.getElementById('test-container').classList.remove('hidden');
-    document.getElementById('timer').classList.remove('hidden'); // Показываем таймер
+    document.getElementById('timer').classList.remove('hidden');
     
-    startTimer(900); // Запуск на 15 минут (15 * 60 = 900 секунд)
+    startTimer(900); // 15 минут
     
     const quizDiv = document.getElementById('quiz');
     quizDiv.innerHTML = "";
@@ -292,7 +293,8 @@ ffunction startTest() {
             </div>`;
     });
 }
-    function startTimer(duration) {
+
+function startTimer(duration) {
     let timer = duration, minutes, seconds;
     timerInterval = setInterval(function () {
         minutes = parseInt(timer / 60, 10);
@@ -304,7 +306,6 @@ ffunction startTest() {
         const display = document.getElementById('timer');
         display.textContent = `[ ${minutes}:${seconds} ]`;
 
-        // Красный пульсирующий алерт на последней минуте (60 секунд)
         if (timer <= 60) {
             display.classList.add('timer-alert');
         }
@@ -312,7 +313,7 @@ ffunction startTest() {
         if (--timer < 0) {
             clearInterval(timerInterval);
             alert("ВРЕМЯ ИСТЕКЛО! Система выполняет принудительную фиксацию результатов.");
-            finishTest(); // Автоматическая сдача
+            finishTest();
         }
     }, 1000);
 }
@@ -331,8 +332,8 @@ function selectMulti(btn, id) {
 }
 
 function finishTest() {
-    clearInterval(timerInterval); // Сразу останавливаем таймер
-    document.getElementById('timer').classList.add('hidden'); // Прячем табло
+    clearInterval(timerInterval);
+    document.getElementById('timer').classList.add('hidden');
     
     const inputs = document.querySelectorAll('.ans');
     let score = 0;
@@ -356,9 +357,11 @@ function finishTest() {
     const uClass = document.getElementById('userClass').value.toUpperCase();
     const timeSpent = Math.floor((Date.now() - startTime) / 1000);
 
+    // КРИТЕРИЙ АБСОЛЮТНОЙ ЧИСТОТЫ ДЛЯ 10 КЛАССА
     const finalGrade = (score === 15) ? 5 : (score >= 12) ? 4 : (score >= 8) ? 3 : 2;
 
-    fetch('https://script.google.com/macros/s/AKfycbyC6lxDWbGd7Yb0XRvbz0LeR5m6Vz0pCBH-rCgFMBkMifQd_I4Bj61rO6KJ1i8-jqo5WA/exec', { // Сюда верни свою боевую ссылку
+    // СЮДА ВСТАВЬ СВОЙ URL ВМЕСТО ЗАГЛУШКИ
+    fetch('https://script.google.com/macros/s/AKfycbyC6lxDWbGd7Yb0XRvbz0LeR5m6Vz0pCBH-rCgFMBkMifQd_I4Bj61rO6KJ1i8-jqo5WA/exec', {
         method: 'POST',
         mode: 'no-cors',
         body: JSON.stringify({
