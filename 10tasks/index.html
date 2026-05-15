@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WW | 10 CLASS COMPUTATIONAL LAB</title>
+    <style>
+        :root { 
+            --main-ice: #00f2ff; 
+            --steel: #2c3e50; 
+            --bg-dark: #0b0e14;
+            --glass: rgba(0, 242, 255, 0.05);
+            --alert-red: #ff3300;
+        }
+        
+        body { 
+            font-family: 'Courier New', monospace; 
+            background: var(--bg-dark); 
+            color: #e0e0e0; 
+            margin: 0; 
+            padding: 0; 
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        #auth {
+            flex: 1; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            padding: 20px;
+        }
+        #auth h1 { color: var(--main-ice); letter-spacing: 5px; font-size: 2.2rem; margin-bottom: 5px; }
+        .subtitle { color: #557; font-size: 0.8rem; letter-spacing: 3px; margin-bottom: 30px; }
+
+        .input-group { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 15px; }
+        input[type="text"] { 
+            background: rgba(255,255,255,0.03); border: 1px solid var(--main-ice); 
+            color: var(--main-ice); padding: 12px; font-size: 1.1rem; 
+            text-align: center; outline: none; transition: 0.3s;
+            font-family: inherit;
+        }
+        input[type="text"]:focus { box-shadow: 0 0 10px rgba(0, 242, 255, 0.3); }
+
+        .timer-display { 
+            position: fixed; top: 15px; right: 15px; 
+            color: var(--main-ice); font-size: 1.4rem; 
+            background: rgba(11, 14, 20, 0.9); padding: 10px 20px; 
+            border: 2px solid var(--main-ice); font-weight: bold;
+            z-index: 1000; box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+        }
+        .timer-alert { 
+            color: var(--alert-red) !important; border-color: var(--alert-red) !important; 
+            box-shadow: 0 0 15px rgba(255, 51, 0, 0.4) !important; animation: pulse 1s infinite; 
+        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+
+        button.action-btn {
+            margin-top: 25px; background: transparent; 
+            border: 2px solid var(--main-ice); color: var(--main-ice);
+            padding: 15px 35px; cursor: pointer; font-family: inherit;
+            text-transform: uppercase; font-weight: bold; letter-spacing: 2px;
+            transition: 0.3s;
+        }
+        button.action-btn:hover { background: var(--main-ice); color: var(--bg-dark); box-shadow: 0 0 20px var(--main-ice); }
+
+        #test-container { padding: 15px; max-width: 900px; margin: 20px auto; width: 100%; box-sizing: border-box; }
+        
+        .task-card { 
+            background: var(--glass); border-left: 5px solid var(--main-ice); 
+            padding: 25px; margin: 30px 0; border-radius: 0 4px 4px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .hidden { display: none !important; }
+        
+        #official-blank { 
+            border: 10px double black; padding: 40px; text-align: center; 
+            margin: 40px auto; background: #fff; color: #000; max-width: 800px;
+        }
+        .blank-title { font-family: serif; font-size: 1.8rem; letter-spacing: 1px; margin-bottom: 5px; }
+        .blank-meta { font-family: monospace; font-size: 0.9rem; color: #444; margin-bottom: 30px; }
+
+        @media (max-width: 600px) {
+            #auth h1 { font-size: 1.6rem; }
+        }
+        @media print { .no-print { display: none !important; } #official-blank { margin: 0; border-width: 5px; } }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- ТАЙМЕР (20 минут на 5 серьезных задач) -->
+    <div id="timer" class="timer-display hidden">[ 20:00 ]</div>
+
+    <!-- ВХОД -->
+    <div id="auth" class="no-print">
+        <h1>STATION /10TASKS</h1>
+        <div class="subtitle">ORGANIC QUANTITATIVE ANALYSIS</div>
+        <div class="input-group">
+            <input type="text" id="userName" placeholder="ФИО УЧАЩЕГОСЯ" autocomplete="off">
+            <input type="text" id="userClass" placeholder="КЛАСС (НАПР. 10-Б)" autocomplete="off">
+        </div>
+        <button class="action-btn" onclick="startTest()">Открыть терминал</button>
+    </div>
+
+    <!-- ТЕСТ -->
+    <div id="test-container" class="hidden no-print">
+        <div id="quiz"></div>
+        <button id="finish-btn" class="action-btn" onclick="finishTest()" style="width: 100%; margin: 40px 0; background: var(--main-ice); color: var(--bg-dark);">ФИКСИРОВАТЬ РЕЗУЛЬТАТЫ</button>
+    </div>
+
+    <!-- СЕРТИФИКАТ -->
+    <div id="official-blank" class="hidden">
+        <div class="blank-title">ПРОТОКОЛ МАТЕМАТИЧЕСКОГО СИНТЕЗА В ОРГАНИКЕ</div>
+        <div class="blank-meta">WW LABORATORIES // ВЫЧИСЛИТЕЛЬНЫЙ ПРЕДЕЛ</div>
+        <hr style="border: 1px solid #000;">
+        <p style="margin-top: 30px;">Настоящим подтверждается, что аналитик:</p>
+        <h1 id="blank-fio" style="font-family: serif; text-transform: uppercase; margin: 10px 0;"></h1>
+        <h3 id="blank-class" style="font-family: monospace; letter-spacing: 2px;"></h3>
+        
+        <div id="result-status" style="font-size: 1.6rem; margin: 40px 0; font-family: serif; font-weight: bold; border: 2px solid #000; padding: 15px; display: inline-block;"></div>
+        
+        <p id="blank-date" style="font-family: monospace; font-size: 0.8rem; margin-top: 5px;"></p>
+        <hr style="border: 0; border-top: 1px dashed #000; margin-top: 40px;">
+        <p style="font-size: 0.7rem; color: #555;">Результаты заверены цифровым ядром. Коэффициент погрешности вычислений: Zero Error.</p>
+        <button class="action-btn no-print" onclick="window.print()" style="border-color: #000; color: #000; margin-top: 20px;">СОХРАНИТЬ В PDF</button>
+    </div>
+</div>
+<script>
+let startTime;
+let timerInterval;
+let activeTasks = []; // Сюда запишутся выбранные случайные варианты
+
+// Тройной пул вариантов для защиты от списывания (уровень ЕГЭ/10 класс)
+const tasksPool = [
+    // Задача 1: Вывод формулы алкана по плотности паров
+    [
+        { q: "При сжигании предельного одномерного углеводорода образовалось 13,2 г углекислого газа. Плотность паров этого алкана по гелию равна 11. Вычислите массу (г) сгоревшего алкана. (Ответ округлите до целых):", a: "4" }, // пропан C3H8, M=44. 13.2г CO2 = 0.3 моль -> 0.1 моль C3H8 = 4.4г -> 4
+        { q: "При сжигании предельного одномерного углеводорода образовалось 26,4 г углекислого газа. Плотность паров этого алкана по гелию равна 11. Вычислите массу (г) сгоревшего алкана. (Ответ округлите до целых):", a: "9" }, // пропан C3H8, M=44. 26.4г CO2 = 0.6 моль -> 0.2 моль C3H8 = 8.8г -> 9
+        { q: "При сжигании предельного одномерного углеводорода образовалось 39,6 г углекислого газа. Плотность паров этого алкана по гелию равна 11. Вычислите массу (г) сгоревшего алкана. (Ответ округлите до целых):", a: "13" } // пропан C3H8, M=44. 39.6г CO2 = 0.9 моль -> 0.3 моль C3H8 = 13.2г -> 13
+    ],
+    // Задача 2: Избыток и недостаток (Спирт + Натрий)
+    [
+        { q: "К 46 г абсолютного этанола добавили 11,5 г металлического натрия. Вычислите объем (л, н.у.) выделившегося водорода. (Ответ округлите до десятых, через точку):", a: "5.6" }, // этанол 1 моль (изб), Na 0.5 моль (нед) -> H2 = 0.25 моль = 5.6л
+        { q: "К 23 г абсолютного этанола добавили 11,5 г металлического натрия. Вычислите объем (л, н.у.) выделившегося водорода. (Ответ округлите до десятых, через точку):", a: "5.6" }, // этанол 0.5 моль, Na 0.5 моль -> Стехиометрия! H2 = 0.25 моль = 5.6л
+        { q: "К 92 г абсолютного этанола добавили 23 г металлического натрия. Вычислите объем (л, н.у.) выделившегося водорода. (Ответ округлите до десятых, через точку):", a: "11.2" }  // этанол 2 моль (изб), Na 1 моль (нед) -> H2 = 0.5 моль = 11.2л
+    ],
+    // Задача 3: Выход продукта (Альдегид из спирта)
+    [
+        { q: "В результате окисления оксидом меди(II) пропанола-1 массой 30 г получили пропаналь массой 23,2 г. Вычислите практический выход (%) продукта реакции. (Ответ запишите в виде целого числа):", a: "80" }, // 30г спирта = 0.5 моль. Теор пропаналь = 0.5 * 58 = 29г. Выход = 23.2 / 29 = 80%
+        { q: "В результате окисления оксидом меди(II) пропанола-1 массой 15 г получили пропаналь массой 11,6 г. Вычислите практический выход (%) продукта реакции. (Ответ запишите в виде целого числа):", a: "80" },
+        { q: "В результате окисления оксидом меди(II) пропанола-1 массой 60 г получили пропаналь массой 43,5 г. Вычислите практический выход (%) продукта реакции. (Ответ запишите в виде целого числа):", a: "75" }  // Теор = 58г. 43.5 / 58 = 75%
+    ],
+    // Задача 4: Массовая доля соли/кислоты (Этерификация)
+    [
+        { q: "Вычислите массу (г) уксусной кислоты, необходимой для полной нейтрализации 200 г 12%-ного раствора гидроксида натрия. (Ответ округлите до целых):", a: "36" }, // NaOH = 24г = 0.6 моль -> Кислоты 0.6 моль * 60 = 36г
+        { q: "Вычислите массу (г) уксусной кислоты, необходимой для полной нейтрализации 100 г 12%-ного раствора гидроксида натрия. (Ответ округлите до целых):", a: "18" }, // NaOH = 12г = 0.3 моль -> Кислоты 0.3 моль * 60 = 18г
+        { q: "Вычислите массу (г) уксусной кислоты, необходимой для полной нейтрализации 400 г 6%-ного раствора гидроксида натрия. (Ответ округлите до целых):", a: "36" }   // NaOH = 24г = 0.6 моль -> Кислоты 36г
+    ],
+    // Задача 5: Вывод формулы по массовым долям элементов
+    [
+        { q: "Органическое вещество содержит 40,0% углерода, 6,7% водорода и 53,3% кислорода по массе. Плотность паров этого вещества по воздуху равна 2,07. Вычислите число атомов <b>водорода</b> в одной молекуле этого вещества:", a: "4" }, // M = 2.07 * 29 = 60 г/моль -> уксусная кислота или метилформат C2H4O2 -> 4 атома H
+        { q: "Органическое вещество содержит 54,5% углерода, 9,1% водорода и 36,4% кислорода по массе. Плотность паров паров вещества по водороду равна 22. Вычислите число атомов <b>углерода</b> в одной молекуле этого вещества:", a: "2" }, // M = 44 г/моль -> ацетальдегид C2H4O -> 2 атома C
+        { q: "Органическое вещество содержит 62,1% углерода, 10,3% водорода и 27,6% кислорода по массе. Известно, что оно является одноатомным спиртом. Вычислите число атомов <b>водорода</b> в одной молекуле этого спирта:", a: "6" }  // M = 58г/моль для фрагмента? Нет, C3H8O имеет M=60. 12*3/60=60%. Для C3H6O (аллиловый) M=58. Пропанол-1 C3H8O -> H=8? Проверим: 12*3=36 (62%), H=6 (10.3%), O=16 (27.6%) -> C3H6O -> 6
+    ]
+];
+
+function startTest() {
+    const fio = document.getElementById('userName').value.trim();
+    const uClass = document.getElementById('userClass').value.trim();
+
+    if(!fio || !uClass) {
+        alert("ОШИБКА ДОСТУПА: Введите ФИО и Класс для открытия линии связи.");
+        return;
+    }
+
+    startTime = Date.now();
+    document.getElementById('auth').classList.add('hidden');
+    document.getElementById('test-container').classList.remove('hidden');
+    document.getElementById('timer').classList.remove('hidden');
+    
+    startTimer(1200); // 20 минут обратного отсчета (20 * 60 = 1200)
+
+    const quizDiv = document.getElementById('quiz');
+    quizDiv.innerHTML = "";
+    activeTasks = [];
+
+    // Рандомизация: выбираем 1 случайный вариант из 3 для каждого из 5 типов задач
+    tasksPool.forEach((taskVariants, index) => {
+        const randomIndex = Math.floor(Math.random() * taskVariants.length);
+        const selectedTask = taskVariants[randomIndex];
+        activeTasks.push(selectedTask); // Сохраняем для финальной проверки
+
+        quizDiv.innerHTML += `
+            <div class="task-card">
+                <p><b>Лабораторная задача №${index + 1}</b></p>
+                <p>${selectedTask.q}</p>
+                <input type="text" class="ans" id="ans-${index}" placeholder="Введите число..." autocomplete="off">
+            </div>`;
+    });
+}
+
+function startTimer(duration) {
+    let timer = duration, minutes, seconds;
+    timerInterval = setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        const display = document.getElementById('timer');
+        display.textContent = `[ ${minutes}:${seconds} ]`;
+
+        if (timer <= 120) { // Пульсирующий алерт за 2 минуты до конца
+            display.classList.add('timer-alert');
+        }
+
+        if (--timer < 0) {
+            clearInterval(timerInterval);
+            alert("ВРЕМЯ ИСТЕКЛО! Принудительная фиксация вычислительных логов.");
+            finishTest();
+        }
+    }, 1000);
+}
+
+function finishTest() {
+    clearInterval(timerInterval);
+    document.getElementById('timer').classList.add('hidden');
+    
+    let score = 0;
+
+    // Сверяем ответы пользователя с динамически выбранными вариантами
+    activeTasks.forEach((task, index) => {
+        const userInput = document.getElementById(`ans-${index}`);
+        if (userInput) {
+            let userAns = userInput.value.trim().replace(',', '.'); // Точка вместо запятой
+            let corrAns = task.a;
+
+            // Сравнение чисел (Zero Error: игнорируем .0 на конце, если ввели целое)
+            if(userAns.endsWith('.0')) userAns = userAns.slice(0, -2);
+            if(corrAns.endsWith('.0')) corrAns = corrAns.slice(0, -2);
+
+            if (userAns === corrAns) score++;
+        }
+    });
+
+    const fio = document.getElementById('userName').value.toUpperCase();
+    const uClass = document.getElementById('userClass').value.toUpperCase();
+    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+
+    // WW-Критерий жесткой точности для 5 расчетных задач: 5=«5», 4=«4», 3=«3», <3=«2»
+    const finalGrade = (score === 5) ? 5 : (score === 4) ? 4 : (score === 3) ? 3 : 2;
+
+    // СИНХРОНИЗАЦИЯ С НОВОЙ ТАБЛИЦЕЙ (Замени URL на боевой при развертывании)
+    fetch('https://script.google.com/macros/s/AKfycbzHO10w65OlP1TzJqRPV65NSrph0L5oi2BLXM6cCGBfQ-47Y4N24wrv2hgQkzEkVhGK/exec', {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify({
+            fio: fio,
+            uClass: uClass,
+            score: score,
+            grade: finalGrade,
+            time: timeSpent,
+            station: '/10tasks'
+        })
+    });
+
+    document.getElementById('test-container').classList.add('hidden');
+    const blank = document.getElementById('official-blank');
+    blank.classList.remove('hidden');
+    
+    document.getElementById('blank-fio').innerText = fio;
+    document.getElementById('blank-class').innerText = "КЛАСС: " + uClass;
+    document.getElementById('blank-date').innerText = "ДАТА РАСЧЕТОВ: " + new Date().toLocaleDateString() + " // ВРЕМЯ АНАЛИЗА: " + timeSpent + " сек.";
+    document.getElementById('result-status').innerHTML = `УСПЕШНОСТЬ: ${score} / 5 ВЫЧИСЛЕНИЙ<br>КЛАСС ТОЧНОСТИ: ОЦЕНКА ${finalGrade}`;
+}
+</script>
+</body>
+</html>
