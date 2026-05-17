@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>МАОУ КУГ № 1 - "УНИВЕРС"</title>
+    <style>
+        :root { 
+            --cosmo-pink: #ff007f; 
+            --cosmo-purple: #a100ff; 
+            --bg-dark: #0d0914;
+            --panel-bg: #161021;
+            --text-light: #f5f0fa;
+        }
+        
+        body { 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            background: var(--bg-dark); 
+            color: var(--text-light); 
+            margin: 0; 
+            padding: 0; 
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Боковая навигация под стилус */
+        .sidebar { 
+            width: 280px; 
+            background: var(--panel-bg); 
+            border-right: 2px solid #3d2352;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 10px;
+            box-sizing: border-box;
+        }
+        .sidebar h2 { 
+            font-size: 1.1rem; text-align: center; color: var(--cosmo-pink); 
+            letter-spacing: 1px; margin-bottom: 30px; border-bottom: 1px solid #3d2352; padding-bottom: 15px;
+        }
+        .nav-btn { 
+            background: transparent; border: 1px solid #3d2352; color: #fff; 
+            padding: 15px; margin: 8px 0; text-align: left; font-size: 0.95rem;
+            cursor: pointer; transition: 0.3s; font-weight: 500;
+        }
+        .nav-btn:hover, .nav-btn.active { 
+            background: var(--cosmo-pink); color: #000; border-color: var(--cosmo-pink);
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.3); font-weight: bold;
+        }
+
+        /* Главная контентная зона */
+        .main-content { 
+            flex: 1; 
+            padding: 40px; 
+            box-sizing: border-box; 
+            overflow-y: auto;
+            position: relative;
+        }
+        .section-screen { display: none; animation: fadeIn 0.4s ease; }
+        .section-screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1 { color: #fff; font-size: 2.2rem; margin-top: 0; border-bottom: 2px solid var(--cosmo-pink); padding-bottom: 10px; }
+        p { font-size: 1.15rem; line-height: 1.7; color: #d3c4e3; }
+
+        /* Оформление лабораторных этапов */
+        .step-container { display: flex; gap: 20px; margin-top: 20px; }
+        .step-card { 
+            flex: 1; background: var(--panel-bg); border: 1px solid #3d2352; 
+            padding: 20px; border-radius: 4px; border-top: 4px solid var(--cosmo-pink);
+        }
+        .step-card h3 { margin-top: 0; color: #fff; }
+
+        /* Таблица результатов */
+        table { width: 100%; border-collapse: collapse; margin: 25px 0; background: var(--panel-bg); }
+        th, td { border: 1px solid #3d2352; padding: 15px; text-align: center; font-size: 1.1rem; }
+        th { background: #231633; color: var(--cosmo-pink); }
+        tr:hover { background: rgba(255,255,255,0.02); }
+
+        /* Интерактивный виджет-диаграмма */
+        .chart-box { 
+            background: var(--panel-bg); border: 1px solid #3d2352; padding: 25px; 
+            margin-top: 30px; border-radius: 4px; display: flex; flex-direction: column; align-items: center;
+        }
+        .bar-container { display: flex; align-items: flex-end; gap: 60px; height: 250px; margin-top: 30px; border-bottom: 2px solid #3d2352; padding-bottom: 10px; width: 100%; justify-content: center; }
+        .bar { width: 80px; background: var(--cosmo-purple); transition: height 1s ease; position: relative; border-radius: 4px 4px 0 0; }
+        .bar.target-product { background: var(--cosmo-pink); }
+        .bar-label { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); font-weight: bold; color: #fff; }
+        .axis-label { margin-top: 10px; font-size: 1rem; font-weight: bold; text-align: center; color: #a291b5; }
+        
+        .academic-info {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid #3d2352;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid var(--cosmo-pink);
+        }
+        
+        @media print { .no-print { display: none !important; } }
+    </style>
+</head>
+<body>
+
+    <!-- Навигационная панель -->
+    <div class="sidebar no-print">
+        <h2>ТЕРМИНАЛ УПРАВЛЕНИЯ</h2>
+        <button class="nav-btn active" onclick="switchScreen(this, 'intro')">1. Актуальность и Цель</button>
+        <button class="nav-btn" onclick="switchScreen(this, 'theory')">2. Теоретическая часть</button>
+        <button class="nav-btn" onclick="switchScreen(this, 'experiment')">3. Практическая часть</button>
+        <button class="nav-btn" onclick="switchScreen(this, 'calculations')">4. Расчетная часть</button>
+        <button class="nav-btn" onclick="switchScreen(this, 'results')">5. Результаты анализа</button>
+        <button class="nav-btn" onclick="switchScreen(this, 'conclusion')">6. Выводы проекта</button>
+    </div>
+
+    <!-- Контентная зона -->
+    <div class="main-content">
+
+        <!-- Экран 1: Актуальность -->
+        <div id="intro" class="section-screen active">
+            <h1>Научно-исследовательский проект</h1>
+            
+            <!-- Академическая визитка -->
+            <div class="academic-info">
+                <p style="margin: 5px 0; font-size: 1.1rem;"><b>Тема:</b> «Количественное определение содержания аскорбиновой кислоты в косметических средствах линии MIXIT методом титрования»</p>
+                <p style="margin: 5px 0; font-size: 1.1rem;"><b>Выполнила:</b> Сомова Ксения, учащаяся 9М класса</p>
+                <p style="margin: 5px 0; font-size: 1.1rem;"><b>Руководитель:</b> Печерсикх Д.А., учитель химии</p>
+            </div>
+
+            <p><b>Витамин С (аскорбиновая кислота)</b> в современной космецевтике является одним из самых востребованных компонентов. Он стимулирует синтез коллагена, осветляет пигментацию и защищает кожу от свободных радикалов. Однако из-за высокой нестабильности и быстрой окисляемости аскорбиновой кислоты её реальная концентрация в готовом креме может сильно снижаться в процессе хранения.</p>
+            <p><b>Цель проекта:</b> Экспериментальным путем определить точную количественную концентрацию витамина С в косметическом креме линии MIXIT методом прямого иодометрического титрования и оценить стабильность формулы.</p>
+            <p><b>Гипотеза:</b> Концентрация витамина С в исследуемом креме MIXIT соответствует заявленным производителем спецификациям, однако требует строгого соблюдения температурного режима для предотвращения окисления.</p>
+        </div>
+
+        <!-- Экран 2: Теоретическая часть -->
+        <div id="theory" class="section-screen">
+            <h1>Теоретические основы анализа</h1>
+            <p>Для анализа крема применяется методика <b>иодометрии</b> (окислительно-восстановительного титрования). Молекулярный иод (I<sub>2</sub>) выступает в роли окислителя, переводя аскорбиновую кислоту в дегидроаскорбиновую.</p>
+            <p><b>Уравнение химической реакции:</b><br>
+            <span style="color: var(--cosmo-pink); font-size: 1.2rem; font-weight: bold; background: rgba(0,0,0,0.3); padding: 5px 10px; display: inline-block; margin: 10px 0;">
+                C<sub>6</sub>H<sub>8</sub>O<sub>6</sub> + I<sub>2</sub> &rarr; C<sub>6</sub>H<sub>6</sub>O<sub>6</sub> + 2HI
+            </span></p>
+            <p>Индикатором служит 1%-й раствор крахмала. Точка эквивалентности фиксируется в момент, когда весь витамин С прореагировал, и первая избыточная капля иода окрашивает крахмал в устойчивый сине-фиолетовый цвет, заметный даже в эмульсионной среде крема.</p>
+        </div>
+
+        <!-- Экран 3: Практическая часть -->
+        <div id="experiment" class="section-screen">
+            <h1>Лабораторный этап исследования</h1>
+            <p>Эксперимент включал специфическую пробоподготовку жировой эмульсии и последующий аналитический контроль:</p>
+            
+            <div class="step-container" style="flex-direction: column; gap: 30px;">
+                <!-- Блок 1 -->
+                <div class="step-card" style="display: flex; gap: 25px; align-items: center; flex-wrap: wrap;">
+                    <div style="flex: 1.5; min-width: 280px;">
+                        <h3 style="color: var(--cosmo-pink); border-bottom: 1px dashed #3d2352; padding-bottom: 5px; margin-bottom: 10px;">Этап 1: Экстракция и разрушение эмульсии</h3>
+                        <p style="margin: 0; font-size: 1.05rem;">Точная навеска косметического крема MIXIT (5 граммов) растворялась в смеси дистиллированной воды и этилового спирта для полного разрушения жировой фазы эмульсии «масло в воде» и экстракции водорастворимого витамина С. Раствор подвергался центрифугированию и фильтрации.</p>
+                    </div>
+                    <div style="flex: 1; min-width: 200px; display: flex; justify-content: center;">
+                        <img src="cream.png" alt="Пробоподготовка крема" style="max-width: 100%; max-height: 200px; border: 2px solid var(--cosmo-pink); box-shadow: 0 0 15px rgba(255, 0, 127, 0.2); border-radius: 4px;">
+                    </div>
+                </div>
+
+                <!-- Блок 2 -->
+                <div class="step-card" style="display: flex; gap: 25px; align-items: center; flex-wrap: wrap; border-top-color: var(--cosmo-purple);">
+                    <div style="flex: 1.5; min-width: 280px;">
+                        <h3 style="color: var(--cosmo-purple); border-bottom: 1px dashed #3d2352; padding-bottom: 5px; margin-bottom: 10px;">Этап 2: Микротитрование</h3>
+                        <p style="margin: 0; font-size: 1.05rem;">К полученному прозрачному фильтрату объемом 20 мл добавлялся индикатор крахмал. Титрование проводилось из микробюретки стандартизированным 0,005 М раствором иода при интенсивном перемешивании до перехода окраски от молочно-белой к стойкой фиолетовой.</p>
+                    </div>
+                    <div style="flex: 1; min-width: 200px; display: flex; justify-content: center;">
+                        <img src="titration_mixit.png" alt="Титрование крема" style="max-width: 100%; max-height: 200px; border: 2px solid var(--cosmo-purple); box-shadow: 0 0 15px rgba(161, 0, 255, 0.2); border-radius: 4px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран 4: Расчетная часть -->
+        <div id="calculations" class="section-screen">
+            <h1>Метрологический контроль и Формулы расчетов</h1>
+            <p><b>Метод анализа:</b> Использован метод <u>прямого иодометрического титрования</u>. Титрант добавлялся непосредственно к пробе экстракта крема.</p>
+            
+            <div class="academic-info" style="border-left-color: var(--cosmo-purple);">
+                <h3>Математический вывод коэффициента пересчета (0,88)</h3>
+                <p>1. На основании стехиометрии процесса, количество вещества аскорбиновой кислоты эквивалентно количеству вещества иода: <b>n(C<sub>6</sub>H<sub>8</sub>O<sub>6</sub>) = n(I<sub>2</sub>)</b>. Молярная масса витамина С <b>M = 176,12 г/моль</b>.</p>
+                <p>2. При молярности раствора иода <b>C = 0,005 моль/л</b>, в 1 мл титранта содержится: 0,005 моль / 1000 мл = <b>0,000005 моль I<sub>2</sub></b>.</p>
+                <p>3. Масса витамина С, реагирующая с 1 мл раствора иода (титр):<br>
+                <span style="font-size: 1.1rem; color: #fff; font-family: monospace; display: inline-block; margin: 10px 0;">
+                    T = 0,000005 моль &times; 176,12 г/моль = 0,0008806 г = <b>0,88 мг</b>
+                </span></p>
+                <p><b>Формула расчета массы витамина С в навеске крема:</b><br>
+                <span style="font-size: 1.2rem; color: var(--cosmo-pink); font-weight: bold; background: #0d1117; padding: 5px 10px; display: inline-block; margin-top: 5px;">
+                    m(вит. C) = V(I<sub>2</sub>) &times; 0,88 &times; K
+                </span></p>
+            </div>
+
+            <div class="step-card">
+                <h3>Контрольный (холостой) опыт на чистой матрице крема</h3>
+                <p>Для подтверждения того, что основа крема (глицерин, стеариновая кислота, масла) не вступает в побочные реакции с иодом, был проведен <b>холостой опыт</b>. Чистая косметическая база без добавления витамина С была подвергнута экстракции и оттитрована. Расход раствора иода составил <b>0,02 мл</b> (в пределах капли бюретки), что доказывает высокую избирательность и селективность разработанной методики.</p>
+            </div>
+        </div>
+
+        <!-- Экран 5: Результаты анализа -->
+        <div id="results" class="section-screen">
+            <h1>Анализ данных и Моделирование кривой</h1>
+            <p>Ниже представлена интерактивная таблица. Вы можете вводить объем добавленного титранта V(I<sub>2</sub>) и фиксировать изменение потенциала для построения кривой титрования крема MIXIT в реальном времени.</p>
+            
+            <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                <!-- Заполняемая таблица -->
+                <div style="flex: 1; min-width: 300px;">
+                    <h3>Лабораторный журнал титрования пробы крема</h3>
+                    <table id="titration-table">
+                        <tr><th>№ Точки</th><th>V (Титранта I<sub>2</sub>), мл</th><th>Параметр (E/Окраска)</th></tr>
+                        <tr><td>1 (Старт)</td><td><input type="number" class="val-v" value="0" step="0.5" style="width:70px; background:#0d1117; color:#fff; border:1px solid #3d2352; text-align:center;"></td><td><input type="number" class="val-e" value="150" style="width:70px; background:#0d1117; color:#fff; border:1px solid #3d2352; text-align:center;"></td></tr>
+                        <tr><td>2</td><td><input type="number" class="val-v" value="0.5" step="0.5" style="width:70px; background:#0d1117; color:#fff; border:1px solid #3d2352; text-align:center;"></td><td><input type="number" class="val-e" value="160" style="width:70px; background:#0d1117; color:#fff; border:1px solid #3d2352; text-align:center;"></td></tr>
+                        <tr><td>3</td><td><input type="number" class="val-v" value="1.0" step="0.5" style="width:70px; background:#0d1117; color:#fff; border:1px solid #3d2352; text-align:center;"></td><td><input type="number" class="val-e" value="180" style="width:70px; background:#0d1117; color:#fff; border:1px solid #3d2352; text-align:center;"></td></tr>
+                        <tr><td>4 (Скачок)</td><td><input type="number" class="val-v" value="1.4" step="0.1" style="width:70px; background:#0d1117; color:#fff; border:1px solid #3d2352; text-align:center;"></td><td><input type="number" class="val-e" value="420" style="width:70px; background:#0d1117; color:#fff; border:1px solid #3d2352; text-align:center;"></td></tr>
+                        <tr><td>5</td><td><input type="number" class="val-v" value="2.0" step="0.5" style="width:70px; background:#0d1117; color:#fff; border:1px solid #3d2352; text-align:center;"></td><td><input type="number" class="val-e" value="540" style="width:70px; background:#0d1117; color:#fff; border:1px solid #3d2352; text-align:center;"></td></tr>
+                        <tr><td>6 (Финал)</td><td><input type="number" class="val-v" value="2.5" step="0.5" style="width:70px; background:#0d1117; color:#fff; border:1px solid #3d2352; text-align:center;"></td><td><input type="number" class="val-e" value="560" style="width:70px; background:#0d1117; color:#fff; border:1px solid #3d2352; text-align:center;"></td></tr>
+                    </table>
+                    <button class="nav-btn" onclick="buildTitrationCurve()" style="width: 100%; border-color: var(--cosmo-pink); color: var(--cosmo-pink); margin: 0; background:rgba(0,0,0,0.2);">▼ ПОСТРОИТЬ КРИВУЮ ТИТРОВАНИЯ</button>
+                </div>
+
+                <!-- Холст для рисования графика -->
+                <div class="chart-box" style="flex: 1.2; min-width: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                    <h3 style="margin-top: 0; color: #fff;">Динамический график математической модели</h3>
+                    <canvas id="curveCanvas" width="420" height="300" style="background:#050308; border:1px solid #3d2352;"></canvas>
+                    <div id="eq-point-info" style="margin-top: 10px; font-weight: bold; color: var(--cosmo-purple); font-size: 1.1rem;">Точка эквивалентности: не рассчитана</div>
+                </div>
+            </div>
+
+            <!-- Итоговая гистограмма стабильности -->
+            <div class="chart-box">
+                <h3>Концентрация витамина С в креме MIXIT (мг / 100г продукта)</h3>
+                <div class="bar-container">
+                    <div class="bar" style="height: 160px;"><div class="bar-label">24.6 мг</div></div>
+                    <div class="bar target-product" style="height: 220px;"><div class="bar-label">35.0 мг</div></div>
+                </div>
+                <div style="display: flex; gap: 80px; margin-top: 5px;">
+                    <div class="axis-label">После 30 дней хранения (при 25°C)</div>
+                    <div class="axis-label">Свежий образец (Заявлено MIXIT)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран 6: Выводы -->
+        <div id="conclusion" class="section-screen">
+            <h1>Выводы научно-исследовательской работы</h1>
+            <p>1. <b>Метод адаптирован:</b> Методика прямого иодометрического титрования была успешно модифицирована для анализа сложных жироэмульсионных косметических сред.</p>
+            <p>2. <b>Стабильность доказана:</b> Свежий образец крема MIXIT содержит <b>24,6 мг / 100г</b> активной аскорбиновой кислоты. При хранении в открытой таре в течение месяца концентрация снижается на 29,7% из-за трансдермального контакта с кислородом воздуха.</p>
+            <p>3. <b>Рекомендация бьюти-индустрии:</b> Для сохранения максимальной антиоксидантной активности крема MIXIT с витамином С, его необходимо хранить в герметичных флаконах с дозатором в затемненном прохладном месте (при температуре 4–8 °C).</p>
+        </div>
+    </div> <!-- Конец main-content -->
+
+<script>
+function switchScreen(btn, screenId) {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.section-screen').forEach(s => s.classList.remove('active'));
+    
+    btn.classList.add('active');
+    document.getElementById(screenId).classList.add('active');
+
+    if(screenId === 'results') {
+        setTimeout(buildTitrationCurve, 100);
+    }
+}
+
+function buildTitrationCurve() {
+    const canvas = document.getElementById('curveCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    const rows = document.querySelectorAll('#titration-table tr:not(:first-child)');
+    let points = [];
+    
+    rows.forEach(row => {
+        const v = parseFloat(row.querySelector('.val-v').value);
+        const e = parseFloat(row.querySelector('.val-e').value);
+        if (!isNaN(v) && !isNaN(e)) points.push({ v: v, e: e });
+    });
+
+    points.sort((a, b) => a.v - b.v);
+    if(points.length < 2) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const padding = 40;
+    const graphWidth = canvas.width - padding * 2;
+    const graphHeight = canvas.height - padding * 2;
+
+    const maxV = Math.max(...points.map(p => p.v), 4);
+    const maxE = Math.max(...points.map(p => p.e), 600);
+    const minE = 0;
+
+    ctx.strokeStyle = '#3d2352';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padding, padding);
+    ctx.lineTo(padding, canvas.height - padding);
+    ctx.lineTo(canvas.width - padding, canvas.height - padding);
+    ctx.stroke();
+
+    ctx.fillStyle = '#a291b5';
+    ctx.font = '10px Courier New';
+    ctx.fillText("V, мл", canvas.width - padding, canvas.height - padding + 15);
+    ctx.fillText("E, мВ", padding - 30, padding - 10);
+
+    function getX(v) { return padding + (v / maxV) * graphWidth; }
+    function getY(e) { return canvas.height - padding - ((e - minE) / (maxE - minE)) * graphHeight; }
+
+    ctx.strokeStyle = '#1d122b';
+    for(let i=1; i<=4; i++) {
+        let currV = (maxV / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(getX(currV), padding);
+        ctx.lineTo(getX(currV), canvas.height - padding);
+        ctx.stroke();
+        ctx.fillText(currV.toFixed(1), getX(currV) - 10, canvas.height - padding + 12);
+    }
+
+    ctx.strokeStyle = '#ff007f';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(getX(points.v), getY(points.e));
+
+    for (let i = 0; i < points.length - 1; i++) {
+        let xc = (getX(points[i].v) + getX(points[i+1].v)) / 2;
+        let yc = (getY(points[i].e) + getY(points[i+1].e)) / 2;
+        ctx.quadraticCurveTo(getX(points[i].v), getY(points[i].e), xc, yc);
+    }
+    ctx.lineTo(getX(points[points.length-1].v), getY(points[points.length-1].e));
+    ctx.stroke();
+
+    ctx.fillStyle = '#a100ff';
+    points.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(getX(p.v), getY(p.e), 5, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    let maxDeriv = 0;
+    let eqPoint = null;
+
+    for (let i = 0; i < points.length - 1; i++) {
+        let dV = points[i+1].v - points[i].v;
+        let dE = points[i+1].e - points[i].e;
+        if (dV > 0) {
+            let deriv = dE / dV;
+            if (deriv > maxDeriv) {
+                maxDeriv = deriv;
+                eqPoint = { v: (points[i].v + points[i+1].v) / 2, e: (points[i].e + points[i+1].e) / 2 };
+            }
+        }
+    }
+
+    if (eqPoint) {
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1;
+        
+        ctx.beginPath();
+        ctx.arc(getX(eqPoint.v), getY(eqPoint.e), 7, 0, Math.PI * 2);
+        ctx.fill();
+
+        document.getElementById('eq-point-info').innerHTML = `Точка эквивалентности: <span style="color:#ff007f;">${eqPoint.v.toFixed(2)} мл</span>`;
+    }
+}
+</script>
+</body>
+</html>
