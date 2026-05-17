@@ -145,17 +145,34 @@
         <div id="experiment" class="section-screen">
             <h1>Лабораторный этап исследования</h1>
             <p>Эксперимент был разделен на две строгие технологические стадии, выполненные в условиях школьной лаборатории:</p>
-            <div class="step-container">
-                <div class="step-card">
-                    <h3>Этап 1: Экстракция</h3>
-                    <p>Навески черного и зеленого чая (по 2 грамма) заливались дистиллированной водой при температуре 85 °C. Экстракция проводилась в течение 15 минут для полного перехода аскорбиновой кислоты в жидкую фазу. Затем растворы охлаждались и тщательно фильтровались через беззольные фильтры.</p>
+            
+            <div class="step-container" style="flex-direction: column; gap: 30px;">
+                
+                <!-- Блок 1: Экстракция -->
+                <div class="step-card" style="display: flex; gap: 25px; align-items: center; flex-wrap: wrap;">
+                    <div style="flex: 1.5; min-width: 280px;">
+                        <h3 style="color: var(--tea-green); border-bottom: 1px dashed #2c3e50; padding-bottom: 5px; margin-bottom: 10px;">Этап 1: Экстракция</h3>
+                        <p style="margin: 0; font-size: 1.05rem;">Навески черного и зеленого чая (по 2 грамма) заливались дистиллированной водой при температуре 85 °C. Экстракция проводилась в течение 15 минут для полного перехода аскорбиновой кислоты в жидкую фазу. Затем растворы охлаждались и тщательно фильтровались через беззольные фильтры.</p>
+                    </div>
+                    <div style="flex: 1; min-width: 200px; display: flex; justify-content: center;">
+                        <!-- Фото экстракции -->
+                        <img src="titr1.jpg" alt="Процесс экстракции" style="max-width: 100%; max-height: 200px; border: 2px solid var(--tea-green); box-shadow: 0 0 15px rgba(46, 204, 113, 0.2); border-radius: 4px;">
+                    </div>
                 </div>
-                <div class="step-card">
-                    <h3>Этап 2: Титрование</h3>
-                    <p>В коническую колбу отбиралась аликвота полученного чайного экстракта объемом 20 мл, добавлялось 2 мл раствора крахмала. Бюретка заполнялась стандартизированным 0,005 М раствором иода. Титрование велось по каплям при постоянном перемешивании до появления устойчивого синего окрашивания.</p>
+
+                <!-- Блок 2: Титрование -->
+                <div class="step-card" style="display: flex; gap: 25px; align-items: center; flex-wrap: wrap; border-top-color: var(--tea-black);">
+                    <div style="flex: 1.5; min-width: 280px;">
+                        <h3 style="color: var(--tea-black); border-bottom: 1px dashed #2c3e50; padding-bottom: 5px; margin-bottom: 10px;">Этап 2: Титрование</h3>
+                        <p style="margin: 0; font-size: 1.05rem;">В коническую колбу отбиралась аликвота полученного чайного экстракта объемом 20 мл, добавлялось 2 мл раствора крахмала. Бюретка заполнялась стандартизированным 0,005 М раствором иода. Титрование велось по каплям при постоянном перемешивании до появления устойчивого синего окрашивания.</p>
+                    </div>
+                    <div style="flex: 1; min-width: 200px; display: flex; justify-content: center;">
+                        <!-- Фото титрования -->
+                        <img src="titr2.jpg" alt="Процесс титрования" style="max-width: 100%; max-height: 200px; border: 2px solid var(--tea-black); box-shadow: 0 0 15px rgba(230, 126, 34, 0.2); border-radius: 4px;">
+                    </div>
                 </div>
+
             </div>
-        </div>
 
         <!-- Экран 4: Результаты анализа -->
         <div id="results" class="section-screen">
