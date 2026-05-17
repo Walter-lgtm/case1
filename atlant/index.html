@@ -152,10 +152,10 @@ let studentClass = "";
 
 // Массив ссылок на твои видеофайлы в репозитории на GitHub (измени пути на свои)
 const videoLinks = [
-    "https://github.com", // Модуль 1
-    "https://github.com", // Модуль 2
-    "https://github.com", // Модуль 3
-    "https://github.com"  // Модуль 4
+    "https://walter-lgtm.github.io/case1/atlant/lesson1.mp4", // Модуль 1
+    "https://walter-lgtm.github.io/case1/atlant/lesson2.mp4", // Модуль 2
+    "https://walter-lgtm.github.io/case1/atlant/lesson3.mp4", // Модуль 3
+    "https://walter-lgtm.github.io/case1/atlant/lesson4.mp4"  // Модуль 4
 ];
 
 // Структура модулей и ФГОС-вопросов (базовый уровень)
@@ -294,7 +294,7 @@ function saveModuleResult() {
 function sendFinalLogs() {
     // СИНХРОНИЗАЦИЯ: Отправляем массив из 4 оценок в твою Google Таблицу
     // Вставь URL развертывания твоей таблицы в поле fetch ниже
-    fetch('ВСТАВЬ_URL_СВОЕЙ_ГУГЛ_ТАБЛИЦЫ', {
+    fetch('https://script.google.com/macros/s/AKfycbxrmaotHEEhAk0uXaQhlx8TVWq5YQP3q-CiSlsAX9JWih1OB5BF8kECcFNQoREjiBnHtA/exec', {
         method: 'POST',
         mode: 'no-cors',
         body: JSON.stringify({
