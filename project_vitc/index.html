@@ -102,8 +102,49 @@
     </div>
 
     <!-- Контентная зона -->
-    <div class="main-content">
-<!-- Экран 1: Актуальность -->
+  <div class="main-content">
+
+    <!-- 1. ТИТУЛЬНЫЙ ЭКРАН (ВВОД ДАННЫХ) -->
+    <div id="auth" class="task-card" style="max-width: 600px; margin: 50px auto; border-top: 4px solid var(--tea-green);">
+        <h2 style="color: var(--tea-green); text-align: center; letter-spacing: 2px; margin-top: 0;">λ TERMINAL INITIALIZATION</h2>
+        <p style="font-size: 0.85rem; color: #8b949e; text-align: center; margin-bottom: 25px;">ВВЕДИТЕ РЕГИСТРАЦИОННЫЕ ДАННЫЕ ИССЛЕДОВАНИЯ ДЛЯ СИНХРОНИЗАЦИИ</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 15px; text-align: left;">
+            <div>
+                <label style="font-size: 0.8rem; color: var(--tea-green); font-weight: bold;">ТЕМА НАУЧНО-ИССЛЕДОВАТЕЛЬСКОГО ПРОЕКТА:</label>
+                <input type="text" id="projectTitle" class="cyber-input" value="Определение концентрации витамина С в черном и зеленом чае" style="margin-top: 5px; width: 100%;">
+            </div>
+            
+            <div style="display: flex; gap: 15px;">
+                <div style="flex: 2;">
+                    <label style="font-size: 0.8rem; color: var(--tea-green); font-weight: bold;">ВЫПОЛНИЛ (ФИО СТУДЕНТА):</label>
+                    <input type="text" id="userName" class="cyber-input" placeholder="Иванов Иван Иванович" style="margin-top: 5px;" autocomplete="off">
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 0.8rem; color: var(--tea-green); font-weight: bold;">КЛАСС:</label>
+                    <input type="text" id="userClass" class="cyber-input" placeholder="10-А" style="margin-top: 5px;" autocomplete="off">
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 15px;">
+                <div style="flex: 1.2;">
+                    <label style="font-size: 0.8rem; color: var(--tea-green); font-weight: bold;">РУКОВОДИТЕЛЬ ПРОЕКТА (ФИО):</label>
+                    <input type="text" id="mentorName" class="cyber-input" placeholder="Петрова Анна Сергеевна" style="margin-top: 5px;" autocomplete="off">
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 0.8rem; color: var(--tea-green); font-weight: bold;">ДОЛЖНОСТЬ РУКОВОДИТЕЛЯ:</label>
+                    <input type="text" id="mentorStatus" class="cyber-input" placeholder="учитель химии" style="margin-top: 5px;" autocomplete="off">
+                </div>
+            </div>
+        </div>
+        
+        <button class="action-btn" onclick="initProjectTerminal()" style="width: 100%; margin-top: 30px; border-color: var(--tea-green); color: var(--tea-green);">ПОДТВЕРДИТЬ И ОТКРЫТЬ ДАШБОРД</button>
+    </div>
+
+    <!-- 2. РАБОЧИЕ ЭКРАНЫ ПРОЕКТА (Скрыты до авторизации) -->
+    <div id="project-screens" class="hidden">
+        
+        <!-- Экран: Актуальность -->
         <div id="intro" class="section-screen active">
             <h1>Актуальность и Цель исследования</h1>
             <p><b>Витамин С (аскорбиновая кислота)</b> — важнейший водорастворимый антиоксидант, необходимый для нормального функционирования соединительной и костной ткани, а также поддержания иммунной системы человека. Организм не способен синтезировать его самостоятельно, поэтому критически важно контролировать его поступление с пищей и популярными напитками.</p>
@@ -111,7 +152,7 @@
             <p><b>Гипотеза:</b> В процессе ферментации при производстве черного чая аскорбиновая кислота частично разрушается, следовательно, концентрация витамина С в зеленом чае должна быть значительно выше.</p>
         </div>
 
-        <!-- Экран 2: Теоретическая часть -->
+        <!-- Экран: Теоретическая часть -->
         <div id="theory" class="section-screen">
             <h1>Теоретические основы анализа</h1>
             <p>Аскорбиновая кислота (C<sub>6</sub>H<sub>8</sub>O<sub>6</sub>) является сильным восстановителем. В основе нашего исследования лежит метод <b>иодометрии</b> (окислительно-восстановительного титрования). Роль окислителя выполняет молекулярный иод (I<sub>2</sub>).</p>
@@ -122,7 +163,7 @@
             <p>В качестве индикатора используется 1%-й раствор крахмала. Как только вся аскорбиновая кислота в растворе полностью окисляется, избыточная капля иода реагирует со свободным крахмалом, окрашивая раствор в стойкий сине-фиолетовый цвет. Это сигнализирует о достижении <b>точки эквивалентности</b>.</p>
         </div>
 
-        <!-- Экран 3: Практическая часть -->
+        <!-- Экран: Практическая часть -->
         <div id="experiment" class="section-screen">
             <h1>Лабораторный этап исследования</h1>
             <p>Эксперимент был разделен на две строгие технологические стадии, выполненные в условиях школьной лаборатории:</p>
@@ -138,13 +179,12 @@
             </div>
         </div>
 
-        <!-- Экран 4: Результаты анализа (МАТЕМАТИЧЕСКОЕ СЕРДЦЕ) -->
+        <!-- Экран: Результаты анализа -->
         <div id="results" class="section-screen">
             <h1>Анализ данных и Моделирование кривой</h1>
-            <p>Ниже представлена интерактивная таблица. Вы можете вводить объем добавленного титранта V(I<sub>2</sub>) и фиксировать изменение условного потенциала (или интенсивности окраски раствора) для построения кривой титрования в реальном времени. Введите экспериментальные значения и нажмите кнопку.</p>
+            <p>Ниже представлена интерактивная таблица. Вы можете вводить объем добавленного титранта V(I<sub>2</sub>) и фиксировать изменение условного потенциала для построения кривой титрования в реальном времени.</p>
             
             <div style="display: flex; gap: 30px; flex-wrap: wrap;">
-                <!-- Заполняемая таблица -->
                 <div style="flex: 1; min-width: 300px;">
                     <h3>Лабораторный журнал титрования</h3>
                     <table id="titration-table">
@@ -159,7 +199,6 @@
                     <button class="nav-btn" onclick="buildTitrationCurve()" style="width: 100%; border-color: var(--tea-green); color: var(--tea-green); margin: 0;">&Delta; ПОСТРОИТЬ КРИВУЮ ТИТРОВАНИЯ</button>
                 </div>
 
-                <!-- Холст для рисования графика -->
                 <div class="chart-box" style="flex: 1.2; min-width: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
                     <h3 style="margin-top: 0; color: #fff;">Динамический график математической модели</h3>
                     <canvas id="curveCanvas" width="420" height="300" style="background:#0b0e14; border:1px solid #2c3e50;"></canvas>
@@ -167,7 +206,6 @@
                 </div>
             </div>
 
-            <!-- Итоговая гистограмма сравнения чая -->
             <div class="chart-box">
                 <h3>Итоговое содержание витамина С (мг / 100г сухого чая)</h3>
                 <div class="bar-container">
@@ -179,68 +217,123 @@
                     <div class="axis-label">Зеленый чай (Образец №2)</div>
                 </div>
             </div>
+            
+            <button class="action-btn" onclick="showFinalBlank()" style="width: 100%; margin-top: 30px; border-color: var(--tea-green); color: var(--tea-green);">СФОРМИРОВАТЬ ПЕЧАТНЫЙ ПРОТОКОЛ ЗАЩИТЫ</button>
         </div>
 
-        <!-- Экран 5: Выводы -->
+        <!-- Экран: Выводы -->
         <div id="conclusion" class="section-screen">
             <h1>Выводы научно-исследовательской работы</h1>
-            <p>В ходе выполнения проекта падаваны успешно реализовали поставленные задачи и пришли к следующим результатам:</p>
             <p>1. <b>Метод проверен:</b> Применяемый метод иодометрического титрования показал высокую точность и воспроизводимость в условиях школьного кабинета химии.</p>
-            <p>2. <b>Гипотеза подтверждена:</b> Концентрация витамина С в зеленом чае (<b>34,2 мг / 100г</b>) практически в 2 раза превышает его содержание в черном чае (<b>18,5 мг / 100г</b>). Это строго доказывает, что процессы термического увядания и глубокой ферментации деструктивно влияют на сохранность аскорбиновой кислоты.</p>
-            <p>3. <b>Практическая ценность:</b> Разработанное интерактивное веб-приложение может использоваться на уроках аналитической химии для быстрой обработки результатов титрования лабораторных работ.</p>
+            <p>2. <b>Гипотеза подтверждена:</b> Концентрация витамина С в зеленом чае (<b>34,2 мг / 100г</b>) практически в 2 раза превышает его содержание в черном чае (<b>18,5 мг / 100г</b>).</p>
+            <p>3. <b>Практическая ценность:</b> Разработанное интерактивное веб-приложение может использоваться на уроках аналитической химии для быстрой обработки результатов лабораторных работ.</p>
         </div>
-    </div> <!-- Конец main-content -->
+    </div> <!-- Конец project-screens -->
+
+    <!-- 3. ОФИЦИАЛЬНЫЙ БЛАНК (HARD COPY) -->
+    <div id="official-blank" class="hidden">
+        <div class="blank-title">ПРОТОКОЛ ЗАЩИТЫ НАУЧНО-ИССЛЕДОВАТЕЛЬСКОГО ПРОЕКТА</div>
+        <div class="blank-meta">WW LABORATORIES // ЭКСПЕРИМЕНТАЛЬНЫЙ СТАНДАРТ ФГОС</div>
+        <hr style="border: 1px solid #000;">
+        
+        <div style="text-align: left; margin: 30px 0; font-size: 1.1rem; line-height: 1.8; color: #000;">
+            <p><b>Тема проекта:</b> <span id="blank-project-title" style="text-decoration: underline;"></span></p>
+            <p><b>Выполнил исследователь:</b> <span id="blank-fio" style="font-weight: bold; text-transform: uppercase;"></span></p>
+            <p><b>Класс:</b> <span id="blank-class"></span></p>
+            <p><b>Руководитель проекта:</b> <span id="blank-mentor-name"></span> (<span id="blank-mentor-status"></span>)</p>
+        </div>
+        
+        <hr style="border: 0; border-top: 1px dashed #000; margin: 20px 0;">
+        
+        <div id="result-status" style="font-size: 1.5rem; font-family: serif; font-weight: bold; border: 2px solid #000; padding: 15px; display: inline-block; margin: 10px 0; color: #000;">
+            СТАТУС ЗАЩИТЫ: ПРОЕКТ УСПЕШНО ЗАЩИЩЕН
+        </div>
+        
+        <p id="blank-date" style="font-family: monospace; font-size: 0.8rem; margin-top: 20px; color: #000;"></p>
+        <button class="action-btn no-print" onclick="window.print()" style="border-color: #000; color: #000; margin-top: 20px;">ПЕЧАТЬ ПРОТОКОЛА (PDF)</button>
+    </div>
+
+  </div> <!-- Конец main-content -->
 
 <script>
+// Запуск терминала с проверкой всех строгих полей
+function initProjectTerminal() {
+    const title = document.getElementById('projectTitle').value.trim();
+    const fio = document.getElementById('userName').value.trim();
+    const uClass = document.getElementById('userClass').value.trim();
+    const mentor = document.getElementById('mentorName').value.trim();
+    const status = document.getElementById('mentorStatus').value.trim();
+
+    if(!title || !fio || !uClass || !mentor || !status) {
+        alert("ОШИБКА ДЕКЛАРАЦИИ: Все поля (Тема, ФИО, Класс, Руководитель и Должность) обязательны!");
+        return;
+    }
+
+    // Прячем окно ввода, открываем экраны проекта и боковую панель
+    document.getElementById('auth').classList.add('hidden');
+    document.getElementById('project-screens').classList.remove('hidden');
+    document.querySelector('.sidebar').style.display = 'flex'; // Показываем меню
+    
+    // Синхронизируем данные с печатным бланком
+    document.getElementById('blank-project-title').innerText = title;
+    document.getElementById('blank-fio').innerText = fio;
+    document.getElementById('blank-class').innerText = uClass;
+    document.getElementById('blank-mentor-name').innerText = mentor;
+    document.getElementById('blank-mentor-status').innerText = status;
+    document.getElementById('blank-date').innerText = "ДАТА РЕГИСТРАЦИИ ПРОТОКОЛА: " + new Date().toLocaleDateString();
+}
+
 // Переключатель экранов навигации по клику стилуса
 function switchScreen(btn, screenId) {
+    // Проверяем, открыт ли проект (защита от кликов до ввода данных)
+    if(document.getElementById('project-screens').classList.contains('hidden')) return;
+
+    document.getElementById('official-blank').classList.add('hidden');
+    document.getElementById('project-screens').classList.remove('hidden');
+
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.section-screen').forEach(s => s.classList.remove('active'));
     
     btn.classList.add('active');
     document.getElementById(screenId).classList.add('active');
 
-    // Если переключились на экран графиков — сразу рендерим базовый вид кривой
     if(screenId === 'results') {
-        setTimeout(buildTitrationCurve, 100);
+        setTimeout(buildTitrationCurve, 50);
     }
 }
 
-// Математическое ядро аппроксимации и отрисовки кривой титрования (Canvas Engine)
+// Переход к печати финала
+function showFinalBlank() {
+    document.getElementById('project-screens').classList.add('hidden');
+    document.getElementById('official-blank').classList.remove('hidden');
+}
+
+// Математический Canvas-движок графиков
 function buildTitrationCurve() {
     const canvas = document.getElementById('curveCanvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     
-    // Сбор точек из интерактивной таблицы
     const rows = document.querySelectorAll('#titration-table tr:not(:first-child)');
     let points = [];
     
     rows.forEach(row => {
         const v = parseFloat(row.querySelector('.val-v').value);
         const e = parseFloat(row.querySelector('.val-e').value);
-        if (!isNaN(v) && !isNaN(e)) {
-            points.push({ v: v, e: e });
-        }
+        if (!isNaN(v) && !isNaN(e)) points.push({ v: v, e: e });
     });
 
-    // Сортировка по возрастанию объема
     points.sort((a, b) => a.v - b.v);
     if(points.length < 2) return;
 
-    // Очистка холста
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Параметры сетки и отступов
     const padding = 40;
     const graphWidth = canvas.width - padding * 2;
     const graphHeight = canvas.height - padding * 2;
 
     const maxV = Math.max(...points.map(p => p.v), 5);
     const maxE = Math.max(...points.map(p => p.e), 600);
-    const minE = 0;
 
-    // Отрисовка координатных осей
     ctx.strokeStyle = '#2c3e50';
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -249,17 +342,15 @@ function buildTitrationCurve() {
     ctx.lineTo(canvas.width - padding, canvas.height - padding);
     ctx.stroke();
 
-    // Подписи осей
     ctx.fillStyle = '#95a5a6';
     ctx.font = '10px Courier New';
     ctx.fillText("V, мл", canvas.width - padding, canvas.height - padding + 15);
-    ctx.fillText("Потенциал, мВ", padding - 35, padding - 10);
+    ctx.fillText("E, мВ", padding - 30, padding - 10);
 
-    // Функция перевода координат химии в пиксели холста
     function getX(v) { return padding + (v / maxV) * graphWidth; }
-    function getY(e) { return canvas.height - padding - ((e - minE) / (maxE - minE)) * graphHeight; }
+    function getY(e) { return canvas.height - padding - (e / maxE) * graphHeight; }
 
-    // Рисуем сетку
+    // Сетка
     ctx.strokeStyle = '#161d26';
     for(let i=1; i<=4; i++) {
         let currV = (maxV / 5) * i;
@@ -270,12 +361,11 @@ function buildTitrationCurve() {
         ctx.fillText(currV.toFixed(1), getX(currV) - 10, canvas.height - padding + 12);
     }
 
-    // Отрисовка плавной кривой по точкам (Безье-сглаживание)
+    // Кривая
     ctx.strokeStyle = '#2ecc71';
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(getX(points[0].v), getY(points[0].e));
-
     for (let i = 0; i < points.length - 1; i++) {
         let xc = (getX(points[i].v) + getX(points[i+1].v)) / 2;
         let yc = (getY(points[i].e) + getY(points[i+1].e)) / 2;
@@ -284,54 +374,33 @@ function buildTitrationCurve() {
     ctx.lineTo(getX(points[points.length-1].v), getY(points[points.length-1].e));
     ctx.stroke();
 
-    // Отрисовка узловых точек эксперимента
+    // Точки
     ctx.fillStyle = '#e67e22';
     points.forEach(p => {
         ctx.beginPath();
-        ctx.arc(getX(p.v), getY(p.e), 5, 0, Math.PI * 2);
+        ctx.arc(getX(p.v), getY(p.e), 4, 0, Math.PI * 2);
         ctx.fill();
     });
 
-    // Нахождение точки эквивалентности (максимум первой производной dE/dV)
+    // Расчет точки эквивалентности
     let maxDeriv = 0;
     let eqPoint = null;
-
     for (let i = 0; i < points.length - 1; i++) {
         let dV = points[i+1].v - points[i].v;
         let dE = points[i+1].e - points[i].e;
-        if (dV > 0) {
-            let deriv = dE / dV;
-            if (deriv > maxDeriv) {
-                maxDeriv = deriv;
-                // Точка эквивалентности находится посередине максимального скачка потенционала
-                eqPoint = { v: (points[i].v + points[i+1].v) / 2, e: (points[i].e + points[i+1].e) / 2 };
-            }
+        if (dV > 0 && (dE/dV) > maxDeriv) {
+            maxDeriv = dE / dV;
+            eqPoint = { v: (points[i].v + points[i+1].v) / 2, e: (points[i].e + points[i+1].e) / 2 };
         }
     }
 
-    // Визуальное выделение точки эквивалентности на графике
     if (eqPoint) {
         ctx.fillStyle = '#ff3300';
         ctx.strokeStyle = '#ff3300';
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4, 4]);
-        
-        // Линии проекции на оси
         ctx.beginPath();
-        ctx.moveTo(getX(eqPoint.v), getY(eqPoint.e));
-        ctx.lineTo(getX(eqPoint.v), canvas.height - padding);
-        ctx.moveTo(getX(eqPoint.v), getY(eqPoint.e));
-        ctx.lineTo(padding, getY(eqPoint.e));
-        ctx.stroke();
-        ctx.setLineDash([]); // Сброс пунктира
-
-        // Жирная точка эквивалентности
-        ctx.beginPath();
-        ctx.arc(getX(eqPoint.v), getY(eqPoint.e), 7, 0, Math.PI * 2);
+        ctx.arc(getX(eqPoint.v), getY(eqPoint.e), 6, 0, Math.PI * 2);
         ctx.fill();
-
-        // Вывод инфо на панель
-        document.getElementById('eq-point-info').innerHTML = `Точка эквивалентности (V): <span style="color:#ff3300;">${eqPoint.v.toFixed(2)} мл</span>`;
+        document.getElementById('eq-point-info').innerHTML = `Точка эквивалентности: <span style="color:#ff3300;">${eqPoint.v.toFixed(2)} мл</span>`;
     }
 }
 </script>
