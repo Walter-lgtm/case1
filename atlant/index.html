@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WW | HOME ATTESTATION TERMINAL</title>
+    <title>Модули аттестации по Химии 8 класс</title>
     <style>
         :root { 
             --neon-blue: #00d4ff; 
@@ -81,7 +81,7 @@
 <body>
 
 <div class="top-bar no-print">
-    <div style="font-weight: bold; color: #fff; letter-spacing: 1px;">WW // ATTESTATION TERMINAL</div>
+    <div style="font-weight: bold; color: #fff; letter-spacing: 1px;">Модули аттестации по Химии 8 класс</div>
     <div class="tool-group">
         <a href="https://walter-lgtm.github.io/loki-chemistry/periodic_bad.html" target="_blank" class="tool-link">ПСХЭ</a>
         <a href="https://walter-lgtm.github.io/loki-chemistry/solubility_bad.html" target="_blank" class="tool-link">Таблица растворимости</a>
@@ -92,15 +92,15 @@
     <!-- АВТОРИЗАЦИЯ -->
     <div id="auth" class="task-card">
         <h3>ИДЕНТИФИКАЦИЯ КАНАЛА</h3>
-        <input type="text" id="userName" class="cyber-input" placeholder="ФИО СТУДЕНТА" style="margin-bottom: 15px;">
-        <input type="text" id="userClass" class="cyber-input" placeholder="КЛАСС (НАПР. 8-Б)" style="margin-bottom: 15px;">
+        <input type="text" id="userName" class="cyber-input" placeholder="ФИО УЧАЩЕГОСЯ" style="margin-bottom: 15px;">
+        <input type="text" id="userClass" class="cyber-input" placeholder="КЛАСС (НАПР. 8В)" style="margin-bottom: 15px;">
         <button class="action-btn" onclick="initTerminal()">ОТКРЫТЬ ДОСТУП</button>
     </div>
 
     <!-- ГЛАВНОЕ МЕНЮ МОДУЛЕЙ -->
     <div id="main-menu" class="hidden">
         <h2 style="color: #fff; margin-bottom: 5px;">ЭЛЕКТРОННАЯ АТТЕСТАЦИЯ</h2>
-        <p style="font-size: 0.9rem; color: #8b949e;">Выберите доступный сектор для сдачи зачета. Максимальный ранг оценки: 3.</p>
+        <p style="font-size: 0.9rem; color: #8b949e;">Выберите доступный сектор для сдачи зачета</p>
         <div class="menu-grid">
             <div class="module-card" onclick="openModule(0)">
                 <div><b>Модуль 1:</b> Основные классы неорганических соединений</div>
@@ -131,8 +131,8 @@
 
     <!-- ИТОГОВЫЙ СЕРТИФИКАТ -->
     <div id="official-blank" class="hidden">
-        <h2>СВОДНЫЙ ВЕДОМОСТНЫЙ АТТЕСТАТ</h2>
-        <p>WW LABORATORIES // ДИСТАНЦИОННЫЙ ПРОТОКОЛ</p>
+        <h2>СВОДНАЯ ВЕДОМОСТЬ</h2>
+        <p>ГИМНАЗИЯ № 1 // ДИСТАНЦИОННЫЙ ПРОТОКОЛ</p>
         <hr>
         <h3 id="blank-fio"></h3>
         <h4 id="blank-class"></h4>
