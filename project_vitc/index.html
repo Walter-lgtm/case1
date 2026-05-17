@@ -118,11 +118,11 @@
         <div id="intro" class="section-screen active">
             <h1>Научно-исследовательский проект</h1>
             
-            <!-- Академическая визитка (Замени заглушки прямо тут) -->
+            <!-- Академическая визитка -->
             <div class="academic-info">
                 <p style="margin: 5px 0; font-size: 1.1rem;"><b>Тема:</b> «Определение концентрации витамина С в черном и зеленом чае»</p>
                 <p style="margin: 5px 0; font-size: 1.1rem;"><b>Выполнил:</b> Иванов Иван Иванович, учащийся 10-А класса</p>
-                <p style="margin: 5px 0; font-size: 1.1rem;"><b>Руководитель:</b> Петрова Анна Сергеевна, учитель химии</p>
+                <p style="margin: 5px 0; font-size: 1.1rem;"><b>Руководитель:</b> Петрова Анна Сергеевна, teacher химии</p>
             </div>
 
             <p><b>Витамин С (аскорбиновая кислота)</b> — важнейший водорастворимый антиоксидант, необходимый для нормального функционирования соединительной и костной ткани, а также поддержания иммунной системы человека. Организм не способен синтезировать его самостоятельно, поэтому критически важно контролировать его поступление с пищей и популярными напитками.</p>
@@ -141,7 +141,7 @@
             <p>В качестве индикатора используется 1%-й раствор крахмала. Как только вся аскорбиновая кислота в растворе полностью окисляется, избыточная капля иода реагирует со свободным крахмалом, окрашивая раствор в стойкий сине-фиолетовый цвет. Это сигнализирует о достижении <b>точки эквивалентности</b>.</p>
         </div>
 
-        <!-- Экран 3: Практическая часть -->
+        <!-- Экран 3: Практическая часть (МЕДИА-МОРФИЗМ) -->
         <div id="experiment" class="section-screen">
             <h1>Лабораторный этап исследования</h1>
             <p>Эксперимент был разделен на две строгие технологические стадии, выполненные в условиях школьной лаборатории:</p>
@@ -155,8 +155,7 @@
                         <p style="margin: 0; font-size: 1.05rem;">Навески черного и зеленого чая (по 2 грамма) заливались дистиллированной водой при температуре 85 °C. Экстракция проводилась в течение 15 минут для полного перехода аскорбиновой кислоты в жидкую фазу. Затем растворы охлаждались и тщательно фильтровались через беззольные фильтры.</p>
                     </div>
                     <div style="flex: 1; min-width: 200px; display: flex; justify-content: center;">
-                        <!-- Фото экстракции -->
-                        <img src="titr1.jpg" alt="Процесс экстракции" style="max-width: 100%; max-height: 200px; border: 2px solid var(--tea-green); box-shadow: 0 0 15px rgba(46, 204, 113, 0.2); border-radius: 4px;">
+                        <img src="extraction.png" alt="Процесс экстракции" style="max-width: 100%; max-height: 200px; border: 2px solid var(--tea-green); box-shadow: 0 0 15px rgba(46, 204, 113, 0.2); border-radius: 4px;">
                     </div>
                 </div>
 
@@ -167,10 +166,12 @@
                         <p style="margin: 0; font-size: 1.05rem;">В коническую колбу отбиралась аликвота полученного чайного экстракта объемом 20 мл, добавлялось 2 мл раствора крахмала. Бюретка заполнялась стандартизированным 0,005 М раствором иода. Титрование велось по каплям при постоянном перемешивании до появления устойчивого синего окрашивания.</p>
                     </div>
                     <div style="flex: 1; min-width: 200px; display: flex; justify-content: center;">
-                        <!-- Фото титрования -->
-                        <img src="titr2.jpg" alt="Процесс титрования" style="max-width: 100%; max-height: 200px; border: 2px solid var(--tea-black); box-shadow: 0 0 15px rgba(230, 126, 34, 0.2); border-radius: 4px;">
+                        <img src="titration.png" alt="Процесс титрования" style="max-width: 100%; max-height: 200px; border: 2px solid var(--tea-black); box-shadow: 0 0 15px rgba(230, 126, 34, 0.2); border-radius: 4px;">
                     </div>
                 </div>
+
+            </div>
+        </div>
 
         <!-- Экран 4: Результаты анализа -->
         <div id="results" class="section-screen">
@@ -190,7 +191,7 @@
                         <tr><td>5</td><td><input type="number" class="val-v" value="3.0" step="0.5" style="width:70px; background:#0d1117; color:#fff; border:1px solid #2c3e50; text-align:center;"></td><td><input type="number" class="val-e" value="520" style="width:70px; background:#0d1117; color:#fff; border:1px solid #2c3e50; text-align:center;"></td></tr>
                         <tr><td>6 (Финал)</td><td><input type="number" class="val-v" value="4.0" step="0.5" style="width:70px; background:#0d1117; color:#fff; border:1px solid #2c3e50; text-align:center;"></td><td><input type="number" class="val-e" value="550" style="width:70px; background:#0d1117; color:#fff; border:1px solid #2c3e50; text-align:center;"></td></tr>
                     </table>
-                    <button class="nav-btn" onclick="buildTitrationCurve()" style="width: 100%; border-color: var(--tea-green); color: var(--tea-green); margin: 0; background:rgba(0,0,0,0.2);">▼ ПОСТРОИТЬ КРИВУЮ ТИТРОВАНИЯ</button>
+                    <button class="nav-btn" onclick="buildTitrationCurve()" style="width: 100%; border-color: var(--tea-green); color: var(--tea-green); margin: 0; background:rgba(0,0,0,0.2);">▼ ПОСТРОИТЬ КРИВУЮ ТИТРОВАЯ</button>
                 </div>
 
                 <!-- Холст для рисования графика -->
