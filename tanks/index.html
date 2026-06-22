@@ -430,15 +430,12 @@
             }
         }
 
-        // 3. ОБРАБОТКА СТРЕЛЬБЫ В ИГРЕ (Right Alt / AltGraph)
-        if (event.code === 'AltRight') {
+        // 3. ОБРАБОТКА СТРЕЛЬБЫ В ИГРЕ (Right Ctrl)
+        if (event.code === 'ControlRight') {
             event.preventDefault();
-            if (currentMenuId === 'game-screen' && !gameState.isPaused) {
-                console.log("🔥 БАБАХ! Выстрел из орудия типа:", gameState.selectedTank);
-                
-                // Эффектная демонстрация: при стрельбе списываем немного очков для теста HUD
-                gameState.score += 10;
-                document.getElementById('hud-score').innerText = gameState.score;
+            if (gameState.currentScreen === 'game-screen' && !gameState.isPaused) {
+                // Вызываем функцию стрельбы (её логику мы напишем следующим шагом)
+                shootPlayerBullet();
             }
         }
     });
@@ -544,23 +541,65 @@
         if (playerTank.y > canvas.height - playerTank.size) playerTank.y = canvas.height - playerTank.size;
     }
 
-    // Отрисовка танка на холсте
+    // Отрисовка игрового мира и танка с гусеницами
     function drawGame() {
-        // Очищаем экран перед каждым новым кадром
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = playerTank.color;
         const s = playerTank.size;
         const cx = playerTank.x;
         const cy = playerTank.y;
+        const mainColor = playerTank.color;
+        const trackColor = '#334155'; // Темно-серый цвет для гусениц
 
-        // Рисуем корпус танка (квадрат)
-        ctx.fillRect(cx, cy, s, s);
+        // Отрисовка гусениц (траков) по бокам в зависимости от направления движения
+        ctx.fillStyle = trackColor;
+        const trackWidth = s / 5; // Ширина одной гусеницы
 
-        // Рисуем дуло в зависимости от направления
-        ctx.fillStyle = '#ffffff'; // Выделим дуло белым цветом для видимости направления
+        if (playerTank.direction === 'up' || playerTank.direction === 'down') {
+            // Гусеницы слева и справа от корпуса
+            ctx.fillRect(cx, cy, trackWidth, s);
+            ctx.fillRect(cx + s - trackWidth, cy, trackWidth, s);
+            
+            // Рисуем насечки на траках для детализации
+            ctx.fillStyle = '#1e293b';
+            for (let i = 2; i < s; i += 6) {
+                ctx.fillRect(cx, cy + i, trackWidth, 2);
+                ctx.fillRect(cx + s - trackWidth, cy + i, trackWidth, 2);
+            }
+            
+            // Основной бронекорпус (чуть сужен, чтобы гусеницы выделялись)
+            ctx.fillStyle = mainColor;
+            ctx.fillRect(cx + trackWidth, cy + 2, s - (trackWidth * 2), s - 4);
+        } else {
+            // Гусеницы сверху и снизу от корпуса (когда танк едет влево/вправо)
+            ctx.fillRect(cx, cy, s, trackWidth);
+            ctx.fillRect(cx, cy + s - trackWidth, s, trackWidth);
+            
+            // Рисуем насечки на траках
+            ctx.fillStyle = '#1e293b';
+            for (let i = 2; i < s; i += 6) {
+                ctx.fillRect(cx + i, cy, 2, trackWidth);
+                ctx.fillRect(cx + i, cy + s - trackWidth, 2, trackWidth);
+            }
+            
+            // Основной бронекорпус
+            ctx.fillStyle = mainColor;
+            ctx.fillRect(cx + 2, cy + trackWidth, s - 4, s - (trackWidth * 2));
+        }
+
+        // Рисуем люк/башню по центру танка
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.arc(cx + s/2, cy + s/2, s/4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#ffffff';
+        ctx.stroke();
+
+        // Рисуем дуло орудия
+        ctx.fillStyle = '#ffffff';
         const gunLength = s / 2;
-        const gunWidth = s / 4;
+        const gunWidth = s / 6;
 
         if (playerTank.direction === 'up') {
             ctx.fillRect(cx + s/2 - gunWidth/2, cy - gunLength, gunWidth, gunLength);
@@ -571,6 +610,9 @@
         } else if (playerTank.direction === 'right') {
             ctx.fillRect(cx + s, cy + s/2 - gunWidth/2, gunLength, gunWidth);
         }
+
+        // Вызываем отрисовку снарядов (напишем в следующем шаге)
+        drawPlayerBullets();
     }
 
     // Бесконечный цикл игры (60 кадров в секунду)
@@ -595,6 +637,101 @@
                 gameLoopId = null;
             }
         }
+        // === СИСТЕМА ВЕДЕНИЯ ОГНЯ И СНАРЯДОВ ===
+    const playerBullets = [];
+
+    // Конфигурация снарядов для разных классов танков
+    const bulletSpecs = {
+        heavy:   { speed: 6,  size: 6,  damage: 40 },  // Снаряд крупный, летит средне
+        assault: { speed: 8,  size: 5,  damage: 25 },  // Сбалансированный
+        ranger:  { speed: 12, size: 4,  damage: 15 }   // Летит молниеносно
+    };
+
+    // Функция инициализации выстрела игрока
+    function shootPlayerBullet() {
+        // Ограничение: не более 1 снаряда на экране одновременно (классика Dendy)
+        // Если хочешь сделать стрельбу очередями, просто закомментируй строчку ниже!
+        if (playerBullets.length >= 1) return;
+
+        const specs = bulletSpecs[gameState.selectedTank];
+        const s = playerTank.size;
+        let bx = 0;
+        let by = 0;
+
+        // Рассчитываем начальную точку вылета снаряда строго из кончика дула
+        if (playerTank.direction === 'up') {
+            bx = playerTank.x + s / 2 - specs.size / 2;
+            by = playerTank.y - (s / 2);
+        } else if (playerTank.direction === 'down') {
+            bx = playerTank.x + s / 2 - specs.size / 2;
+            by = playerTank.y + s + (s / 2) - specs.size;
+        } else if (playerTank.direction === 'left') {
+            bx = playerTank.x - (s / 2);
+            by = playerTank.y + s / 2 - specs.size / 2;
+        } else if (playerTank.direction === 'right') {
+            bx = playerTank.x + s + (s / 2) - specs.size;
+            by = playerTank.y + s / 2 - specs.size / 2;
+        }
+
+        // Добавляем снаряд в массив летящих объектов
+        playerBullets.push({
+            x: bx,
+            y: by,
+            dir: playerTank.direction,
+            speed: specs.speed,
+            size: specs.size
+        });
+
+        // Визуальный счетчик очков для теста HUD (каждые 10 выстрелов — бонус, просто для фана)
+        gameState.score += 1;
+        document.getElementById('hud-score').innerText = gameState.score;
+    }
+
+    // Расчет полета снарядов (физика)
+    function updateBullets() {
+        if (gameState.isPaused) return;
+
+        for (let i = playerBullets.length - 1; i >= 0; i--) {
+            const b = playerBullets[i];
+
+            // Двигаем снаряд в зависимости от его направления
+            if (b.dir === 'up') b.y -= b.speed;
+            else if (b.dir === 'down') b.y += b.speed;
+            else if (b.dir === 'left') b.x -= b.speed;
+            else if (b.dir === 'right') b.x += b.speed;
+
+            // Уничтожаем снаряд, если он улетел за границы игрового поля Canvas
+            if (b.x < 0 || b.y < 0 || b.x > canvas.width || b.y > canvas.height) {
+                playerBullets.splice(i, 1);
+            }
+        }
+    }
+
+    // Визуальная отрисовка снарядов на Canvas
+    function drawPlayerBullets() {
+        ctx.fillStyle = '#f43f5e'; // Ярко-розовый/красный неоновый цвет снаряда
+        playerBullets.forEach(b => {
+            ctx.beginPath();
+            ctx.arc(b.x + b.size/2, b.y + b.size/2, b.size, 0, Math.PI * 2);
+            ctx.fill();
+            // Добавляем эффект свечения вокруг снаряда
+            ctx.shadowColor = '#f43f5e';
+            ctx.shadowBlur = 8;
+        });
+        // Сбрасываем тень, чтобы остальные объекты не светились
+        ctx.shadowBlur = 0;
+    }
+
+    // Чтобы снаряды начали летать, нам нужно обновить главный игровой цикл!
+    // Найди функцию gameLoop() у себя в коде и полностью замени её на эту:
+    function gameLoop() {
+        if (gameState.currentScreen === 'game-screen') {
+            updatePhysics();
+            updateBullets(); // <--- Подключили расчет полета снарядов
+            drawGame();
+            gameLoopId = requestAnimationFrame(gameLoop);
+        }
+    }
     };
 </script>
 </body>
