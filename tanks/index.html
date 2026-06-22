@@ -487,11 +487,15 @@
         if (!canvas) return;
         ctx = canvas.getContext('2d');
 
+        // Загружаем кирпичные стены уровня
+        loadLevel();
+
         const specs = tankSpecs[gameState.selectedTank];
         playerTank.color = specs.color;
         playerTank.speed = specs.speed;
         playerTank.size = specs.size;
         
+        // Корректируем стартовую позицию, чтобы танк не заспавнился прямо внутри кирпичей
         playerTank.x = canvas.width / 2 - playerTank.size / 2;
         playerTank.y = canvas.height - playerTank.size - 20;
         playerTank.direction = 'up';
@@ -558,6 +562,62 @@
         gameState.score += 1;
         document.getElementById('hud-score').innerText = gameState.score;
     }
+        // === СИСТЕМА ИГРОВОЙ КАРТЫ (БЛОКИ) ===
+    const BLOCK_SIZE = 40; // Размер одного блока (квадрата) в пикселях
+    let mapGrid = [];      // Двумерный массив, где будет храниться текущая карта
+
+    // Оригинальный шаблон карты уровня (20 столбцов на 15 строк)
+    // 0 - пустое место, 1 - 🧱 разрушаемый кирпич
+    const LEVEL_ONE_TEMPLATE = [,
+ ,
+ ,
+ ,
+ ,
+ ,
+ ,
+ ,
+ ,
+ ,
+ ,
+ ,
+ ,
+ ,
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    ];
+
+    // Функция отрисовки всех блоков кирпичей на Canvas
+    function drawMap() {
+        for (let r = 0; r < mapGrid.length; r++) {
+            for (let c = 0; c < mapGrid[r].length; c++) {
+                if (mapGrid[r][c] === 1) {
+                    const bx = c * BLOCK_SIZE;
+                    const by = r * BLOCK_SIZE;
+
+                    // Рисуем кирпичную текстуру футуристичного стиля
+                    ctx.fillStyle = '#b45309'; // Коричнево-оранжевый кирпич
+                    ctx.fillRect(bx, by, BLOCK_SIZE, BLOCK_SIZE);
+
+                    // Рисуем рамку и внутренние швы кирпичей для красоты
+                    ctx.strokeStyle = '#78350f';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(bx, by, BLOCK_SIZE, BLOCK_SIZE);
+
+                    // Делаем горизонтальную разделительную линию по центру блока
+                    ctx.beginPath();
+                    ctx.moveTo(bx, by + BLOCK_SIZE / 2);
+                    ctx.lineTo(bx + BLOCK_SIZE, by + BLOCK_SIZE / 2);
+                    ctx.stroke();
+                }
+            }
+        }
+    }
+        // Функция копирования шаблона уровня в рабочий массив игры
+    function loadLevel() {
+        mapGrid = [];
+        for (let r = 0; r < LEVEL_ONE_TEMPLATE.length; r++) {
+            mapGrid.push([...LEVEL_ONE_TEMPLATE[r]]);
+        }
+    }
 
     // Перемещение снарядов в пространстве
     function updateBullets() {
@@ -590,7 +650,7 @@
     // Главная функция рендеринга графики танка
     function drawGame() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+        drawMap();
         const s = playerTank.size;
         const cx = playerTank.x;
         const cy = playerTank.y;
@@ -678,6 +738,104 @@
     window.onload = function() {
         updateMenuVisuals('main-menu');
     };
+          // Функция проверки столкновения объекта (танка) с кирпичными блоками
+    function checkWallCollision(x, y, size) {
+        // Рассчитываем, какие ячейки сетки перекрывает объект
+        const startBufC = Math.floor(x / BLOCK_SIZE);
+        const endBufC = Math.floor((x + size - 1) / BLOCK_SIZE);
+        const startBufR = Math.floor(y / BLOCK_SIZE);
+        const endBufR = Math.floor((y + size - 1) / BLOCK_SIZE);
+
+        // Проверяем каждую ячейку под объектом
+        for (let r = startBufR; r <= endBufR; r++) {
+            for (let c = startBufC; c <= endBufC; c++) {
+                // Если вышли за границы карты — это тоже препятствие
+                if (r < 0 || r >= 15 || c < 0 || c >= 20) return true;
+                // Если в ячейке стоит кирпич (1) — столкновение зафиксировано
+                if (mapGrid[r][c] === 1) return true;
+            }
+        }
+        return false;
+    }
+
+    // Модифицированная физика движения танка (с проверкой стен)
+    // Найди у себя функцию updatePhysics() и ПОЛНОСТЬЮ замени её на эту:
+    function updatePhysics() {
+        if (gameState.isPaused) return;
+
+        let nextX = playerTank.x;
+        let nextY = playerTank.y;
+
+        if (keysPressed['ArrowUp']) {
+            nextY -= playerTank.speed;
+            playerTank.direction = 'up';
+            // Если впереди нет стены — двигаемся
+            if (!checkWallCollision(playerTank.x, nextY, playerTank.size)) {
+                playerTank.y = nextY;
+            }
+        } else if (keysPressed['ArrowDown']) {
+            nextY += playerTank.speed;
+            playerTank.direction = 'down';
+            if (!checkWallCollision(playerTank.x, nextY, playerTank.size)) {
+                playerTank.y = nextY;
+            }
+        } else if (keysPressed['ArrowLeft']) {
+            nextX -= playerTank.speed;
+            playerTank.direction = 'left';
+            if (!checkWallCollision(nextX, playerTank.y, playerTank.size)) {
+                playerTank.x = nextX;
+            }
+        } else if (keysPressed['ArrowRight']) {
+            nextX += playerTank.speed;
+            playerTank.direction = 'right';
+            if (!checkWallCollision(nextX, playerTank.y, playerTank.size)) {
+                playerTank.x = nextX;
+            }
+        }
+
+        // Ограничение границами экрана
+        if (playerTank.x < 0) playerTank.x = 0;
+        if (playerTank.y < 0) playerTank.y = 0;
+        if (playerTank.x > canvas.width - playerTank.size) playerTank.x = canvas.width - playerTank.size;
+        if (playerTank.y > canvas.height - playerTank.size) playerTank.y = canvas.height - playerTank.size;
+    }
+
+    // Модифицированный расчет полета снарядов (разрушение блоков)
+    // Найди у себя функцию updateBullets() и ПОЛНОСТЬЮ замени её на эту:
+    function updateBullets() {
+        if (gameState.isPaused) return;
+        
+        for (let i = playerBullets.length - 1; i >= 0; i--) {
+            const b = playerBullets[i];
+            
+            if (b.dir === 'up') b.y -= b.speed;
+            else if (b.dir === 'down') b.y += b.speed;
+            else if (b.dir === 'left') b.x -= b.speed;
+            else if (b.dir === 'right') b.x += b.speed;
+
+            // 1. Проверяем попадание снаряда в кирпич на карте
+            const cellC = Math.floor((b.x + b.size / 2) / BLOCK_SIZE);
+            const cellR = Math.floor((b.y + b.size / 2) / BLOCK_SIZE);
+
+            if (cellR >= 0 && cellR < 15 && cellC >= 0 && cellC < 20) {
+                if (mapGrid[cellR][cellC] === 1) {
+                    // Уничтожаем блок кирпича (превращаем в пустоту)
+                    mapGrid[cellR][cellC] = 0;
+                    // Удаляем снаряд из игры
+                    playerBullets.splice(i, 1);
+                    // Начисляем очки за разрушение тактического лабиринта!
+                    gameState.score += 5;
+                    document.getElementById('hud-score').innerText = gameState.score;
+                    continue;
+                }
+            }
+
+            // 2. Удаление при выходе за экран
+            if (b.x < 0 || b.y < 0 || b.x > canvas.width || b.y > canvas.height) {
+                playerBullets.splice(i, 1);
+            }
+        }
+    }
 </script>
 </body>
 </html>
