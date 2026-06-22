@@ -210,6 +210,26 @@
             letter-spacing: 1px;
             text-transform: uppercase;
         }
+        /* Стили кнопки Назад */
+        .back-btn {
+            margin-top: 30px;
+            padding: 12px 30px;
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: 1px;
+        }
+
+        .back-btn:hover {
+            border-color: #ff007c;
+            color: #ff007c;
+            box-shadow: 0 0 15px rgba(255, 0, 124, 0.2);
+            background-color: rgba(255, 0, 124, 0.02);
+        }
     </style>
 </head>
 <body>
@@ -226,7 +246,7 @@
         <div class="controls-hint">Навигация: ↑ ↓ | Выбор: ENTER</div>
     </div>
 
-    <!-- 2. ЭКРАН ВЫБОРА ТАНКА -->
+    <!-- 2. ЭКРАН ВЫБОРА ТАНКА (ОБНОВЛЕННЫЙ) -->
     <div id="tank-menu" class="screen">
         <h2 class="screen-title">ВЫБЕРИТЕ СВОЙ БОЕВОЙ ТАНК</h2>
         <div class="tank-grid">
@@ -243,21 +263,25 @@
                 <p>Высокая скорость стрельбы, маневренный, мало HP.</p>
             </div>
         </div>
-        <div class="controls-hint">Назад: ESC | Выбор: ENTER</div>
+        <!-- Кнопка возврата -->
+        <div class="back-btn" onclick="changeScreen('main-menu')">← НАЗАД В МЕНЮ</div>
+        <div class="controls-hint">Назад: ESC / Клик | Выбор: ENTER</div>
     </div>
 
-    <!-- 3. ЭКРАН УРОВНЯ СЛОЖНОСТИ -->
+    <!-- 3. ЭКРАН УРОВНЯ СЛОЖНОСТИ (ОБНОВЛЕННЫЙ) -->
     <div id="difficulty-menu" class="screen">
         <h2 class="screen-title">УРОВЕНЬ СЛОЖНОСТИ</h2>
         <div class="menu-options">
             <div class="menu-item selected" data-diff="easy">НОВОБРАНЕЦ (Легко)</div>
-            <div class="menu-item" data-diff="medium">ВЕТЕРАН (Средно)</div>
+            <div class="menu-item" data-diff="medium">ВЕТЕРАН (Средне)</div>
             <div class="menu-item" data-diff="hard">КИБЕРСПОРТСМЕН (Жесть)</div>
         </div>
-        <div class="controls-hint">Назад: ESC | Выбор: ENTER</div>
+        <!-- Кнопка возврата -->
+        <div class="back-btn" onclick="changeScreen('main-menu')">← НАЗАД В МЕНЮ</div>
+        <div class="controls-hint">Назад: ESC / Клик | Выбор: ENTER</div>
     </div>
 
-    <!-- 4. ИГРОВОЙ ЭКРАН (ИНТЕРФЕЙС И ХОЛСТ) -->
+    <!-- 4. ИГРОВОЙ ЭКРАН (ОБНОВЛЕННЫЙ С КНОПКОЙ В ОВЕРЛЕЕ) -->
     <div id="game-screen" class="screen">
         <div id="game-hud">
             <div>ТАНК: <span id="hud-tank-name">ТЯЖЕЛЫЙ</span></div>
@@ -269,13 +293,13 @@
             <div>ОЧКИ: <span id="hud-score">0</span></div>
         </div>
         
-        <!-- Место для будущего игрового холста Canvas -->
         <div id="canvas-placeholder">ИГРОВОЕ ПОЛЕ (ЗДЕСЬ БУДЕТ CANVAS)</div>
 
-        <!-- Окно паузы -->
+        <!-- Обновленное окно паузы с кнопкой выхода -->
         <div id="pause-overlay">
             <h2>ПАУЗА</h2>
-            <p>Для продолжения нажмите ENTER</p>
+            <p style="margin-bottom: 25px;">Для продолжения нажмите ENTER</p>
+            <div class="menu-item" style="min-width: 250px; font-size: 16px;" onclick="changeScreen('main-menu')">В ГЛАВНОЕ МЕНЮ</div>
         </div>
     </div>
     <script>
@@ -313,6 +337,12 @@
         if (targetScreen) {
             targetScreen.classList.add('active');
             gameState.currentScreen = screenId;
+            
+            // Сбрасываем оверлей паузы, если уходим в главное меню
+            if (screenId === 'main-menu') {
+                gameState.isPaused = false;
+                document.getElementById('pause-overlay').style.display = 'none';
+            }
             
             // Если переходим на игровой экран — обновляем HUD и запускаем «игру»
             if (screenId === 'game-screen') {
