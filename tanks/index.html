@@ -169,17 +169,12 @@
             transition: width 0.3s ease;
         }
 
-        #canvas-placeholder {
+        #game-canvas {
             width: 800px;
             height: 600px;
             background-color: #020617;
             border: 2px solid #3b82f6;
             box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            color: #3b82f6;
             border-radius: 8px;
         }
 
@@ -293,7 +288,7 @@
             <div>ОЧКИ: <span id="hud-score">0</span></div>
         </div>
         
-        <div id="canvas-placeholder">ИГРОВОЕ ПОЛЕ (ЗДЕСЬ БУДЕТ CANVAS)</div>
+        <canvas id="game-canvas" width="800" height="600"></canvas>
 
         <!-- Обновленное окно паузы с кнопкой выхода -->
         <div id="pause-overlay">
@@ -461,6 +456,146 @@
             });
         });
     });
+        // === ИГРОВОЙ ДВИЖОК CANVAS ===
+    let canvas, ctx;
+    let gameLoopId = null;
+
+    // Конфигурация характеристик танков
+    const tankSpecs = {
+        heavy:   { color: '#eab308', speed: 2, size: 40, hp: 150 }, // Медленный, желтый
+        assault: { color: '#10b981', speed: 3.5, size: 36, hp: 100 }, // Средний, зеленый
+        ranger:  { color: '#a855f7', speed: 5, size: 32, hp: 70 }    // Быстрый, фиолетовый
+    };
+
+    // Объект нашего танка
+    const playerTank = {
+        x: 400,
+        y: 500,
+        direction: 'up', // 'up', 'down', 'left', 'right'
+        speed: 3,
+        size: 36,
+        color: '#eab308'
+    };
+
+    // Отслеживание зажатых клавиш для плавного движения
+    const keysPressed = {};
+
+    window.addEventListener('keydown', (e) => {
+        if (gameState.currentScreen === 'game-screen' && !gameState.isPaused) {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                e.preventDefault();
+                keysPressed[e.key] = true;
+            }
+        }
+    });
+
+    window.addEventListener('keyup', (e) => {
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+            keysPressed[e.key] = false;
+        }
+    });
+
+    // Инициализация игрового мира при старте
+    function initGame() {
+        canvas = document.getElementById('game-canvas');
+        ctx = canvas.getContext('2d');
+
+        // Подстраиваем характеристики под выбранный игроком танк
+        const specs = tankSpecs[gameState.selectedTank];
+        playerTank.color = specs.color;
+        playerTank.speed = specs.speed;
+        playerTank.size = specs.size;
+        
+        // Ставим танк в начальную позицию (по центру внизу)
+        playerTank.x = canvas.width / 2 - playerTank.size / 2;
+        playerTank.y = canvas.height - playerTank.size - 20;
+        playerTank.direction = 'up';
+
+        // Очищаем старые нажатия клавиш
+        Object.keys(keysPressed).forEach(k => keysPressed[k] = false);
+
+        // Запускаем игровой цикл, если он еще не запущен
+        if (gameLoopId) cancelAnimationFrame(gameLoopId);
+        gameLoopId = requestAnimationFrame(gameLoop);
+    }
+
+    // Расчет перемещения танка
+    function updatePhysics() {
+        if (gameState.isPaused) return;
+
+        if (keysPressed['ArrowUp']) {
+            playerTank.y -= playerTank.speed;
+            playerTank.direction = 'up';
+        } else if (keysPressed['ArrowDown']) {
+            playerTank.y += playerTank.speed;
+            playerTank.direction = 'down';
+        } else if (keysPressed['ArrowLeft']) {
+            playerTank.x -= playerTank.speed;
+            playerTank.direction = 'left';
+        } else if (keysPressed['ArrowRight']) {
+            playerTank.x += playerTank.speed;
+            playerTank.direction = 'right';
+        }
+
+        // Ограничение движения границами холста Canvas
+        if (playerTank.x < 0) playerTank.x = 0;
+        if (playerTank.y < 0) playerTank.y = 0;
+        if (playerTank.x > canvas.width - playerTank.size) playerTank.x = canvas.width - playerTank.size;
+        if (playerTank.y > canvas.height - playerTank.size) playerTank.y = canvas.height - playerTank.size;
+    }
+
+    // Отрисовка танка на холсте
+    function drawGame() {
+        // Очищаем экран перед каждым новым кадром
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = playerTank.color;
+        const s = playerTank.size;
+        const cx = playerTank.x;
+        const cy = playerTank.y;
+
+        // Рисуем корпус танка (квадрат)
+        ctx.fillRect(cx, cy, s, s);
+
+        // Рисуем дуло в зависимости от направления
+        ctx.fillStyle = '#ffffff'; // Выделим дуло белым цветом для видимости направления
+        const gunLength = s / 2;
+        const gunWidth = s / 4;
+
+        if (playerTank.direction === 'up') {
+            ctx.fillRect(cx + s/2 - gunWidth/2, cy - gunLength, gunWidth, gunLength);
+        } else if (playerTank.direction === 'down') {
+            ctx.fillRect(cx + s/2 - gunWidth/2, cy + s, gunWidth, gunLength);
+        } else if (playerTank.direction === 'left') {
+            ctx.fillRect(cx - gunLength, cy + s/2 - gunWidth/2, gunLength, gunWidth);
+        } else if (playerTank.direction === 'right') {
+            ctx.fillRect(cx + s, cy + s/2 - gunWidth/2, gunLength, gunWidth);
+        }
+    }
+
+    // Бесконечный цикл игры (60 кадров в секунду)
+    function gameLoop() {
+        if (gameState.currentScreen === 'game-screen') {
+            updatePhysics();
+            drawGame();
+            gameLoopId = requestAnimationFrame(gameLoop);
+        }
+    }
+
+    // Модифицируем существующую функцию смены экранов, чтобы при старте игры запускался Canvas
+    const oldChangeScreen = changeScreen;
+    changeScreen = function(screenId) {
+        oldChangeScreen(screenId);
+        if (screenId === 'game-screen') {
+            // Ждем миллисекунду, чтобы DOM успел обновиться и canvas появился на экране
+            setTimeout(initGame, 10);
+        } else {
+            if (gameLoopId) {
+                cancelAnimationFrame(gameLoopId);
+                gameLoopId = null;
+            }
+        }
+    };
 </script>
 </body>
 </html>
