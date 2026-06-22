@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Mega Tanks 2026</title>
+    <style>
+        {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #080a0f;
+            color: #e2e8f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Управление экранами */
+        .screen {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: radial-gradient(circle at center, #111625 0%, #070913 100%);
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Главное меню */
+        .game-title {
+            font-size: 64px;
+            font-weight: 900;
+            color: #00f0ff;
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+            margin-bottom: 50px;
+            letter-spacing: 4px;
+        }
+
+        .screen-title {
+            font-size: 36px;
+            color: #ff007c;
+            text-shadow: 0 0 15px rgba(ff, 0, 124, 0.5);
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+
+        .menu-options {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .menu-item {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 18px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            letter-spacing: 1px;
+        }
+
+        .menu-item.selected, .menu-item:hover {
+            background-color: rgba(0, 240, 255, 0.1);
+            border-color: #00f0ff;
+            color: #00f0ff;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+            transform: scale(1.03);
+        }
+
+        /* Экран выбора танка */
+        .tank-grid {
+            display: flex;
+            gap: 30px;
+            max-width: 1000px;
+            padding: 20px;
+        }
+
+        .tank-card {
+            flex: 1;
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tank-card h3 {
+            font-size: 22px;
+            margin-top: 0;
+            color: #fff;
+            transition: color 0.3s;
+        }
+
+        .tank-card p {
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 1.5;
+        }
+
+        .tank-card.selected, .tank-card:hover {
+            border-color: #ff007c;
+            box-shadow: 0 0 25px rgba(255, 0, 124, 0.3);
+            background-color: rgba(255, 0, 124, 0.05);
+            transform: translateY(-10px);
+        }
+
+        .tank-card.selected h3 {
+            color: #ff007c;
+        }
+
+        /* Игровой HUD интерфейс */
+        #game-hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+            background-color: #111827;
+            border: 1px solid #374151;
+            padding: 15px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .hp-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hp-bar-bg {
+            width: 150px;
+            height: 16px;
+            background-color: #1f2937;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #4b5563;
+        }
+
+        #hp-bar-fill {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #ef4444, #f87171);
+            box-shadow: 0 0 8px #ef4444;
+            transition: width 0.3s ease;
+        }
+
+        #canvas-placeholder {
+            width: 800px;
+            height: 600px;
+            background-color: #020617;
+            border: 2px solid #3b82f6;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #3b82f6;
+            border-radius: 8px;
+        }
+
+        /* Окно паузы */
+        #pause-overlay {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        #pause-overlay h2 {
+            font-size: 48px;
+            color: #eab308;
+            text-shadow: 0 0 15px rgba(234, 179, 8, 0.5);
+            margin: 0 0 10px 0;
+        }
+
+        /* Подсказки по кнопкам */
+        .controls-hint {
+            margin-top: 40px;
+            font-size: 14px;
+            color: #64748b;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. ЭКРАН ГЛАВНОГО МЕНЮ -->
+    <div id="main-menu" class="screen active">
+        <h1 class="game-title">MEGA TANKS 2026</h1>
+        <div class="menu-options">
+            <div class="menu-item selected" data-action="start">СТАРТ</div>
+            <div class="menu-item" data-action="select-tank">ВЫБОР ТАНКА</div>
+            <div class="menu-item" data-action="difficulty">УРОВЕНЬ СЛОЖНОСТИ</div>
+            <div class="menu-item" data-action="exit">ВЫХОД ИЗ ИГРЫ</div>
+        </div>
+        <div class="controls-hint">Навигация: ↑ ↓ | Выбор: ENTER</div>
+    </div>
+
+    <!-- 2. ЭКРАН ВЫБОРА ТАНКА -->
+    <div id="tank-menu" class="screen">
+        <h2 class="screen-title">ВЫБЕРИТЕ СВОЙ БОЕВОЙ ТАНК</h2>
+        <div class="tank-grid">
+            <div class="tank-card selected" data-tank="heavy">
+                <h3>ТЯЖЕЛЫЙ ТАНК</h3>
+                <p>Много HP, медленный, сокрушительный урон.</p>
+            </div>
+            <div class="tank-card" data-tank="assault">
+                <h3>ШТУРМОВОЙ ТАНК</h3>
+                <p>Сбалансированная броня, средняя скорость.</p>
+            </div>
+            <div class="tank-card" data-tank="ranger">
+                <h3>РЕЙНДЖЕР</h3>
+                <p>Высокая скорость стрельбы, маневренный, мало HP.</p>
+            </div>
+        </div>
+        <div class="controls-hint">Назад: ESC | Выбор: ENTER</div>
+    </div>
+
+    <!-- 3. ЭКРАН УРОВНЯ СЛОЖНОСТИ -->
+    <div id="difficulty-menu" class="screen">
+        <h2 class="screen-title">УРОВЕНЬ СЛОЖНОСТИ</h2>
+        <div class="menu-options">
+            <div class="menu-item selected" data-diff="easy">НОВОБРАНЕЦ (Легко)</div>
+            <div class="menu-item" data-diff="medium">ВЕТЕРАН (Средно)</div>
+            <div class="menu-item" data-diff="hard">КИБЕРСПОРТСМЕН (Жесть)</div>
+        </div>
+        <div class="controls-hint">Назад: ESC | Выбор: ENTER</div>
+    </div>
+
+    <!-- 4. ИГРОВОЙ ЭКРАН (ИНТЕРФЕЙС И ХОЛСТ) -->
+    <div id="game-screen" class="screen">
+        <div id="game-hud">
+            <div>ТАНК: <span id="hud-tank-name">ТЯЖЕЛЫЙ</span></div>
+            <div class="hp-container">
+                <span>HP: </span>
+                <div class="hp-bar-bg"><div id="hp-bar-fill"></div></div>
+            </div>
+            <div>СЛОЖНОСТЬ: <span id="hud-diff">ВЕТЕРАН</span></div>
+            <div>ОЧКИ: <span id="hud-score">0</span></div>
+        </div>
+        
+        <!-- Место для будущего игрового холста Canvas -->
+        <div id="canvas-placeholder">ИГРОВОЕ ПОЛЕ (ЗДЕСЬ БУДЕТ CANVAS)</div>
+
+        <!-- Окно паузы -->
+        <div id="pause-overlay">
+            <h2>ПАУЗА</h2>
+            <p>Для продолжения нажмите ENTER</p>
+        </div>
+    </div>
+    <script>
+    // Состояние игры (Выбор игрока)
+    const gameState = {
+        currentScreen: 'main-menu',
+        selectedTank: 'heavy',
+        tankNameRu: 'ТЯЖЕЛЫЙ ТАНК',
+        difficulty: 'medium',
+        difficultyNameRu: 'ВЕТЕРАН',
+        isPaused: false,
+        score: 0
+    };
+
+    // Определение структуры каждого меню для навигации с клавиатуры
+    const menus = {
+        'main-menu': {
+            items: document.querySelectorAll('#main-menu .menu-item'),
+            currentIndex: 0
+        },
+        'tank-menu': {
+            items: document.querySelectorAll('#tank-menu .tank-card'),
+            currentIndex: 0
+        },
+        'difficulty-menu': {
+            items: document.querySelectorAll('#difficulty-menu .menu-item'),
+            currentIndex: 0
+        }
+    };
+
+    // Функция переключения экранов
+    function changeScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        const targetScreen = document.getElementById(screenId);
+        if (targetScreen) {
+            targetScreen.classList.add('active');
+            gameState.currentScreen = screenId;
+            
+            // Если переходим на игровой экран — обновляем HUD и запускаем «игру»
+            if (screenId === 'game-screen') {
+                document.getElementById('hud-tank-name').innerText = gameState.tankNameRu;
+                document.getElementById('hud-diff').innerText = gameState.difficultyNameRu;
+                document.getElementById('hud-score').innerText = gameState.score;
+                document.getElementById('hp-bar-fill').style.width = '100%';
+                gameState.isPaused = false;
+                document.getElementById('pause-overlay').style.display = 'none';
+            }
+        }
+    }
+
+    // Обновление визуального выделения элементов в меню
+    function updateMenuVisuals(menuId) {
+        const menu = menus[menuId];
+        menu.items.forEach((item, index) => {
+            if (index === menu.currentIndex) {
+                item.classList.add('selected');
+                item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            } else {
+                item.classList.remove('selected');
+            }
+        });
+    }
+
+    // Обработка выбора (нажатие ENTER на элементе меню)
+    function handleMenuAction() {
+        const currentMenuId = gameState.currentScreen;
+        if (!menus[currentMenuId]) return;
+
+        const menu = menus[currentMenuId];
+        const selectedItem = menu.items[menu.currentIndex];
+
+        if (currentMenuId === 'main-menu') {
+            const action = selectedItem.getAttribute('data-action');
+            if (action === 'start') changeScreen('game-screen');
+            if (action === 'select-tank') changeScreen('tank-menu');
+            if (action === 'difficulty') changeScreen('difficulty-menu');
+            if (action === 'exit') alert('Выход из игры. Спасибо за игру!');
+        } 
+        else if (currentMenuId === 'tank-menu') {
+            gameState.selectedTank = selectedItem.getAttribute('data-tank');
+            gameState.tankNameRu = selectedItem.querySelector('h3').innerText;
+            changeScreen('main-menu');
+        } 
+        else if (currentMenuId === 'difficulty-menu') {
+            gameState.difficulty = selectedItem.getAttribute('data-diff');
+            gameState.difficultyNameRu = selectedItem.innerText.split(' (')[0];
+            changeScreen('main-menu');
+        }
+    }
+
+    // Главный перехватчик клавиш
+    window.addEventListener('keydown', function(event) {
+        const currentMenuId = gameState.currentScreen;
+
+        // 1. НАВИГАЦИЯ В МЕНЮ (Стрелочки ↑ и ↓)
+        if (menus[currentMenuId]) {
+            const menu = menus[currentMenuId];
+            
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                menu.currentIndex = (menu.currentIndex + 1) % menu.items.length;
+                updateMenuVisuals(currentMenuId);
+            } 
+            else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                menu.currentIndex = (menu.currentIndex - 1 + menu.items.length) % menu.items.length;
+                updateMenuVisuals(currentMenuId);
+            }
+            
+            // Кнопка выхода/возврата (ESC)
+            if (event.key === 'Escape' && currentMenuId !== 'main-menu') {
+                changeScreen('main-menu');
+                return;
+            }
+        }
+
+        // 2. ОБРАБОТКА КЛАВИШИ ENTER (Выбор в меню или Пауза в игре)
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            if (currentMenuId === 'game-screen') {
+                // Включение/выключение паузы во время игры
+                gameState.isPaused = !gameState.isPaused;
+                document.getElementById('pause-overlay').style.display = gameState.isPaused ? 'flex' : 'none';
+                console.log(gameState.isPaused ? "Игра приостановлена" : "Игра возобновлена");
+            } else {
+                handleMenuAction();
+            }
+        }
+
+        // 3. ОБРАБОТКА СТРЕЛЬБЫ В ИГРЕ (Right Alt / AltGraph)
+        if (event.code === 'AltRight') {
+            event.preventDefault();
+            if (currentMenuId === 'game-screen' && !gameState.isPaused) {
+                console.log("🔥 БАБАХ! Выстрел из орудия типа:", gameState.selectedTank);
+                
+                // Эффектная демонстрация: при стрельбе списываем немного очков для теста HUD
+                gameState.score += 10;
+                document.getElementById('hud-score').innerText = gameState.score;
+            }
+        }
+    });
+
+    // Добавляем поддержку мышки, чтобы элементы выбирались и кликались на ПК
+    Object.keys(menus).forEach(menuId => {
+        const menu = menus[menuId];
+        menu.items.forEach((item, index) => {
+            item.addEventListener('mouseenter', () => {
+                menu.currentIndex = index;
+                updateMenuVisuals(menuId);
+            });
+            item.addEventListener('click', () => {
+                handleMenuAction();
+            });
+        });
+    });
+</script>
+</body>
+</html>
