@@ -562,6 +562,99 @@
         gameState.score += 1;
         document.getElementById('hud-score').innerText = gameState.score;
     }
+        // === СИСТЕМА ДИНАМИЧЕСКИХ БОНУСОВ (ДРОП) ===
+    const activeBonuses = []; // Массив бонусов, которые сейчас лежат на карте
+
+    // Характеристики и цвета выпадающих предметов
+    const bonusSpecs = {
+        medkit: { color: '#ef4444', icon: '❤️', label: 'АПТЕЧКА' },
+        speed:  { color: '#3b82f6', icon: '⚡', label: 'УСКОРЕНИЕ' },
+        invisible: { color: '#10b981', icon: '👻', label: 'МАСКИРОВКА' }
+    };
+
+    // Таймеры действующих баффов на игроке
+    const playerBuffs = {
+        speedEndTime: 0,
+        invisibleEndTime: 0
+    };
+
+    // Функция отрисовки выпавших бонусов на холсте
+    function drawBonuses() {
+        activeBonuses.forEach(b => {
+            const spec = bonusSpecs[b.type];
+            
+            // Рисуем светящуюся неоновую подложку под бонусом
+            ctx.fillStyle = spec.color;
+            ctx.globalAlpha = 0.2;
+            ctx.beginPath();
+            ctx.arc(b.x + BLOCK_SIZE/2, b.y + BLOCK_SIZE/2, BLOCK_SIZE/2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+
+            // Отрисовываем иконку бонуса по центру клетки
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(spec.icon, b.x + BLOCK_SIZE/2, b.y + BLOCK_SIZE/2);
+        });
+    }
+        // Шанс выпадения бонуса при разрушении кирпича (25%)
+    function trySpawnBonus(bx, by) {
+        if (Math.random() < 0.25) {
+            const types = Object.keys(bonusSpecs);
+            // Случайно выбираем: аптечка, скорость или инвиз
+            const randomType = types[Math.floor(Math.random() * types.length)];
+            
+            activeBonuses.push({
+                x: bx,
+                y: by,
+                type: randomType
+            });
+        }
+    }
+
+    // Функция проверки подбора бонусов танком игрока
+    function checkBonusCollection() {
+        const pSize = playerTank.size;
+        
+        for (let i = activeBonuses.length - 1; i >= 0; i--) {
+            const b = activeBonuses[i];
+            
+            // Простая коллизия прямоугольников (Танк наехал на бонус)
+            if (playerTank.x < b.x + BLOCK_SIZE &&
+                playerTank.x + pSize > b.x &&
+                playerTank.y < b.y + BLOCK_SIZE &&
+                playerTank.y + pSize > b.y) {
+                
+                // АКТИВИРУЕМ БОНУС
+                applyBonusEffect(b.type);
+                
+                // Удаляем бонус с поля
+                activeBonuses.splice(i, 1);
+            }
+        }
+    }
+
+    // Логика работы каждого бонуса
+    function applyBonusEffect(type) {
+        const currentTime = Date.now();
+        
+        if (type === 'medkit') {
+            // Аптечка: чиним полоску HP бар (например, восстанавливаем до 100%)
+            document.getElementById('hp-bar-fill').style.width = '100%';
+            console.log("❤️ Сработала Аптечка! Танк полностью отремонтирован.");
+        } 
+        else if (type === 'speed') {
+            // Ускорение: даем бафф на 10 секунд
+            playerBuffs.speedEndTime = currentTime + 10000;
+            console.log("⚡ Активирован форсаж! Скорость увеличена на 10 секунд.");
+        } 
+        else if (type === 'invisible') {
+            // Маскировка: инвиз на 7 секунд
+            playerBuffs.invisibleEndTime = currentTime + 7000;
+            console.log("👻 Включен режим Стелс! Танк невидим для врагов.");
+        }
+    }
       // === СИСТЕМА ИГРОВОЙ КАРТЫ (АВТО-ГЕНЕРАЦИЯ) ===
     const BLOCK_SIZE = 40; // Размер блока в пикселях
     let mapGrid = [];      // Рабочая сетка карты
@@ -636,12 +729,34 @@
     // Перемещение снарядов в пространстве
     function updateBullets() {
         if (gameState.isPaused) return;
+        
         for (let i = playerBullets.length - 1; i >= 0; i--) {
             const b = playerBullets[i];
+            
             if (b.dir === 'up') b.y -= b.speed;
             else if (b.dir === 'down') b.y += b.speed;
             else if (b.dir === 'left') b.x -= b.speed;
             else if (b.dir === 'right') b.x += b.speed;
+
+            const cellC = Math.floor((b.x + b.size / 2) / BLOCK_SIZE);
+            const cellR = Math.floor((b.y + b.size / 2) / BLOCK_SIZE);
+
+            if (cellR >= 0 && cellR < 15 && cellC >= 0 && cellC < 20) {
+                if (mapGrid[cellR][cellC] === 1) {
+                    const bx = cellC * BLOCK_SIZE;
+                    const by = cellR * BLOCK_SIZE;
+
+                    mapGrid[cellR][cellC] = 0; // Стираем кирпич
+                    
+                    // ВЫЗЫВАЕМ ШАНС ВЫПАДЕНИЯ БОНУСА НА МЕСТЕ КИРПИЧА!
+                    trySpawnBonus(bx, by);
+
+                    playerBullets.splice(i, 1);
+                    gameState.score += 5;
+                    document.getElementById('hud-score').innerText = gameState.score;
+                    continue;
+                }
+            }
 
             if (b.x < 0 || b.y < 0 || b.x > canvas.width || b.y > canvas.height) {
                 playerBullets.splice(i, 1);
@@ -664,7 +779,18 @@
     // Главная функция рендеринга графики танка
     function drawGame() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawMap();
+
+        drawMap();      // Рисуем карту
+        drawBonuses();  // РИСУЕМ БОНУСЫ НА ЗЕМЛЕ
+
+        const currentTime = Date.now();
+        // ПРОВЕРКА ЭФФЕКТА НЕВИДИМОСТИ (МАСКИРОВКИ)
+        if (currentTime < playerBuffs.invisibleEndTime) {
+            ctx.globalAlpha = 0.4; // Танк становится призрачным
+        } else {
+            ctx.globalAlpha = 1.0;
+        }
+
         const s = playerTank.size;
         const cx = playerTank.x;
         const cy = playerTank.y;
@@ -674,7 +800,6 @@
         ctx.fillStyle = trackColor;
         const trackWidth = s / 5;
 
-        // Рендеринг гусениц в зависимости от направления
         if (playerTank.direction === 'up' || playerTank.direction === 'down') {
             ctx.fillRect(cx, cy, trackWidth, s);
             ctx.fillRect(cx + s - trackWidth, cy, trackWidth, s);
@@ -697,7 +822,6 @@
             ctx.fillRect(cx + 2, cy + trackWidth, s - 4, s - (trackWidth * 2));
         }
 
-        // Круглая центральная башня
         ctx.fillStyle = '#1e293b';
         ctx.beginPath();
         ctx.arc(cx + s/2, cy + s/2, s/4, 0, Math.PI * 2);
@@ -706,7 +830,6 @@
         ctx.strokeStyle = '#ffffff';
         ctx.stroke();
 
-        // Орудийный ствол
         ctx.fillStyle = '#ffffff';
         const gunLength = s / 2;
         const gunWidth = s / 6;
@@ -721,6 +844,7 @@
             ctx.fillRect(cx + s, cy + s/2 - gunWidth/2, gunLength, gunWidth);
         }
 
+        ctx.globalAlpha = 1.0; // Сбрасываем прозрачность
         drawPlayerBullets();
     }
 
@@ -774,8 +898,18 @@
 
     // Модифицированная физика движения танка (с проверкой стен)
     // Найди у себя функцию updatePhysics() и ПОЛНОСТЬЮ замени её на эту:
-    function updatePhysics() {
+   function updatePhysics() {
         if (gameState.isPaused) return;
+
+        const currentTime = Date.now();
+        const baseSpecs = tankSpecs[gameState.selectedTank];
+        
+        // ДИНАМИЧЕСКИЙ РАСЧЕТ СКОРОСТИ С УЧЕТОМ БАФФА
+        let currentSpeed = baseSpecs.speed;
+        if (currentTime < playerBuffs.speedEndTime) {
+            currentSpeed = baseSpecs.speed * 1.7; // Форсаж увеличивает скорость на 70%
+        }
+        playerTank.speed = currentSpeed;
 
         let nextX = playerTank.x;
         let nextY = playerTank.y;
@@ -783,7 +917,6 @@
         if (keysPressed['ArrowUp']) {
             nextY -= playerTank.speed;
             playerTank.direction = 'up';
-            // Если впереди нет стены — двигаемся
             if (!checkWallCollision(playerTank.x, nextY, playerTank.size)) {
                 playerTank.y = nextY;
             }
@@ -806,6 +939,15 @@
                 playerTank.x = nextX;
             }
         }
+
+        // ПРОВЕРКА ПОДБОРА БОНУСОВ
+        checkBonusCollection();
+
+        if (playerTank.x < 0) playerTank.x = 0;
+        if (playerTank.y < 0) playerTank.y = 0;
+        if (playerTank.x > canvas.width - playerTank.size) playerTank.x = canvas.width - playerTank.size;
+        if (playerTank.y > canvas.height - playerTank.size) playerTank.y = canvas.height - playerTank.size;
+    }
 
         // Ограничение границами экрана
         if (playerTank.x < 0) playerTank.x = 0;
