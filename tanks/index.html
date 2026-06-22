@@ -467,7 +467,7 @@
         }
 
         // Стрельба на правый Ctrl
-        if (event.code === 'ControlRight') {
+        if (event.code === 'ControlLeft') {
             event.preventDefault();
             if (currentMenuId === 'game-screen' && !gameState.isPaused) {
                 shootPlayerBullet();
