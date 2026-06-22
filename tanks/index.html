@@ -487,15 +487,15 @@
         if (!canvas) return;
         ctx = canvas.getContext('2d');
 
-        // Загружаем кирпичные стены уровня
-        loadLevel();
+        // ВЫЗЫВАЕМ НАШУ АВТО-ГЕНЕРАЦИЮ КАРТЫ!
+        generateLevel();
 
         const specs = tankSpecs[gameState.selectedTank];
         playerTank.color = specs.color;
         playerTank.speed = specs.speed;
         playerTank.size = specs.size;
         
-        // Корректируем стартовую позицию, чтобы танк не заспавнился прямо внутри кирпичей
+        // Позиция танка игрока (строго по центру внизу в безопасной зоне)
         playerTank.x = canvas.width / 2 - playerTank.size / 2;
         playerTank.y = canvas.height - playerTank.size - 20;
         playerTank.direction = 'up';
@@ -562,28 +562,42 @@
         gameState.score += 1;
         document.getElementById('hud-score').innerText = gameState.score;
     }
-        // === СИСТЕМА ИГРОВОЙ КАРТЫ (БЛОКИ) ===
-    const BLOCK_SIZE = 40; // Размер одного блока (квадрата) в пикселях
-    let mapGrid = [];      // Двумерный массив, где будет храниться текущая карта
+      // === СИСТЕМА ИГРОВОЙ КАРТЫ (АВТО-ГЕНЕРАЦИЯ) ===
+    const BLOCK_SIZE = 40; // Размер блока в пикселях
+    let mapGrid = [];      // Рабочая сетка карты
 
-    // Оригинальный шаблон карты уровня (20 столбцов на 15 строк)
-    // 0 - пустое место, 1 - 🧱 разрушаемый кирпич
-    const LEVEL_ONE_TEMPLATE = [,
- ,
- ,
- ,
- ,
- ,
- ,
- ,
- ,
- ,
- ,
- ,
- ,
- ,
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    ];
+    // Умная функция, которая сама строит лабиринт без использования таблиц с цифрами
+    function generateLevel() {
+        mapGrid = [];
+        
+        // Создаем пустую сетку 15 строк на 20 колонок
+        for (let r = 0; r < 15; r++) {
+            let row = [];
+            for (let c = 0; c < 20; c++) {
+                // Базово везде пусто (0)
+                let blockType = 0; 
+                
+                // Строим вертикальные тактические кирпичные колонны (как в Dendy)
+                // Ставим кирпичи (1) на определенных колоннах, но оставляем проходы
+                if ((c === 2 || c === 5 || c === 8 || c === 11 || c === 14 || c === 17) && (r > 1 && r < 13)) {
+                    blockType = 1;
+                }
+                
+                // Делаем горизонтальные защитные перегородки по центру карты
+                if (r === 7 && (c > 3 && c < 16) && c !== 9 && c !== 10) {
+                    blockType = 1;
+                }
+                
+                // Обязательно оставляем пустую зону внизу по центру, чтобы танк игрока не застрял при спавне!
+                if (r >= 13 && c >= 8 && c <= 11) {
+                    blockType = 0;
+                }
+                
+                row.push(blockType);
+            }
+            mapGrid.push(row);
+        }
+    }
 
     // Функция отрисовки всех блоков кирпичей на Canvas
     function drawMap() {
