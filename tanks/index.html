@@ -391,7 +391,7 @@
         }
     }
 
-    // Главный перехватчик клавиш
+    // === ГЛАВНЫЙ ПЕРЕХВАТЧИК КЛАВИШ (ИСПРАВЛЕННЫЙ) ===
     window.addEventListener('keydown', function(event) {
         const currentMenuId = gameState.currentScreen;
 
@@ -410,31 +410,41 @@
                 updateMenuVisuals(currentMenuId);
             }
             
-            // Кнопка выхода/возврата (ESC)
+            // Кнопка выхода/возврата (ESC) в меню
             if (event.key === 'Escape' && currentMenuId !== 'main-menu') {
                 changeScreen('main-menu');
                 return;
             }
         }
 
-        // 2. ОБРАБОТКА КЛАВИШИ ENTER (Выбор в меню или Пауза в игре)
+        // 2. ДОБАВЛЕНО: ПЕРЕХВАТ СТРЕЛОК ДЛЯ ДВИЖЕНИЯ ТАНКА В ИГРЕ
+        if (currentMenuId === 'game-screen' && !gameState.isPaused) {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+                event.preventDefault(); // Чтобы страница в браузере не дергалась
+                keysPressed[event.key] = true; // Записываем, что кнопка зажата!
+            }
+        }
+
+        // 3. ОБРАБОТКА КЛАВИШИ ENTER (Выбор в меню или Пауза в игре)
         if (event.key === 'Enter') {
             event.preventDefault();
             if (currentMenuId === 'game-screen') {
-                // Включение/выключение паузы во время игры
                 gameState.isPaused = !gameState.isPaused;
                 document.getElementById('pause-overlay').style.display = gameState.isPaused ? 'flex' : 'none';
-                console.log(gameState.isPaused ? "Игра приостановлена" : "Игра возобновлена");
+                
+                // Если поставили на паузу — сбрасываем зажатые стрелочки, чтобы танк не ехал сам
+                if (gameState.isPaused) {
+                    Object.keys(keysPressed).forEach(k => keysPressed[k] = false);
+                }
             } else {
                 handleMenuAction();
             }
         }
 
-        // 3. ОБРАБОТКА СТРЕЛЬБЫ В ИГРЕ (Right Ctrl)
+        // 4. ОБРАБОТКА СТРЕЛЬБЫ В ИГРЕ (Right Ctrl)
         if (event.code === 'ControlRight') {
             event.preventDefault();
-            if (gameState.currentScreen === 'game-screen' && !gameState.isPaused) {
-                // Вызываем функцию стрельбы (её логику мы напишем следующим шагом)
+            if (currentMenuId === 'game-screen' && !gameState.isPaused) {
                 shootPlayerBullet();
             }
         }
