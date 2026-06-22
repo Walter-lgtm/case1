@@ -324,8 +324,7 @@
             currentIndex: 0
         }
     };
-
-    // Функция переключения экранов
+        // Функция переключения экранов
     function changeScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         const targetScreen = document.getElementById(screenId);
@@ -333,13 +332,17 @@
             targetScreen.classList.add('active');
             gameState.currentScreen = screenId;
             
-            // Сбрасываем оверлей паузы, если уходим в главное меню
+            // Сбрасываем оверлей паузы при уходе в главное меню
             if (screenId === 'main-menu') {
                 gameState.isPaused = false;
                 document.getElementById('pause-overlay').style.display = 'none';
+                if (gameLoopId) {
+                    cancelAnimationFrame(gameLoopId);
+                    gameLoopId = null;
+                }
             }
             
-            // Если переходим на игровой экран — обновляем HUD и запускаем «игру»
+            // Если переходим на игровой экран — обновляем HUD и запускаем Canvas
             if (screenId === 'game-screen') {
                 document.getElementById('hud-tank-name').innerText = gameState.tankNameRu;
                 document.getElementById('hud-diff').innerText = gameState.difficultyNameRu;
@@ -347,6 +350,7 @@
                 document.getElementById('hp-bar-fill').style.width = '100%';
                 gameState.isPaused = false;
                 document.getElementById('pause-overlay').style.display = 'none';
+                setTimeout(initGame, 10);
             }
         }
     }
@@ -354,17 +358,16 @@
     // Обновление визуального выделения элементов в меню
     function updateMenuVisuals(menuId) {
         const menu = menus[menuId];
+        if (!menu) return;
         menu.items.forEach((item, index) => {
             if (index === menu.currentIndex) {
                 item.classList.add('selected');
-                item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
             } else {
                 item.classList.remove('selected');
             }
         });
     }
-
-    // Обработка выбора (нажатие ENTER на элементе меню)
+        // Обработка выбора (нажатие ENTER на элементе меню)
     function handleMenuAction() {
         const currentMenuId = gameState.currentScreen;
         if (!menus[currentMenuId]) return;
@@ -386,19 +389,45 @@
         } 
         else if (currentMenuId === 'difficulty-menu') {
             gameState.difficulty = selectedItem.getAttribute('data-diff');
-            gameState.difficultyNameRu = selectedItem.innerText.split(' (')[0];
+            gameState.difficultyNameRu = selectedItem.innerText;
             changeScreen('main-menu');
         }
     }
 
-    // === ГЛАВНЫЙ ПЕРЕХВАТЧИК КЛАВИШ (ИСПРАВЛЕННЫЙ) ===
+    // === ПАРАМЕТРЫ ДВИЖКА CANVAS ===
+    let canvas, ctx;
+    let gameLoopId = null;
+
+    // Спецификации классов танков
+    const tankSpecs = {
+        heavy:   { color: '#eab308', speed: 2, size: 40, hp: 150 },
+        assault: { color: '#10b981', speed: 3.5, size: 36, hp: 100 },
+        ranger:  { color: '#a855f7', speed: 5, size: 32, hp: 70 }
+    };
+
+    // Объект игрока
+    const playerTank = {
+        x: 400, y: 500,
+        direction: 'up',
+        speed: 3, size: 36, color: '#eab308'
+    };
+
+    const keysPressed = {};
+    const playerBullets = [];
+
+    // Характеристики снарядов
+    const bulletSpecs = {
+        heavy:   { speed: 6,  size: 6,  damage: 40 },
+        assault: { speed: 8,  size: 5,  damage: 25 },
+        ranger:  { speed: 12, size: 4,  damage: 15 }
+    };
+        // Слушатель нажатия клавиш
     window.addEventListener('keydown', function(event) {
         const currentMenuId = gameState.currentScreen;
 
-        // 1. НАВИГАЦИЯ В МЕНЮ (Стрелочки ↑ и ↓)
+        // Навигация в меню
         if (menus[currentMenuId]) {
             const menu = menus[currentMenuId];
-            
             if (event.key === 'ArrowDown') {
                 event.preventDefault();
                 menu.currentIndex = (menu.currentIndex + 1) % menu.items.length;
@@ -409,30 +438,26 @@
                 menu.currentIndex = (menu.currentIndex - 1 + menu.items.length) % menu.items.length;
                 updateMenuVisuals(currentMenuId);
             }
-            
-            // Кнопка выхода/возврата (ESC) в меню
             if (event.key === 'Escape' && currentMenuId !== 'main-menu') {
                 changeScreen('main-menu');
                 return;
             }
         }
 
-        // 2. ДОБАВЛЕНО: ПЕРЕХВАТ СТРЕЛОК ДЛЯ ДВИЖЕНИЯ ТАНКА В ИГРЕ
+        // Перехват движения танка в игре
         if (currentMenuId === 'game-screen' && !gameState.isPaused) {
             if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
-                event.preventDefault(); // Чтобы страница в браузере не дергалась
-                keysPressed[event.key] = true; // Записываем, что кнопка зажата!
+                event.preventDefault();
+                keysPressed[event.key] = true;
             }
         }
 
-        // 3. ОБРАБОТКА КЛАВИШИ ENTER (Выбор в меню или Пауза в игре)
+        // Клавиша ENTER (выбор или пауза)
         if (event.key === 'Enter') {
             event.preventDefault();
             if (currentMenuId === 'game-screen') {
                 gameState.isPaused = !gameState.isPaused;
                 document.getElementById('pause-overlay').style.display = gameState.isPaused ? 'flex' : 'none';
-                
-                // Если поставили на паузу — сбрасываем зажатые стрелочки, чтобы танк не ехал сам
                 if (gameState.isPaused) {
                     Object.keys(keysPressed).forEach(k => keysPressed[k] = false);
                 }
@@ -441,7 +466,7 @@
             }
         }
 
-        // 4. ОБРАБОТКА СТРЕЛЬБЫ В ИГРЕ (Right Ctrl)
+        // Стрельба на правый Ctrl
         if (event.code === 'ControlRight') {
             event.preventDefault();
             if (currentMenuId === 'game-screen' && !gameState.isPaused) {
@@ -450,83 +475,35 @@
         }
     });
 
-    // Добавляем поддержку мышки, чтобы элементы выбирались и кликались на ПК
-    Object.keys(menus).forEach(menuId => {
-        const menu = menus[menuId];
-        menu.items.forEach((item, index) => {
-            item.addEventListener('mouseenter', () => {
-                menu.currentIndex = index;
-                updateMenuVisuals(menuId);
-            });
-            item.addEventListener('click', () => {
-                handleMenuAction();
-            });
-        });
-    });
-        // === ИГРОВОЙ ДВИЖОК CANVAS ===
-    let canvas, ctx;
-    let gameLoopId = null;
-
-    // Конфигурация характеристик танков
-    const tankSpecs = {
-        heavy:   { color: '#eab308', speed: 2, size: 40, hp: 150 }, // Медленный, желтый
-        assault: { color: '#10b981', speed: 3.5, size: 36, hp: 100 }, // Средний, зеленый
-        ranger:  { color: '#a855f7', speed: 5, size: 32, hp: 70 }    // Быстрый, фиолетовый
-    };
-
-    // Объект нашего танка
-    const playerTank = {
-        x: 400,
-        y: 500,
-        direction: 'up', // 'up', 'down', 'left', 'right'
-        speed: 3,
-        size: 36,
-        color: '#eab308'
-    };
-
-    // Отслеживание зажатых клавиш для плавного движения
-    const keysPressed = {};
-
-    window.addEventListener('keydown', (e) => {
-        if (gameState.currentScreen === 'game-screen' && !gameState.isPaused) {
-            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-                e.preventDefault();
-                keysPressed[e.key] = true;
-            }
+    // Слушатель отпускания клавиш
+    window.addEventListener('keyup', function(event) {
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+            keysPressed[event.key] = false;
         }
     });
-
-    window.addEventListener('keyup', (e) => {
-        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-            keysPressed[e.key] = false;
-        }
-    });
-
-    // Инициализация игрового мира при старте
+        // Запуск параметров игрового поля
     function initGame() {
         canvas = document.getElementById('game-canvas');
+        if (!canvas) return;
         ctx = canvas.getContext('2d');
 
-        // Подстраиваем характеристики под выбранный игроком танк
         const specs = tankSpecs[gameState.selectedTank];
         playerTank.color = specs.color;
         playerTank.speed = specs.speed;
         playerTank.size = specs.size;
         
-        // Ставим танк в начальную позицию (по центру внизу)
         playerTank.x = canvas.width / 2 - playerTank.size / 2;
         playerTank.y = canvas.height - playerTank.size - 20;
         playerTank.direction = 'up';
 
-        // Очищаем старые нажатия клавиш
+        playerBullets.length = 0;
         Object.keys(keysPressed).forEach(k => keysPressed[k] = false);
 
-        // Запускаем игровой цикл, если он еще не запущен
         if (gameLoopId) cancelAnimationFrame(gameLoopId);
         gameLoopId = requestAnimationFrame(gameLoop);
     }
 
-    // Расчет перемещения танка
+    // Расчет координат перемещения танка
     function updatePhysics() {
         if (gameState.isPaused) return;
 
@@ -544,131 +521,20 @@
             playerTank.direction = 'right';
         }
 
-        // Ограничение движения границами холста Canvas
         if (playerTank.x < 0) playerTank.x = 0;
         if (playerTank.y < 0) playerTank.y = 0;
         if (playerTank.x > canvas.width - playerTank.size) playerTank.x = canvas.width - playerTank.size;
         if (playerTank.y > canvas.height - playerTank.size) playerTank.y = canvas.height - playerTank.size;
     }
 
-    // Отрисовка игрового мира и танка с гусеницами
-    function drawGame() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        const s = playerTank.size;
-        const cx = playerTank.x;
-        const cy = playerTank.y;
-        const mainColor = playerTank.color;
-        const trackColor = '#334155'; // Темно-серый цвет для гусениц
-
-        // Отрисовка гусениц (траков) по бокам в зависимости от направления движения
-        ctx.fillStyle = trackColor;
-        const trackWidth = s / 5; // Ширина одной гусеницы
-
-        if (playerTank.direction === 'up' || playerTank.direction === 'down') {
-            // Гусеницы слева и справа от корпуса
-            ctx.fillRect(cx, cy, trackWidth, s);
-            ctx.fillRect(cx + s - trackWidth, cy, trackWidth, s);
-            
-            // Рисуем насечки на траках для детализации
-            ctx.fillStyle = '#1e293b';
-            for (let i = 2; i < s; i += 6) {
-                ctx.fillRect(cx, cy + i, trackWidth, 2);
-                ctx.fillRect(cx + s - trackWidth, cy + i, trackWidth, 2);
-            }
-            
-            // Основной бронекорпус (чуть сужен, чтобы гусеницы выделялись)
-            ctx.fillStyle = mainColor;
-            ctx.fillRect(cx + trackWidth, cy + 2, s - (trackWidth * 2), s - 4);
-        } else {
-            // Гусеницы сверху и снизу от корпуса (когда танк едет влево/вправо)
-            ctx.fillRect(cx, cy, s, trackWidth);
-            ctx.fillRect(cx, cy + s - trackWidth, s, trackWidth);
-            
-            // Рисуем насечки на траках
-            ctx.fillStyle = '#1e293b';
-            for (let i = 2; i < s; i += 6) {
-                ctx.fillRect(cx + i, cy, 2, trackWidth);
-                ctx.fillRect(cx + i, cy + s - trackWidth, 2, trackWidth);
-            }
-            
-            // Основной бронекорпус
-            ctx.fillStyle = mainColor;
-            ctx.fillRect(cx + 2, cy + trackWidth, s - 4, s - (trackWidth * 2));
-        }
-
-        // Рисуем люк/башню по центру танка
-        ctx.fillStyle = '#1e293b';
-        ctx.beginPath();
-        ctx.arc(cx + s/2, cy + s/2, s/4, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = '#ffffff';
-        ctx.stroke();
-
-        // Рисуем дуло орудия
-        ctx.fillStyle = '#ffffff';
-        const gunLength = s / 2;
-        const gunWidth = s / 6;
-
-        if (playerTank.direction === 'up') {
-            ctx.fillRect(cx + s/2 - gunWidth/2, cy - gunLength, gunWidth, gunLength);
-        } else if (playerTank.direction === 'down') {
-            ctx.fillRect(cx + s/2 - gunWidth/2, cy + s, gunWidth, gunLength);
-        } else if (playerTank.direction === 'left') {
-            ctx.fillRect(cx - gunLength, cy + s/2 - gunWidth/2, gunLength, gunWidth);
-        } else if (playerTank.direction === 'right') {
-            ctx.fillRect(cx + s, cy + s/2 - gunWidth/2, gunLength, gunWidth);
-        }
-
-        // Вызываем отрисовку снарядов (напишем в следующем шаге)
-        drawPlayerBullets();
-    }
-
-    // Бесконечный цикл игры (60 кадров в секунду)
-    function gameLoop() {
-        if (gameState.currentScreen === 'game-screen') {
-            updatePhysics();
-            drawGame();
-            gameLoopId = requestAnimationFrame(gameLoop);
-        }
-    }
-
-    // Модифицируем существующую функцию смены экранов, чтобы при старте игры запускался Canvas
-    const oldChangeScreen = changeScreen;
-    changeScreen = function(screenId) {
-        oldChangeScreen(screenId);
-        if (screenId === 'game-screen') {
-            // Ждем миллисекунду, чтобы DOM успел обновиться и canvas появился на экране
-            setTimeout(initGame, 10);
-        } else {
-            if (gameLoopId) {
-                cancelAnimationFrame(gameLoopId);
-                gameLoopId = null;
-            }
-        }
-        // === СИСТЕМА ВЕДЕНИЯ ОГНЯ И СНАРЯДОВ ===
-    const playerBullets = [];
-
-    // Конфигурация снарядов для разных классов танков
-    const bulletSpecs = {
-        heavy:   { speed: 6,  size: 6,  damage: 40 },  // Снаряд крупный, летит средне
-        assault: { speed: 8,  size: 5,  damage: 25 },  // Сбалансированный
-        ranger:  { speed: 12, size: 4,  damage: 15 }   // Летит молниеносно
-    };
-
-    // Функция инициализации выстрела игрока
+    // Логика инициализации снаряда при выстреле
     function shootPlayerBullet() {
-        // Ограничение: не более 1 снаряда на экране одновременно (классика Dendy)
-        // Если хочешь сделать стрельбу очередями, просто закомментируй строчку ниже!
         if (playerBullets.length >= 1) return;
 
         const specs = bulletSpecs[gameState.selectedTank];
         const s = playerTank.size;
-        let bx = 0;
-        let by = 0;
+        let bx = 0, by = 0;
 
-        // Рассчитываем начальную точку вылета снаряда строго из кончика дула
         if (playerTank.direction === 'up') {
             bx = playerTank.x + s / 2 - specs.size / 2;
             by = playerTank.y - (s / 2);
@@ -683,65 +549,135 @@
             by = playerTank.y + s / 2 - specs.size / 2;
         }
 
-        // Добавляем снаряд в массив летящих объектов
         playerBullets.push({
-            x: bx,
-            y: by,
+            x: bx, y: by,
             dir: playerTank.direction,
-            speed: specs.speed,
-            size: specs.size
+            speed: specs.speed, size: specs.size
         });
 
-        // Визуальный счетчик очков для теста HUD (каждые 10 выстрелов — бонус, просто для фана)
         gameState.score += 1;
         document.getElementById('hud-score').innerText = gameState.score;
     }
 
-    // Расчет полета снарядов (физика)
+    // Перемещение снарядов в пространстве
     function updateBullets() {
         if (gameState.isPaused) return;
-
         for (let i = playerBullets.length - 1; i >= 0; i--) {
             const b = playerBullets[i];
-
-            // Двигаем снаряд в зависимости от его направления
             if (b.dir === 'up') b.y -= b.speed;
             else if (b.dir === 'down') b.y += b.speed;
             else if (b.dir === 'left') b.x -= b.speed;
             else if (b.dir === 'right') b.x += b.speed;
 
-            // Уничтожаем снаряд, если он улетел за границы игрового поля Canvas
             if (b.x < 0 || b.y < 0 || b.x > canvas.width || b.y > canvas.height) {
                 playerBullets.splice(i, 1);
             }
         }
     }
-
-    // Визуальная отрисовка снарядов на Canvas
+        // Отрисовка снарядов на Canvas
     function drawPlayerBullets() {
-        ctx.fillStyle = '#f43f5e'; // Ярко-розовый/красный неоновый цвет снаряда
+        ctx.fillStyle = '#f43f5e';
         playerBullets.forEach(b => {
             ctx.beginPath();
             ctx.arc(b.x + b.size/2, b.y + b.size/2, b.size, 0, Math.PI * 2);
             ctx.fill();
-            // Добавляем эффект свечения вокруг снаряда
             ctx.shadowColor = '#f43f5e';
             ctx.shadowBlur = 8;
         });
-        // Сбрасываем тень, чтобы остальные объекты не светились
-        ctx.shadowBlur = 0;
+        ctx.shadowBlur = 0; // Сброс эффекта свечения для остальных элементов
     }
 
-    // Чтобы снаряды начали летать, нам нужно обновить главный игровой цикл!
-    // Найди функцию gameLoop() у себя в коде и полностью замени её на эту:
+    // Главная функция рендеринга графики танка
+    function drawGame() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const s = playerTank.size;
+        const cx = playerTank.x;
+        const cy = playerTank.y;
+        const mainColor = playerTank.color;
+        const trackColor = '#334155';
+
+        ctx.fillStyle = trackColor;
+        const trackWidth = s / 5;
+
+        // Рендеринг гусениц в зависимости от направления
+        if (playerTank.direction === 'up' || playerTank.direction === 'down') {
+            ctx.fillRect(cx, cy, trackWidth, s);
+            ctx.fillRect(cx + s - trackWidth, cy, trackWidth, s);
+            ctx.fillStyle = '#1e293b';
+            for (let i = 2; i < s; i += 6) {
+                ctx.fillRect(cx, cy + i, trackWidth, 2);
+                ctx.fillRect(cx + s - trackWidth, cy + i, trackWidth, 2);
+            }
+            ctx.fillStyle = mainColor;
+            ctx.fillRect(cx + trackWidth, cy + 2, s - (trackWidth * 2), s - 4);
+        } else {
+            ctx.fillRect(cx, cy, s, trackWidth);
+            ctx.fillRect(cx, cy + s - trackWidth, s, trackWidth);
+            ctx.fillStyle = '#1e293b';
+            for (let i = 2; i < s; i += 6) {
+                ctx.fillRect(cx + i, cy, 2, trackWidth);
+                ctx.fillRect(cx + i, cy + s - trackWidth, 2, trackWidth);
+            }
+            ctx.fillStyle = mainColor;
+            ctx.fillRect(cx + 2, cy + trackWidth, s - 4, s - (trackWidth * 2));
+        }
+
+        // Круглая центральная башня
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.arc(cx + s/2, cy + s/2, s/4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#ffffff';
+        ctx.stroke();
+
+        // Орудийный ствол
+        ctx.fillStyle = '#ffffff';
+        const gunLength = s / 2;
+        const gunWidth = s / 6;
+
+        if (playerTank.direction === 'up') {
+            ctx.fillRect(cx + s/2 - gunWidth/2, cy - gunLength, gunWidth, gunLength);
+        } else if (playerTank.direction === 'down') {
+            ctx.fillRect(cx + s/2 - gunWidth/2, cy + s, gunWidth, gunLength);
+        } else if (playerTank.direction === 'left') {
+            ctx.fillRect(cx - gunLength, cy + s/2 - gunWidth/2, gunLength, gunWidth);
+        } else if (playerTank.direction === 'right') {
+            ctx.fillRect(cx + s, cy + s/2 - gunWidth/2, gunLength, gunWidth);
+        }
+
+        drawPlayerBullets();
+    }
+
+    // Бесконечный цикл обновления кадров (60 FPS)
     function gameLoop() {
         if (gameState.currentScreen === 'game-screen') {
             updatePhysics();
-            updateBullets(); // <--- Подключили расчет полета снарядов
+            updateBullets();
             drawGame();
             gameLoopId = requestAnimationFrame(gameLoop);
         }
     }
+
+    // Интеграция мыши/тачпадов для ПК интерфейса меню
+    Object.keys(menus).forEach(menuId => {
+        const menu = menus[menuId];
+        menu.items.forEach((item, index) => {
+            item.addEventListener('mouseenter', () => {
+                menu.currentIndex = index;
+                updateMenuVisuals(menuId);
+            });
+            item.addEventListener('click', () => {
+                handleMenuAction();
+            });
+        });
+    });
+
+    // Стартовая авто-настройка визуальной подсветки главного меню
+    window.onload = function() {
+        updateMenuVisuals('main-menu');
+    };
 </script>
 </body>
 </html>
