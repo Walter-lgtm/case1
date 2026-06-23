@@ -296,6 +296,31 @@
     </div>
 
     <script>
+        // === СИСТЕМА ФОНОВОГО АУДИО (ТВОЙ ФАЙЛ) ===
+    // Подключаем твой файл из папки проекта
+    const gameMusic = new Audio("battle-theme.mp3"); 
+    
+    // Включаем бесконечный повтор по кругу
+    gameMusic.loop = true;
+    // Громкость на 20%, чтобы не било по ушам
+    gameMusic.volume = 0.2; 
+
+    // Главная функция контроля аудио
+    function manageMusic() {
+        const currentScreen = document.querySelector('.screen.active').id;
+
+        if (currentScreen === 'game-screen' && !gameState.isPaused) {
+            // Если в игре и нет паузы — запускаем трек
+            gameMusic.play().catch(err => {
+                // Браузеры блокируют автозвук без действия пользователя, это нормально
+                console.log("Музыка наготове. Ждем нажатия клавиши.");
+            });
+        } else {
+            // Если вышли в меню или нажали паузу — останавливаем
+            gameMusic.pause();
+        }
+    }
+        
         // === СОСТОЯНИЕ ИГРЫ И НАСТРОЙКИ ===
     const gameState = {
         currentScreen: 'main-menu',
@@ -469,16 +494,20 @@
     }
 
     // === ИНТЕРФЕЙС И НАВИГАЦИЯ ===
-    function changeScreen(screenId) {
+   function changeScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         const targetScreen = document.getElementById(screenId);
         if (targetScreen) {
             targetScreen.classList.add('active');
-            gameState.currentScreen = screenId; // Строгая синхронизация!
+            gameState.currentScreen = screenId;
             
             if (screenId === 'main-menu') {
                 gameState.isPaused = false;
                 document.getElementById('pause-overlay').style.display = 'none';
+                
+                // ВЫКЛЮЧАЕМ МУЗЫКУ при возврате в меню
+                manageMusic(); 
+                
                 if (gameLoopId) {
                     cancelAnimationFrame(gameLoopId);
                     gameLoopId = null;
@@ -493,7 +522,11 @@
                 gameState.isPaused = false;
                 document.getElementById('pause-overlay').style.display = 'none';
                 
-                window.focus(); // Принудительный фокус на окно для клавиатуры
+                window.focus();
+                
+                // ВКЛЮЧАЕМ МУЗЫКУ при старте боя
+                manageMusic(); 
+                
                 setTimeout(initGame, 10);
             }
         }
@@ -536,11 +569,12 @@
             changeScreen('main-menu');
         }
     }
-        // === УПРАВЛЕНИЕ КЛАВИАТУРОЙ ===
+      // === УПРАВЛЕНИЕ КЛАВИАТУРОЙ (ПОЛНЫЙ ГОТОВЫЙ БЛОК) ===
     window.addEventListener('keydown', function(event) {
         // Железобетонное определение текущего активного экрана по HTML
         const currentMenuId = document.querySelector('.screen.active').id;
 
+        // 1. НАВИГАЦИЯ В МЕНЮ (Стрелочки ↑ и ↓)
         if (menus[currentMenuId]) {
             const menu = menus[currentMenuId];
             if (event.key === 'ArrowDown') {
@@ -559,6 +593,7 @@
             }
         }
 
+        // 2. ДВИЖЕНИЕ ТАНКА В ИГРЕ (Зажатие стрелочек)
         if (currentMenuId === 'game-screen' && !gameState.isPaused) {
             if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
                 event.preventDefault();
@@ -566,11 +601,16 @@
             }
         }
 
+        // 3. Клавиша ENTER (Выбор в меню или Пауза в игре)
         if (event.key === 'Enter') {
             event.preventDefault();
             if (currentMenuId === 'game-screen') {
                 gameState.isPaused = !gameState.isPaused;
                 document.getElementById('pause-overlay').style.display = gameState.isPaused ? 'flex' : 'none';
+                
+                // Ставим музыку на паузу или снимаем с нее
+                manageMusic(); 
+
                 if (gameState.isPaused) {
                     Object.keys(keysPressed).forEach(k => keysPressed[k] = false);
                 }
@@ -579,14 +619,22 @@
             }
         }
 
+        // 4. СТРЕЛЬБА В ИГРЕ (Левый Ctrl)
         if (event.code === 'ControlLeft') {
             event.preventDefault();
             if (currentMenuId === 'game-screen' && !gameState.isPaused) {
                 shootPlayerBullet();
             }
         }
+
+        // 5. СТРАХОВКА АВТОЗАПУСКА ТРЕКА
+        // Если игрок в бою, игра не на паузе, а музыка молчит — принудительно даем старт
+        if (currentMenuId === 'game-screen' && !gameState.isPaused && gameMusic.paused) {
+            gameMusic.play().catch(err => console.log("Браузер заблокировал звук, ждем повторного клика/нажатия."));
+        }
     });
 
+    // Остановка танка, когда игрок отпускает стрелочки
     window.addEventListener('keyup', function(event) {
         if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
             keysPressed[event.key] = false;
