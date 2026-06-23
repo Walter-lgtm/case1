@@ -541,7 +541,7 @@
 
     // === УПРАВЛЕНИЕ КЛАВИАТУРОЙ ===
     window.addEventListener('keydown', function(event) {
-        const currentMenuId = gameState.currentScreen;
+        const currentMenuId = document.querySelector('.screen.active').id;
 
         if (menus[currentMenuId]) {
             const menu = menus[currentMenuId];
