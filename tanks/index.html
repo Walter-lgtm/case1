@@ -599,8 +599,13 @@
         if (!canvas) return;
         ctx = canvas.getContext('2d');
 
-        generateLevel();
-        activeBonuses.length = 0;
+        generateLevel(); // Авто-генерация кирпичей
+        activeBonuses.length = 0; // Очистка бонусов
+
+        // === НОВОЕ: Сброс массивов противников перед стартом ===
+        enemyTanks.length = 0;
+        enemyBullets.length = 0;
+        lastEnemySpawnTime = 0; // Чтобы первый враг появился мгновенно
 
         const specs = tankSpecs[gameState.selectedTank];
         playerTank.color = specs.color;
@@ -669,8 +674,316 @@
         gameState.score += 1;
         document.getElementById('hud-score').innerText = gameState.score;
     }
+        // === СИСТЕМА ВРАЖЕСКИХ ТАНКОВ (ИИ противников) ===
+    const enemyTanks = []; // Массив, где хранятся активные враги на карте
+    const enemyBullets = []; // Массив для снарядов, выпущенных врагами
+    
+    let lastEnemySpawnTime = 0; // Таймер для контроля появления врагов
+    const SPAWN_COOLDOWN = 4000; // Враг появляется каждые 4 секунды (4000 мс)
+    const MAX_ENEMIES_ON_MAP = 4; // Максимум 4 врага на экране одновременно
 
-    function updateBullets() {
+    // Координаты точек появления врагов (вверху карты: слева, по центру, справа)
+    const enemySpawnPoints = [
+        { x: 40, y: 40 },
+        { x: 380, y: 40 },
+        { x: 720, y: 40 }
+    ];
+
+    // Базовая функция создания нового вражеского танка
+    function spawnEnemy() {
+        if (enemyTanks.length >= MAX_ENEMIES_ON_MAP) return;
+
+        // Выбираем случайную точку спавна из трех доступных вверху
+        const point = enemySpawnPoints[Math.floor(Math.random() * enemySpawnPoints.length)];
+        
+        // Создаем объект серого вражеского танка
+        enemyTanks.push({
+            x: point.x,
+            y: point.y,
+            size: 36,
+            color: '#94a3b8', // Серый цвет врагов
+            direction: 'down', // Базово едут вниз, на игрока
+            speed: 1.5, // Едут чуть медленнее игрока для баланса
+            lastShotTime: 0,
+            shotCooldown: 2000 + Math.random() * 2000, // Стреляют раз в 2-4 секунды
+            lastDirChangeTime: 0,
+            dirChangeCooldown: 1000 + Math.random() * 1500 // Меняют направление раз в 1-2.5 секунды
+        });
+    }
+        // === ЛОГИКА ИСКУССТВЕННОГО ИНТЕЛЛЕКТА ВРАГОВ ===
+    function updateEnemies() {
+        if (gameState.isPaused) return;
+
+        const currentTime = Date.now();
+
+        // 1. Автоматический спавн новых врагов по таймеру
+        if (currentTime - lastEnemySpawnTime > SPAWN_COOLDOWN) {
+            spawnEnemy();
+            lastEnemySpawnTime = currentTime;
+        }
+
+        // 2. Цикл обработки каждого вражеского танка
+        enemyTanks.forEach(enemy => {
+            let nextX = enemy.x;
+            let nextY = enemy.y;
+
+            // Вычисляем следующий шаг в зависимости от текущего направления
+            if (enemy.direction === 'up') nextY -= enemy.speed;
+            else if (enemy.direction === 'down') nextY += enemy.speed;
+            else if (enemy.direction === 'left') nextX -= enemy.speed;
+            else if (enemy.direction === 'right') nextX += enemy.speed;
+
+            // Проверяем: уперся ли враг в стену или границы экрана
+            const isHitWall = checkWallCollision(nextX, nextY, enemy.size);
+            
+            // Время для случайного смены направления (на перекрестках)
+            const isTimeChangeDir = currentTime - enemy.lastDirChangeTime > enemy.dirChangeCooldown;
+
+            if (isHitWall || isTimeChangeDir) {
+                // Массив всех 4 направлений
+                const directions = ['up', 'down', 'left', 'right'];
+                const validDirections = [];
+
+                // Ищем направления, где путь свободен
+                directions.forEach(dir => {
+                    let testX = enemy.x;
+                    let testY = enemy.y;
+                    if (dir === 'up') testY -= enemy.speed * 4;
+                    else if (dir === 'down') testY += enemy.speed * 4;
+                    else if (dir === 'left') testX -= enemy.speed * 4;
+                    else if (dir === 'right') testX += enemy.speed * 4;
+
+                    if (!checkWallCollision(testX, testY, enemy.size)) {
+                        validDirections.push(dir);
+                    }
+                });
+
+                // Выбираем новое случайное направление из свободных путей
+                if (validDirections.length > 0) {
+                    enemy.direction = validDirections[Math.floor(Math.random() * validDirections.length)];
+                } else {
+                    // Если кругом тупик — просто разворачиваемся назад
+                    const opposites = { 'up': 'down', 'down': 'up', 'left': 'right', 'right': 'left' };
+                    enemy.direction = opposites[enemy.direction];
+                }
+
+                enemy.lastDirChangeTime = currentTime;
+            } else {
+                // Если путь свободен — едем вперед
+                enemy.x = nextX;
+                enemy.y = nextY;
+            }
+
+            // 3. БОЕВОЙ ИИ: Автоматическая стрельба врага по кулдауну
+            if (currentTime - enemy.lastShotTime > enemy.shotCooldown) {
+                shootEnemyBullet(enemy);
+                enemy.lastShotTime = currentTime;
+                enemy.shotCooldown = 2000 + Math.random() * 2000; // Сбрасываем таймер на случайные 2-4 сек
+            }
+        });
+    }
+
+    // Функция инициализации выстрела врага
+    function shootEnemyBullet(enemy) {
+        const s = enemy.size;
+        let bx = 0, by = 0;
+        const bSize = 5; // Фиксированный размер снаряда врага
+
+        if (enemy.direction === 'up') { bx = enemy.x + s/2 - bSize/2; by = enemy.y - bSize; }
+        else if (enemy.direction === 'down') { bx = enemy.x + s/2 - bSize/2; by = enemy.y + s; }
+        else if (enemy.direction === 'left') { bx = enemy.x - bSize; by = enemy.y + s/2 - bSize/2; }
+        else if (enemy.direction === 'right') { bx = enemy.x + s; by = enemy.y + s/2 - bSize/2; }
+
+        enemyBullets.push({
+            x: bx,
+            y: by,
+            dir: enemy.direction,
+            speed: 5, // Скорость снаряда врага чуть медленнее, чтобы игрок мог увернуться
+            size: bSize
+        });
+    }
+        // === ФИЗИКА СНАРЯДОВ ПРОТИВНИКОВ ===
+    function updateEnemyBullets() {
+        if (gameState.isPaused) return;
+
+        for (let i = enemyBullets.length - 1; i >= 0; i--) {
+            const b = enemyBullets[i];
+
+            // Двигаем вражеский снаряд по вектору его направления
+            if (b.dir === 'up') b.y -= b.speed;
+            else if (b.dir === 'down') b.y += b.speed;
+            else if (b.dir === 'left') b.x -= b.speed;
+            else if (b.dir === 'right') b.x += b.speed;
+
+            // 1. Проверяем столкновение снаряда врага с кирпичами на карте
+            const cellC = Math.floor((b.x + b.size / 2) / BLOCK_SIZE);
+            const cellR = Math.floor((b.y + b.size / 2) / BLOCK_SIZE);
+
+            if (cellR >= 0 && cellR < 15 && cellC >= 0 && cellC < 20) {
+                if (mapGrid[cellR][cellC] === 1) {
+                    mapGrid[cellR][cellC] = 0; // Враг разрушает кирпич!
+                    
+                    // Из разрушенных врагами кирпичей бонусы тоже могут выпасть (для фана)
+                    trySpawnBonus(cellC * BLOCK_SIZE, cellR * BLOCK_SIZE);
+                    
+                    enemyBullets.splice(i, 1); // Стираем снаряд врага
+                    continue;
+                }
+            }
+
+            // 2. Уничтожение вражеского снаряда при выходе за границы Canvas
+            if (b.x < 0 || b.y < 0 || b.x > canvas.width || b.y > canvas.height) {
+                enemyBullets.splice(i, 1);
+            }
+        }
+    }
+// === СИСТЕМА СТОЛКНОВЕНИЯ СНАРЯДОВ С ТАНКАМИ (УРОН) ===
+    function checkCombatCollisions() {
+        if (gameState.isPaused) return;
+
+        // 1. Проверяем попадание НАШИХ снарядов во ВРАЖЕСКИЕ танки
+        for (let bIdx = playerBullets.length - 1; bIdx >= 0; bIdx--) {
+            const pb = playerBullets[bIdx];
+            
+            for (let eIdx = enemyTanks.length - 1; eIdx >= 0; eIdx--) {
+                const enemy = enemyTanks[eIdx];
+
+                // Простая коллизия точки снаряда и квадрата врага
+                if (pb.x > enemy.x && pb.x < enemy.x + enemy.size &&
+                    pb.y > enemy.y && pb.y < enemy.y + enemy.size) {
+                    
+                    // Уничтожаем врага и снаряд
+                    enemyTanks.splice(eIdx, 1);
+                    playerBullets.splice(bIdx, 1);
+
+                    // Начисляем 100 очков за уничтожение техники!
+                    gameState.score += 100;
+                    document.getElementById('hud-score').innerText = gameState.score;
+                    break; // Прерываем внутренний цикл, так как снаряд исчез
+                }
+            }
+        }
+
+        // 2. Проверяем попадание ВРАЖЕСКИХ снарядов в НАШ танк
+        const pSpecs = tankSpecs[gameState.selectedTank]; // Характеристики нашего класса
+        const currentTime = Date.now();
+
+        // Если активен бафф МАСКИРОВКИ (инвиз), вражеские снаряды пролетают сквозь нас!
+        const isInvisible = currentTime < playerBuffs.invisibleEndTime;
+
+        if (!isInvisible) {
+            for (let bIdx = enemyBullets.length - 1; bIdx >= 0; bIdx--) {
+                const eb = enemyBullets[bIdx];
+
+                if (eb.x > playerTank.x && eb.x < playerTank.x + playerTank.size &&
+                    eb.y > playerTank.y && eb.y < playerTank.y + playerTank.size) {
+                    
+                    // Удаляем вражеский снаряд
+                    enemyBullets.splice(bIdx, 1);
+
+                    // Рассчитываем урон: вычитаем фиксированный процент из полоски HP
+                    // Тяжелый танк получает меньше урона визуально, так как у него больше базового HP
+                    let damagePercent = 25; // Базовый урон штурмового танка (4 попадания)
+                    if (gameState.selectedTank === 'heavy') damagePercent = 15; // Тяжелый (7 попаданий)
+                    if (gameState.selectedTank === 'ranger') damagePercent = 40; // Рейнджер хрупкий (3 попадания)
+
+                    // Достаем текущую ширину заполнения полоски HP
+                    const hpBar = document.getElementById('hp-bar-fill');
+                    let currentWidth = parseFloat(hpBar.style.width) || 100;
+                    currentWidth -= damagePercent;
+
+                    if (currentWidth <= 0) {
+                        hpBar.style.width = '0%';
+                        log("GAME OVER! Ваш танк уничтожен.", true);
+                        alert("GAME OVER! Ваш боевой танк уничтожен. Возврат в меню.");
+                        changeScreen('main-menu');
+                    } else {
+                        hpBar.style.width = currentWidth + '%';
+                        console.log(`💥 Попадание в наш танк! Оставшееся HP: ${currentWidth}%`);
+                    }
+                }
+            }
+        }
+    }
+        // Функция отрисовки летящих снарядов противников
+    function drawEnemyBullets() {
+        ctx.fillStyle = '#f97316'; // Оранжевый неоновый цвет для вражеских снарядов
+        enemyBullets.forEach(b => {
+            ctx.beginPath();
+            ctx.arc(b.x + b.size/2, b.y + b.size/2, b.size, 0, Math.PI * 2);
+            ctx.fill();
+            // Эффект оранжевого свечения вокруг снаряда врага
+            ctx.shadowColor = '#f97316';
+            ctx.shadowBlur = 6;
+        });
+        ctx.shadowBlur = 0; // Сброс свечения
+    }
+
+    // Функция детальной отрисовки серых вражеских танков с гусеницами
+    function drawEnemies() {
+        enemyTanks.forEach(enemy => {
+            const s = enemy.size;
+            const cx = enemy.x;
+            const cy = enemy.y;
+            const mainColor = enemy.color; // Серый цвет
+            const trackColor = '#1e293b'; // Темные гусеницы
+
+            ctx.fillStyle = trackColor;
+            const trackWidth = s / 5;
+
+            // Рисуем гусеницы врага в зависимости от его направления
+            if (enemy.direction === 'up' || enemy.direction === 'down') {
+                ctx.fillRect(cx, cy, trackWidth, s);
+                ctx.fillRect(cx + s - trackWidth, cy, trackWidth, s);
+                ctx.fillStyle = '#0f172a';
+                for (let i = 2; i < s; i += 6) {
+                    ctx.fillRect(cx, cy + i, trackWidth, 2);
+                    ctx.fillRect(cx + s - trackWidth, cy + i, trackWidth, 2);
+                }
+                ctx.fillStyle = mainColor;
+                ctx.fillRect(cx + trackWidth, cy + 2, s - (trackWidth * 2), s - 4);
+            } else {
+                ctx.fillRect(cx, cy, s, trackWidth);
+                ctx.fillRect(cx, cy + s - trackWidth, s, trackWidth);
+                ctx.fillStyle = '#0f172a';
+                for (let i = 2; i < s; i += 6) {
+                    ctx.fillRect(cx + i, cy, 2, trackWidth);
+                    ctx.fillRect(cx + i, cy + s - trackWidth, 2, trackWidth);
+                }
+                ctx.fillStyle = mainColor;
+                ctx.fillRect(cx + 2, cy + trackWidth, s - 4, s - (trackWidth * 2));
+            }
+
+            // Круглая башня по центру серого танка
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.arc(cx + s/2, cy + s/2, s/4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = '#94a3b8';
+            ctx.stroke();
+
+            // Дуло орудия врага (красное на конце для агрессивного вида)
+            ctx.fillStyle = '#94a3b8';
+            const gunLength = s / 2;
+            const gunWidth = s / 6;
+
+            if (enemy.direction === 'up') {
+                ctx.fillRect(cx + s/2 - gunWidth/2, cy - gunLength, gunWidth, gunLength);
+                ctx.fillStyle = '#ef4444'; ctx.fillRect(cx + s/2 - gunWidth/2, cy - gunLength, gunWidth, 3);
+            } else if (enemy.direction === 'down') {
+                ctx.fillRect(cx + s/2 - gunWidth/2, cy + s, gunWidth, gunLength);
+                ctx.fillStyle = '#ef4444'; ctx.fillRect(cx + s/2 - gunWidth/2, cy + s + gunLength - 3, gunWidth, 3);
+            } else if (enemy.direction === 'left') {
+                ctx.fillRect(cx - gunLength, cy + s/2 - gunWidth/2, gunLength, gunWidth);
+                ctx.fillStyle = '#ef4444'; ctx.fillRect(cx - gunLength, cy + s/2 - gunWidth/2, 3, gunWidth);
+            } else if (enemy.direction === 'right') {
+                ctx.fillRect(cx + s, cy + s/2 - gunWidth/2, gunLength, gunWidth);
+                ctx.fillStyle = '#ef4444'; ctx.fillRect(cx + s + gunLength - 3, cy + s/2 - gunWidth/2, 3, gunWidth);
+            }
+        });
+    }
+        function updateBullets() {
         if (gameState.isPaused) return;
         for (let i = playerBullets.length - 1; i >= 0; i--) {
             const b = playerBullets[i];
@@ -712,8 +1025,13 @@
 
     function drawGame() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawMap();
-        drawBonuses();
+        
+        drawMap();      // Рисуем кирпичи
+        drawBonuses();  // Рисуем бонусы на земле
+
+        // === НОВОЕ: Отрисовка вражеских сил ===
+        drawEnemyBullets(); // Оранжевые снаряды врагов
+        drawEnemies();      // Серые танки с гусеницами
 
         const currentTime = Date.now();
         if (currentTime < playerBuffs.invisibleEndTime) ctx.globalAlpha = 0.4;
@@ -745,18 +1063,24 @@
         else if (playerTank.direction === 'right') ctx.fillRect(cx + s, cy + s/2 - gunWidth/2, gunLength, gunWidth);
 
         ctx.globalAlpha = 1.0;
-        drawPlayerBullets();
+        drawPlayerBullets(); // Наши неоновые плазменные снаряды
     }
-
     function gameLoop() {
         if (gameState.currentScreen === 'game-screen') {
-            updatePhysics();
-            updateBullets();
-            drawGame();
+            updatePhysics();       // Физика игрока и подбор бонусов
+            
+            // === НОВОЕ: Движок ИИ и физики противников ===
+            updateEnemies();       // Движение и стрельба ИИ
+            updateEnemyBullets();   // Полет снарядов врагов по кирпичам
+            checkCombatCollisions(); // Проверка урона и уничтожения танков
+
+            updateBullets();       // Полет наших снарядов по кирпичам
+            drawGame();            // Рендеринг всей графики на Canvas
+            
             gameLoopId = requestAnimationFrame(gameLoop);
         }
     }
-
+        
     Object.keys(menus).forEach(menuId => {
         const menu = menus[menuId];
         menu.items.forEach((item, index) => {
