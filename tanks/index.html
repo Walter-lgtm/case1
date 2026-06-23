@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Mega Tanks 2026</title>
     <style>
-        {
+        * {
             box-sizing: border-box;
             user-select: none;
         }
@@ -53,11 +53,10 @@
         .screen-title {
             font-size: 36px;
             color: #ff007c;
-            text-shadow: 0 0 15px rgba(ff, 0, 124, 0.5);
+            text-shadow: 0 0 15px rgba(255, 0, 124, 0.5);
             margin-bottom: 40px;
             text-transform: uppercase;
         }
-
         .menu-options {
             display: flex;
             flex-direction: column;
@@ -130,6 +129,35 @@
             color: #ff007c;
         }
 
+        /* Кнопка Назад */
+        .back-btn {
+            margin-top: 30px;
+            padding: 12px 30px;
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: 1px;
+        }
+
+        .back-btn:hover {
+            border-color: #ff007c;
+            color: #ff007c;
+            box-shadow: 0 0 15px rgba(255, 0, 124, 0.2);
+            background-color: rgba(255, 0, 124, 0.02);
+        }
+
+        /* Подсказки по кнопкам */
+        .controls-hint {
+            margin-top: 40px;
+            font-size: 14px;
+            color: #64748b;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
         /* Игровой HUD интерфейс */
         #game-hud {
             display: flex;
@@ -196,35 +224,6 @@
             text-shadow: 0 0 15px rgba(234, 179, 8, 0.5);
             margin: 0 0 10px 0;
         }
-
-        /* Подсказки по кнопкам */
-        .controls-hint {
-            margin-top: 40px;
-            font-size: 14px;
-            color: #64748b;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        /* Стили кнопки Назад */
-        .back-btn {
-            margin-top: 30px;
-            padding: 12px 30px;
-            background-color: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            letter-spacing: 1px;
-        }
-
-        .back-btn:hover {
-            border-color: #ff007c;
-            color: #ff007c;
-            box-shadow: 0 0 15px rgba(255, 0, 124, 0.2);
-            background-color: rgba(255, 0, 124, 0.02);
-        }
     </style>
 </head>
 <body>
@@ -241,7 +240,7 @@
         <div class="controls-hint">Навигация: ↑ ↓ | Выбор: ENTER</div>
     </div>
 
-    <!-- 2. ЭКРАН ВЫБОРА ТАНКА (ОБНОВЛЕННЫЙ) -->
+    <!-- 2. ЭКРАН ВЫБОРА ТАНКА -->
     <div id="tank-menu" class="screen">
         <h2 class="screen-title">ВЫБЕРИТЕ СВОЙ БОЕВОЙ ТАНК</h2>
         <div class="tank-grid">
@@ -258,12 +257,11 @@
                 <p>Высокая скорость стрельбы, маневренный, мало HP.</p>
             </div>
         </div>
-        <!-- Кнопка возврата -->
         <div class="back-btn" onclick="changeScreen('main-menu')">← НАЗАД В МЕНЮ</div>
         <div class="controls-hint">Назад: ESC / Клик | Выбор: ENTER</div>
     </div>
 
-    <!-- 3. ЭКРАН УРОВНЯ СЛОЖНОСТИ (ОБНОВЛЕННЫЙ) -->
+    <!-- 3. ЭКРАН УРОВНЯ СЛОЖНОСТИ -->
     <div id="difficulty-menu" class="screen">
         <h2 class="screen-title">УРОВЕНЬ СЛОЖНОСТИ</h2>
         <div class="menu-options">
@@ -271,12 +269,11 @@
             <div class="menu-item" data-diff="medium">ВЕТЕРАН (Средне)</div>
             <div class="menu-item" data-diff="hard">КИБЕРСПОРТСМЕН (Жесть)</div>
         </div>
-        <!-- Кнопка возврата -->
         <div class="back-btn" onclick="changeScreen('main-menu')">← НАЗАД В МЕНЮ</div>
         <div class="controls-hint">Назад: ESC / Клик | Выбор: ENTER</div>
     </div>
 
-    <!-- 4. ИГРОВОЙ ЭКРАН (ОБНОВЛЕННЫЙ С КНОПКОЙ В ОВЕРЛЕЕ) -->
+    <!-- 4. ИГРОВОЙ ЭКРАН -->
     <div id="game-screen" class="screen">
         <div id="game-hud">
             <div>ТАНК: <span id="hud-tank-name">ТЯЖЕЛЫЙ</span></div>
@@ -290,15 +287,16 @@
         
         <canvas id="game-canvas" width="800" height="600"></canvas>
 
-        <!-- Обновленное окно паузы с кнопкой выхода -->
+        <!-- Окно паузы -->
         <div id="pause-overlay">
             <h2>ПАУЗА</h2>
             <p style="margin-bottom: 25px;">Для продолжения нажмите ENTER</p>
             <div class="menu-item" style="min-width: 250px; font-size: 16px;" onclick="changeScreen('main-menu')">В ГЛАВНОЕ МЕНЮ</div>
         </div>
     </div>
+
     <script>
-   // === СОСТОЯНИЕ ИГРЫ И НАСТРОЙКИ ===
+        // === СОСТОЯНИЕ ИГРЫ И НАСТРОЙКИ ===
     const gameState = {
         currentScreen: 'main-menu',
         selectedTank: 'heavy',
@@ -408,8 +406,7 @@
         }
         return false;
     }
-
-    // === СИСТЕМА ДИНАМИЧЕСКИХ БОНУСОВ ===
+        // === СИСТЕМА ДИНАМИЧЕСКИХ БОНУСОВ ===
     const activeBonuses = []; 
     const bonusSpecs = {
         medkit: { color: '#ef4444', icon: '❤️' },
@@ -477,7 +474,7 @@
         const targetScreen = document.getElementById(screenId);
         if (targetScreen) {
             targetScreen.classList.add('active');
-            gameState.currentScreen = screenId;
+            gameState.currentScreen = screenId; // Строгая синхронизация!
             
             if (screenId === 'main-menu') {
                 gameState.isPaused = false;
@@ -495,7 +492,8 @@
                 document.getElementById('hp-bar-fill').style.width = '100%';
                 gameState.isPaused = false;
                 document.getElementById('pause-overlay').style.display = 'none';
-                window.focus();
+                
+                window.focus(); // Принудительный фокус на окно для клавиатуры
                 setTimeout(initGame, 10);
             }
         }
@@ -534,13 +532,13 @@
         } 
         else if (currentMenuId === 'difficulty-menu') {
             gameState.difficulty = selectedItem.getAttribute('data-diff');
-            gameState.difficultyNameRu = selectedItem.innerText.split(' (')[0];
+            gameState.difficultyNameRu = selectedItem.innerText;
             changeScreen('main-menu');
         }
     }
-
-    // === УПРАВЛЕНИЕ КЛАВИАТУРОЙ ===
+        // === УПРАВЛЕНИЕ КЛАВИАТУРОЙ ===
     window.addEventListener('keydown', function(event) {
+        // Железобетонное определение текущего активного экрана по HTML
         const currentMenuId = document.querySelector('.screen.active').id;
 
         if (menus[currentMenuId]) {
@@ -573,112 +571,208 @@
             if (currentMenuId === 'game-screen') {
                 gameState.isPaused = !gameState.isPaused;
                 document.getElementById('pause-overlay').style.display = gameState.isPaused ? 'flex' : 'none';
-                if (gameState.isPaused) {Object.keys(keysPressed).forEach(k => keysPressed[k] = false);}
-                } else {handleMenuAction();}}
-        if (event.code === 'ControlLeft') {event.preventDefault();
-        if (currentMenuId === 'game-screen' && !gameState.isPaused) {shootPlayerBullet();}}});window.addEventListener('keyup', function(event) {if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {keysPressed[event.key] = false;}});
-        // === ДВИЖОК И ЦИКЛ ИГРЫ ===
-        function initGame() {canvas = document.getElementById('game-canvas');
-        if (!canvas) return;ctx = canvas.getContext('2d');generateLevel();activeBonuses.length = 0;
+                if (gameState.isPaused) {
+                    Object.keys(keysPressed).forEach(k => keysPressed[k] = false);
+                }
+            } else {
+                handleMenuAction();
+            }
+        }
+
+        if (event.code === 'ControlLeft') {
+            event.preventDefault();
+            if (currentMenuId === 'game-screen' && !gameState.isPaused) {
+                shootPlayerBullet();
+            }
+        }
+    });
+
+    window.addEventListener('keyup', function(event) {
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+            keysPressed[event.key] = false;
+        }
+    });
+
+    // === ДВИЖОК И ЦИКЛ ИГРЫ ===
+    function initGame() {
+        canvas = document.getElementById('game-canvas');
+        if (!canvas) return;
+        ctx = canvas.getContext('2d');
+
+        generateLevel();
+        activeBonuses.length = 0;
+
         const specs = tankSpecs[gameState.selectedTank];
         playerTank.color = specs.color;
         playerTank.speed = specs.speed;
         playerTank.size = specs.size;
+        
         playerTank.x = canvas.width / 2 - playerTank.size / 2;
         playerTank.y = canvas.height - playerTank.size - 20;
         playerTank.direction = 'up';
+
         playerBullets.length = 0;
         Object.keys(keysPressed).forEach(k => keysPressed[k] = false);
-        if (gameLoopId) cancelAnimationFrame(gameLoopId);gameLoopId = requestAnimationFrame(gameLoop);}
-        function updatePhysics() {if (gameState.isPaused) return;
+
+        if (gameLoopId) cancelAnimationFrame(gameLoopId);
+        gameLoopId = requestAnimationFrame(gameLoop);
+    }
+
+    function updatePhysics() {
+        if (gameState.isPaused) return;
+
         const currentTime = Date.now();
         const baseSpecs = tankSpecs[gameState.selectedTank];
+        
         let currentSpeed = baseSpecs.speed;
-        if (currentTime < playerBuffs.speedEndTime) {currentSpeed = baseSpecs.speed * 1.7;}
+        if (currentTime < playerBuffs.speedEndTime) {
+            currentSpeed = baseSpecs.speed * 1.7; 
+        }
         playerTank.speed = currentSpeed;
+
         let nextX = playerTank.x;
         let nextY = playerTank.y;
-        if (keysPressed['ArrowUp']) {nextY -= playerTank.speed;playerTank.direction = 'up';
-        if (!checkWallCollision(playerTank.x, nextY, playerTank.size)) playerTank.y = nextY;} 
-        else if (keysPressed['ArrowDown']) {nextY += playerTank.speed;
-        playerTank.direction = 'down';
-        if (!checkWallCollision(playerTank.x, nextY, playerTank.size)) playerTank.y = nextY;} 
-        else if (keysPressed['ArrowLeft']) {nextX -= playerTank.speed;
-        playerTank.direction = 'left';
-        if (!checkWallCollision(nextX, playerTank.y, playerTank.size)) playerTank.x = nextX;} 
-        else if (keysPressed['ArrowRight']) {nextX += playerTank.speed;
-        playerTank.direction = 'right';
-        if (!checkWallCollision(nextX, playerTank.y, playerTank.size)) playerTank.x = nextX;}checkBonusCollection();}
-        function shootPlayerBullet() {if (playerBullets.length >= 1) return;
+
+        if (keysPressed['ArrowUp']) {
+            nextY -= playerTank.speed;
+            playerTank.direction = 'up';
+            if (!checkWallCollision(playerTank.x, nextY, playerTank.size)) playerTank.y = nextY;
+        } else if (keysPressed['ArrowDown']) {
+            nextY += playerTank.speed;
+            playerTank.direction = 'down';
+            if (!checkWallCollision(playerTank.x, nextY, playerTank.size)) playerTank.y = nextY;
+        } else if (keysPressed['ArrowLeft']) {
+            nextX -= playerTank.speed;
+            playerTank.direction = 'left';
+            if (!checkWallCollision(nextX, playerTank.y, playerTank.size)) playerTank.x = nextX;
+        } else if (keysPressed['ArrowRight']) {
+            nextX += playerTank.speed;
+            playerTank.direction = 'right';
+            if (!checkWallCollision(nextX, playerTank.y, playerTank.size)) playerTank.x = nextX;
+        }
+
+        checkBonusCollection();
+    }
+
+    function shootPlayerBullet() {
+        if (playerBullets.length >= 1) return;
         const specs = bulletSpecs[gameState.selectedTank];
-        const s = playerTank.size;let bx = 0, by = 0;
+        const s = playerTank.size;
+        let bx = 0, by = 0;
+
         if (playerTank.direction === 'up') { bx = playerTank.x + s/2 - specs.size/2; by = playerTank.y - s/2; }
         else if (playerTank.direction === 'down') { bx = playerTank.x + s/2 - specs.size/2; by = playerTank.y + s + s/2 - specs.size; }
         else if (playerTank.direction === 'left') { bx = playerTank.x - s/2; by = playerTank.y + s/2 - specs.size/2; }
         else if (playerTank.direction === 'right') { bx = playerTank.x + s + s/2 - specs.size; by = playerTank.y + s/2 - specs.size/2; }
+
         playerBullets.push({ x: bx, y: by, dir: playerTank.direction, speed: specs.speed, size: specs.size });
-        gameState.score += 1;document.getElementById('hud-score').innerText = gameState.score;}
-        function updateBullets() {if (gameState.isPaused) return;
-        for (let i = playerBullets.length - 1; i >= 0; i--) {const b = playerBullets[i];
-        if (b.dir === 'up') b.y -= b.speed;
-        else if (b.dir === 'down') b.y += b.speed;
-        else if (b.dir === 'left') b.x -= b.speed;
-        else if (b.dir === 'right') b.x += b.speed;
-        const cellC = Math.floor((b.x + b.size/2) / BLOCK_SIZE);
-        const cellR = Math.floor((b.y + b.size/2) / BLOCK_SIZE);
-        if (cellR >= 0 && cellR < 15 && cellC >= 0 && cellC < 20) {if (mapGrid[cellR][cellC] === 1) {mapGrid[cellR][cellC] = 0;
-        trySpawnBonus(cellC * BLOCK_SIZE, cellR * BLOCK_SIZE);
-        playerBullets.splice(i, 1);gameState.score += 5;document.getElementById('hud-score').innerText = gameState.score;
-        continue;}}
-        if (b.x < 0 || b.y < 0 || b.x > canvas.width || b.y > canvas.height) {playerBullets.splice(i, 1);}}}
-        function drawGame() {ctx.clearRect(0, 0, canvas.width, canvas.height);
+        gameState.score += 1;
+        document.getElementById('hud-score').innerText = gameState.score;
+    }
+
+    function updateBullets() {
+        if (gameState.isPaused) return;
+        for (let i = playerBullets.length - 1; i >= 0; i--) {
+            const b = playerBullets[i];
+            if (b.dir === 'up') b.y -= b.speed;
+            else if (b.dir === 'down') b.y += b.speed;
+            else if (b.dir === 'left') b.x -= b.speed;
+            else if (b.dir === 'right') b.x += b.speed;
+
+            const cellC = Math.floor((b.x + b.size/2) / BLOCK_SIZE);
+            const cellR = Math.floor((b.y + b.size/2) / BLOCK_SIZE);
+
+            if (cellR >= 0 && cellR < 15 && cellC >= 0 && cellC < 20) {
+                if (mapGrid[cellR][cellC] === 1) {
+                    mapGrid[cellR][cellC] = 0;
+                    trySpawnBonus(cellC * BLOCK_SIZE, cellR * BLOCK_SIZE);
+                    playerBullets.splice(i, 1);
+                    gameState.score += 5;
+                    document.getElementById('hud-score').innerText = gameState.score;
+                    continue;
+                }
+            }
+            if (b.x < 0 || b.y < 0 || b.x > canvas.width || b.y > canvas.height) {
+                playerBullets.splice(i, 1);
+            }
+        }
+    }
+
+    function drawPlayerBullets() {
+        ctx.fillStyle = '#f43f5e';
+        playerBullets.forEach(b => {
+            ctx.beginPath();
+            ctx.arc(b.x + b.size/2, b.y + b.size/2, b.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowColor = '#f43f5e';
+            ctx.shadowBlur = 8;
+        });
+        ctx.shadowBlur = 0;
+    }
+
+    function drawGame() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawMap();
         drawBonuses();
+
         const currentTime = Date.now();
         if (currentTime < playerBuffs.invisibleEndTime) ctx.globalAlpha = 0.4;
         else ctx.globalAlpha = 1.0;
-        const s = playerTank.size;
-        const cx = playerTank.x; 
-        const cy = playerTank.y;
-        const mainColor = playerTank.color; 
-        const trackColor = '#334155';ctx.fillStyle = trackColor; 
-        const trackWidth = s / 5;
-        if (playerTank.direction === 'up' || playerTank.direction === 'down') {ctx.fillRect(cx, cy, trackWidth, s); 
-        ctx.fillRect(cx + s - trackWidth, cy, trackWidth, s);
-        ctx.fillStyle = '#1e293b';
-        for (let i = 2; i < s; i += 6) { ctx.fillRect(cx, cy + i, trackWidth, 2); 
-        ctx.fillRect(cx + s - trackWidth, cy + i, trackWidth, 2); }
-        ctx.fillStyle = mainColor; 
-        ctx.fillRect(cx + trackWidth, cy + 2, s - (trackWidth * 2), s - 4);} 
-        else {ctx.fillRect(cx, cy, s, trackWidth); 
-        ctx.fillRect(cx, cy + s - trackWidth, s, trackWidth);
-        ctx.fillStyle = '#1e293b';
-        for (let i = 2; i < s; i += 6) { ctx.fillRect(cx + i, cy, 2, trackWidth); 
-        ctx.fillRect(cx + i, cy + s - trackWidth, 2, trackWidth); }
-        ctx.fillStyle = mainColor; 
-        ctx.fillRect(cx + 2, cy + trackWidth, s - 4, s - (trackWidth * 2));}
-        ctx.fillStyle = '#1e293b'; 
-        ctx.beginPath(); 
-        ctx.arc(cx + s/2, cy + s/2, s/4, 0, Math.PI * 2);
-        ctx.fill();ctx.lineWidth = 2; 
-        ctx.strokeStyle = '#ffffff';
-        ctx.stroke();
-        ctx.fillStyle = '#ffffff'; 
-        const gunLength = s / 2; 
-        const gunWidth = s / 6;
+
+        const s = playerTank.size; const cx = playerTank.x; const cy = playerTank.y;
+        const mainColor = playerTank.color; const trackColor = '#334155';
+        ctx.fillStyle = trackColor; const trackWidth = s / 5;
+
+        if (playerTank.direction === 'up' || playerTank.direction === 'down') {
+            ctx.fillRect(cx, cy, trackWidth, s); ctx.fillRect(cx + s - trackWidth, cy, trackWidth, s);
+            ctx.fillStyle = '#1e293b';
+            for (let i = 2; i < s; i += 6) { ctx.fillRect(cx, cy + i, trackWidth, 2); ctx.fillRect(cx + s - trackWidth, cy + i, trackWidth, 2); }
+            ctx.fillStyle = mainColor; ctx.fillRect(cx + trackWidth, cy + 2, s - (trackWidth * 2), s - 4);
+        } else {
+            ctx.fillRect(cx, cy, s, trackWidth); ctx.fillRect(cx, cy + s - trackWidth, s, trackWidth);
+            ctx.fillStyle = '#1e293b';
+            for (let i = 2; i < s; i += 6) { ctx.fillRect(cx + i, cy, 2, trackWidth); ctx.fillRect(cx + i, cy + s - trackWidth, 2, trackWidth); }
+            ctx.fillStyle = mainColor; ctx.fillRect(cx + 2, cy + trackWidth, s - 4, s - (trackWidth * 2));
+        }
+
+        ctx.fillStyle = '#1e293b'; ctx.beginPath(); ctx.arc(cx + s/2, cy + s/2, s/4, 0, Math.PI * 2); ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = '#ffffff'; ctx.stroke();
+        ctx.fillStyle = '#ffffff'; const gunLength = s / 2; const gunWidth = s / 6;
+
         if (playerTank.direction === 'up') ctx.fillRect(cx + s/2 - gunWidth/2, cy - gunLength, gunWidth, gunLength);
         else if (playerTank.direction === 'down') ctx.fillRect(cx + s/2 - gunWidth/2, cy + s, gunWidth, gunLength);
         else if (playerTank.direction === 'left') ctx.fillRect(cx - gunLength, cy + s/2 - gunWidth/2, gunLength, gunWidth);
         else if (playerTank.direction === 'right') ctx.fillRect(cx + s, cy + s/2 - gunWidth/2, gunLength, gunWidth);
-        ctx.globalAlpha = 1.0;drawPlayerBullets();}
-        function gameLoop() {if (gameState.currentScreen === 'game-screen') {updatePhysics();
-        updateBullets();
-        drawGame();
-        gameLoopId = requestAnimationFrame(gameLoop);}}
-        Object.keys(menus).forEach(menuId => {const menu = menus[menuId];
-        menu.items.forEach((item, index) => {item.addEventListener('mouseenter', () => {menu.currentIndex = index;updateMenuVisuals(menuId);});
-        item.addEventListener('click', () => {handleMenuAction();});});});
-        window.onload = function() {updateMenuVisuals('main-menu');};
+
+        ctx.globalAlpha = 1.0;
+        drawPlayerBullets();
+    }
+
+    function gameLoop() {
+        if (gameState.currentScreen === 'game-screen') {
+            updatePhysics();
+            updateBullets();
+            drawGame();
+            gameLoopId = requestAnimationFrame(gameLoop);
+        }
+    }
+
+    Object.keys(menus).forEach(menuId => {
+        const menu = menus[menuId];
+        menu.items.forEach((item, index) => {
+            item.addEventListener('mouseenter', () => {
+                menu.currentIndex = index;
+                updateMenuVisuals(menuId);
+            });
+            item.addEventListener('click', () => {
+                handleMenuAction();
+            });
+        });
+    });
+
+    window.onload = function() {
+        updateMenuVisuals('main-menu');
+    };
 </script>
 </body>
 </html>
